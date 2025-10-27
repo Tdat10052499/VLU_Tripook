@@ -7,6 +7,10 @@ const Register: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    username: '',
+    phone: '',
+    date_of_birth: '',
+    gender: '',
     password: '',
     confirmPassword: ''
   });
@@ -65,7 +69,18 @@ const Register: React.FC = () => {
     }
 
     try {
-      await register(formData.name, formData.email, formData.password);
+      // Prepare user data for registration
+      const userData = {
+        name: formData.name.trim(),
+        email: formData.email.toLowerCase().trim(),
+        username: formData.username.trim() || undefined,
+        phone: formData.phone.trim() || undefined,
+        date_of_birth: formData.date_of_birth || undefined,
+        gender: formData.gender || undefined,
+        password: formData.password
+      };
+
+      await register(userData);
       navigate('/auth/login', { 
         state: { message: 'Registration successful! Please log in with your new account.' }
       });
@@ -128,6 +143,71 @@ const Register: React.FC = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder="Enter your email"
               />
+            </div>
+
+            <div>
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+                Username (Optional)
+              </label>
+              <input
+                id="username"
+                name="username"
+                type="text"
+                autoComplete="username"
+                value={formData.username}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="Choose a username"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                Phone Number
+              </label>
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                autoComplete="tel"
+                required
+                value={formData.phone}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="Enter your phone number"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="date_of_birth" className="block text-sm font-medium text-gray-700 mb-2">
+                Date of Birth
+              </label>
+              <input
+                id="date_of_birth"
+                name="date_of_birth"
+                type="date"
+                value={formData.date_of_birth}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-2">
+                Gender (Optional)
+              </label>
+              <select
+                id="gender"
+                name="gender"
+                value={formData.gender}
+                onChange={(e) => setFormData({...formData, gender: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              >
+                <option value="">Select gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
             </div>
 
             <div>

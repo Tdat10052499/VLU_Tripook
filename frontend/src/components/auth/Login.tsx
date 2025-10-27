@@ -5,8 +5,9 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const Login: React.FC = () => {
   const [formData, setFormData] = useState({
-    email: '',
-    password: ''
+    login: '',
+    password: '',
+    rememberMe: false
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -28,9 +29,14 @@ const Login: React.FC = () => {
     setError('');
 
     try {
-      await login(formData.email, formData.password);
-      navigate('/'); // Redirect to home page after successful login
+      await login(formData.login, formData.password, formData.rememberMe);
+      
+      // Use setTimeout to ensure state update completes
+      setTimeout(() => {
+        navigate('/', { replace: true });
+      }, 100);
     } catch (err: any) {
+      console.error('Login error:', err);
       setError(err.message || 'Login failed. Please try again.');
     } finally {
       setIsLoading(false);
@@ -58,19 +64,19 @@ const Login: React.FC = () => {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email Address
+              <label htmlFor="login" className="block text-sm font-medium text-gray-700 mb-2">
+                Email or Username
               </label>
               <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
+                id="login"
+                name="login"
+                type="text"
+                autoComplete="username"
                 required
-                value={formData.email}
+                value={formData.login}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="Enter your email"
+                placeholder="Enter your email or username"
               />
             </div>
 
@@ -105,6 +111,19 @@ const Login: React.FC = () => {
             </div>
 
             <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <input
+                  id="rememberMe"
+                  name="rememberMe"
+                  type="checkbox"
+                  checked={formData.rememberMe}
+                  onChange={(e) => setFormData({...formData, rememberMe: e.target.checked})}
+                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                />
+                <label htmlFor="rememberMe" className="ml-2 block text-sm text-gray-700">
+                  Remember me
+                </label>
+              </div>
               <div className="text-sm">
                 <Link
                   to="/auth/forgot-password"

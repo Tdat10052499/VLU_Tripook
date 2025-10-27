@@ -5,12 +5,16 @@ from functools import wraps
 from flask import request, jsonify
 from app.models.user import User
 
-def generate_token(user_id):
+def generate_token(user_id, remember_me=False):
     """Generate JWT token for user"""
+    # Set token expiration based on remember_me
+    expiration_time = timedelta(days=30) if remember_me else timedelta(days=1)
+    
     payload = {
         'user_id': str(user_id),
-        'exp': datetime.utcnow() + timedelta(days=7),  # Token expires in 7 days
-        'iat': datetime.utcnow()
+        'exp': datetime.utcnow() + expiration_time,
+        'iat': datetime.utcnow(),
+        'remember_me': remember_me
     }
     
     return jwt.encode(

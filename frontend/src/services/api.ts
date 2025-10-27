@@ -84,13 +84,17 @@ export const activityService = {
 
 // Authentication API
 export const authAPI = {
-  login: async (email: string, password: string) => {
-    const response = await api.post('/auth/login', { email, password });
+  login: async (loginIdentifier: string, password: string, rememberMe: boolean = false) => {
+    const response = await api.post('/auth/login', { 
+      login: loginIdentifier, 
+      password, 
+      remember_me: rememberMe 
+    });
     return response.data;
   },
   
-  register: async (name: string, email: string, password: string) => {
-    const response = await api.post('/auth/register', { name, email, password });
+  register: async (userData: any) => {
+    const response = await api.post('/auth/register', userData);
     return response.data;
   },
   

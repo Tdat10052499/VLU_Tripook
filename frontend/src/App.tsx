@@ -1,9 +1,11 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
-import Navbar from './components/Navbar';
-import Home from './pages/Home';
+import Home from './components/Home';
 import Dashboard from './pages/Dashboard';
+import Profile from './pages/Profile';
+import Settings from './pages/Settings';
+import Trips from './pages/Trips';
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import ForgotPassword from './components/auth/ForgotPassword';
@@ -15,7 +17,6 @@ function App() {
     <AuthProvider>
       <div className="App">
         <Router>
-          <Navbar />
           <main className="min-h-screen bg-gray-50">
             <Routes>
               <Route path="/" element={<Home />} />
@@ -28,6 +29,30 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Dashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/profile" 
+                element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/settings" 
+                element={
+                  <ProtectedRoute>
+                    <Settings />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/trips" 
+                element={
+                  <ProtectedRoute>
+                    <Trips />
                   </ProtectedRoute>
                 } 
               />

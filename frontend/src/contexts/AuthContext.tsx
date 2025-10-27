@@ -5,7 +5,11 @@ import Cookies from 'js-cookie';
 interface User {
   id: string;
   email: string;
+  username: string;
   name: string;
+  phone?: string;
+  date_of_birth?: string;
+  gender?: string;
   picture?: string;
   is_verified: boolean;
 }
@@ -14,8 +18,8 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  login: (loginIdentifier: string, password: string, rememberMe?: boolean) => Promise<void>;
+  register: (userData: any) => Promise<void>;
   logout: () => void;
   checkAuth: () => Promise<void>;
 }
@@ -39,15 +43,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const login = async (email: string, password: string): Promise<void> => {
+  const login = async (loginIdentifier: string, password: string, rememberMe: boolean = false): Promise<void> => {
     try {
-      const response = await authAPI.login(email, password);
+      const response = await authAPI.login(loginIdentifier, password, rememberMe);
       
       if (response.success) {
-        const { token, user } = response.data;
+        const { token, user, remember_me } = response.data;
         
-        // Store token in cookies
-        Cookies.set('auth_token', token, { expires: 7 }); // 7 days
+        // Store token in cookies with appropriate expiration
+        const expirationDays = remember_me ? 30 : 1;
+        Cookies.set('auth_token', token, { expires: expirationDays });
         
         setUser(user);
         setIsAuthenticated(true);
@@ -59,9 +64,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const register = async (name: string, email: string, password: string): Promise<void> => {
+  const register = async (userData: any): Promise<void> => {
     try {
-      const response = await authAPI.register(name, email, password);
+      const response = await authAPI.register(userData);
       
       if (!response.success) {
         throw new Error(response.message || 'Registration failed');

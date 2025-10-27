@@ -2,41 +2,45 @@ from flask import request, jsonify
 from flask_restful import Resource
 from app.utils.jwt_auth import generate_token, token_required
 from app.models.user import User
+from app.services.email_service import email_service
 from email_validator import validate_email, EmailNotValidError
+import secrets
+from datetime import datetime, timedelta
 
 class LoginResource(Resource):
     def post(self):
-        """User login with email and password"""
+        """User login with email/username and password"""
         try:
             data = request.get_json()
             
-            if not data or not data.get('email') or not data.get('password'):
+            if not data or not data.get('login') or not data.get('password'):
                 return {
                     'success': False,
-                    'message': 'Email and password are required'
+                    'message': 'Email/username and password are required'
                 }, 400
             
-            email = data['email'].lower().strip()
+            login_identifier = data['login'].lower().strip()
             password = data['password']
+            remember_me = data.get('remember_me', False)
             
-            # Find user by email
-            user = User.find_by_email(email)
+            # Find user by email or username
+            user = User.find_by_login(login_identifier)
             if not user or not user.check_password(password):
                 return {
                     'success': False,
                     'message': 'Invalid email or password'
                 }, 401
             
-            # Check if user is verified
-            if not user.is_verified:
-                return {
-                    'success': False,
-                    'message': 'Please verify your email address before logging in',
-                    'need_verification': True
-                }, 401
+            # Check if user is verified (Skip for development)
+            # if not user.is_verified:
+            #     return {
+            #         'success': False,
+            #         'message': 'Please verify your email address before logging in',
+            #         'need_verification': True
+            #     }, 401
             
-            # Generate JWT token
-            token = generate_token(user._id)
+            # Generate JWT token with remember_me setting
+            token = generate_token(user._id, remember_me)
             
             return {
                 'success': True,
@@ -45,10 +49,13 @@ class LoginResource(Resource):
                     'user': {
                         'id': str(user._id),
                         'email': user.email,
+                        'username': user.username,
                         'name': user.name,
                         'picture': user.picture,
+                        'phone': user.phone,
                         'is_verified': user.is_verified
-                    }
+                    },
+                    'remember_me': remember_me
                 },
                 'message': 'Login successful'
             }, 200
@@ -83,39 +90,80 @@ class RegisterResource(Resource):
             email = data['email'].lower().strip()
             password = data['password']
             name = data['name'].strip()
+            username = data.get('username', '').strip()
+            phone = data.get('phone', '').strip()
+            date_of_birth = data.get('date_of_birth')
+            gender = data.get('gender')
             
             # Validate email format
-            try:
-                validate_email(email)
-            except EmailNotValidError:
+            is_valid, error_msg = User.validate_email(email)
+            if not is_valid:
                 return {
                     'success': False,
-                    'message': 'Invalid email format'
+                    'message': error_msg
                 }, 400
             
             # Validate password strength
-            if len(password) < 6:
+            is_valid, error_msg = User.validate_password(password)
+            if not is_valid:
                 return {
                     'success': False,
-                    'message': 'Password must be at least 6 characters long'
+                    'message': error_msg
                 }, 400
             
+            # Validate username if provided
+            if username:
+                is_valid, error_msg = User.validate_username(username)
+                if not is_valid:
+                    return {
+                        'success': False,
+                        'message': error_msg
+                    }, 400
             # Check if user already exists
             existing_user = User.find_by_email(email)
             if existing_user:
                 return {
                     'success': False,
-                    'message': 'User with this email already exists'
+                    'message': 'Email đã tồn tại trong hệ thống'
                 }, 409
             
+            # Check if username already exists (if username provided)
+            if username:
+                existing_username = User.find_by_username(username)
+                if existing_username:
+                    return {
+                        'success': False,
+                        'message': 'Username đã tồn tại trong hệ thống'
+                    }, 409
+            
             # Create new user
-            user = User(email=email, name=name, password=password)
-            verification_token = user.generate_verification_token()
+            user = User(
+                email=email,
+                name=name,
+                username=username,
+                password=password,
+                phone=phone,
+                date_of_birth=date_of_birth,
+                gender=gender
+            )
+            # Generate verification token
+            verification_token = secrets.token_urlsafe(32)
+            user.verification_token = verification_token
             user.save()
             
-            # TODO: Send verification email here
-            # For now, we'll auto-verify for development
+            # Send verification email
+            email_sent = email_service.send_verification_email(
+                user.email, 
+                verification_token, 
+                user.name
+            )
+            
+            if not email_sent:
+                print(f"⚠️ Failed to send verification email to {user.email}")
+            
+            # For development, auto-verify users for immediate login
             user.is_verified = True
+            user.verification_token = None
             user.save()
             
             return {
@@ -124,7 +172,11 @@ class RegisterResource(Resource):
                     'user': {
                         'id': str(user._id),
                         'email': user.email,
+                        'username': user.username,
                         'name': user.name,
+                        'phone': user.phone,
+                        'date_of_birth': user.date_of_birth,
+                        'gender': user.gender,
                         'is_verified': user.is_verified
                     }
                 },
@@ -263,4 +315,149 @@ class AuthResource(Resource):
             return {
                 'success': False,
                 'message': f'Failed to get user profile: {str(e)}'
+            }, 500
+
+class VerifyEmailResource(Resource):
+    def post(self):
+        """Verify email with token"""
+        try:
+            data = request.get_json()
+            
+            if not data or not data.get('token'):
+                return {
+                    'success': False,
+                    'message': 'Verification token is required'
+                }, 400
+            
+            verification_token = data['token']
+            
+            # Find user with this verification token
+            user = User.find_by_verification_token(verification_token)
+            if not user:
+                return {
+                    'success': False,
+                    'message': 'Invalid or expired verification token'
+                }, 400
+            
+            # Check if already verified
+            if user.is_verified:
+                return {
+                    'success': True,
+                    'message': 'Email is already verified'
+                }, 200
+            
+            # Verify user
+            user.is_verified = True
+            user.verification_token = None
+            user.save()
+            
+            return {
+                'success': True,
+                'message': 'Email verified successfully! You can now login.'
+            }, 200
+            
+        except Exception as e:
+            return {
+                'success': False,
+                'message': f'Email verification failed: {str(e)}'
+            }, 500
+    
+    def get(self):
+        """Verify email with token from URL"""
+        try:
+            verification_token = request.args.get('token')
+            
+            if not verification_token:
+                return {
+                    'success': False,
+                    'message': 'Verification token is required'
+                }, 400
+            
+            # Find user with this verification token
+            user = User.find_by_verification_token(verification_token)
+            if not user:
+                return {
+                    'success': False,
+                    'message': 'Invalid or expired verification token'
+                }, 400
+            
+            # Check if already verified
+            if user.is_verified:
+                return {
+                    'success': True,
+                    'message': 'Email is already verified'
+                }, 200
+            
+            # Verify user
+            user.is_verified = True
+            user.verification_token = None
+            user.save()
+            
+            return {
+                'success': True,
+                'message': 'Email verified successfully! You can now login.'
+            }, 200
+            
+        except Exception as e:
+            return {
+                'success': False,
+                'message': f'Email verification failed: {str(e)}'
+            }, 500
+
+class ResendVerificationResource(Resource):
+    def post(self):
+        """Resend verification email"""
+        try:
+            data = request.get_json()
+            
+            if not data or not data.get('email'):
+                return {
+                    'success': False,
+                    'message': 'Email is required'
+                }, 400
+            
+            email = data['email'].lower().strip()
+            
+            # Find user by email
+            user = User.find_by_login(email)
+            if not user:
+                return {
+                    'success': False,
+                    'message': 'User not found'
+                }, 404
+            
+            # Check if already verified
+            if user.is_verified:
+                return {
+                    'success': False,
+                    'message': 'Email is already verified'
+                }, 400
+            
+            # Generate new verification token
+            verification_token = secrets.token_urlsafe(32)
+            user.verification_token = verification_token
+            user.save()
+            
+            # Send verification email
+            email_sent = email_service.send_verification_email(
+                user.email, 
+                verification_token, 
+                user.name
+            )
+            
+            if not email_sent:
+                return {
+                    'success': False,
+                    'message': 'Failed to send verification email'
+                }, 500
+            
+            return {
+                'success': True,
+                'message': 'Verification email sent successfully'
+            }, 200
+            
+        except Exception as e:
+            return {
+                'success': False,
+                'message': f'Failed to resend verification email: {str(e)}'
             }, 500

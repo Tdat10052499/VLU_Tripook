@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import os
 
 # Import routes
-from app.routes.auth import AuthResource
+from app.routes.auth import LoginResource, RegisterResource, VerifyEmailResource, ResendVerificationResource
 from app.routes.trips import TripsResource, TripResource
 from app.routes.activities import ActivitiesResource, ActivityResource
 from app.routes.users import UserResource
@@ -24,12 +24,18 @@ def create_app():
     app.config['MONGO_URI'] = os.getenv('MONGO_URI')
     app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'tripook-jwt-secret-key-2024')
     
-    # Initialize CORS
+    # Initialize CORS with more permissive settings for development
     CORS(app, resources={
         r"/api/*": {
-            "origins": ["http://localhost:3000"],
+            "origins": [
+                "http://localhost:3000", 
+                "http://127.0.0.1:3000",
+                "http://localhost:3001", 
+                "http://127.0.0.1:3001"
+            ],
             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-            "allow_headers": ["Content-Type", "Authorization"]
+            "allow_headers": ["Content-Type", "Authorization", "Accept"],
+            "supports_credentials": True
         }
     })
     
@@ -37,7 +43,10 @@ def create_app():
     api = Api(app, prefix='/api')
     
     # Register routes
-    api.add_resource(AuthResource, '/auth')
+    api.add_resource(LoginResource, '/auth/login')
+    api.add_resource(RegisterResource, '/auth/register')
+    api.add_resource(VerifyEmailResource, '/auth/verify')
+    api.add_resource(ResendVerificationResource, '/auth/resend-verification')
     api.add_resource(UserResource, '/user')
     api.add_resource(TripsResource, '/trips')
     api.add_resource(TripResource, '/trips/<string:trip_id>')
