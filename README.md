@@ -1,1 +1,2 @@
 # VLU_Tripook
+2275106050051 - Nguyen Minh Chinh
