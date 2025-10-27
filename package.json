@@ -1,0 +1,34 @@
+{
+  "name": "tripook",
+  "version": "1.0.0",
+  "description": "Tripook - Your ultimate travel planning companion",
+  "scripts": {
+    "dev:frontend": "cd frontend && npm start",
+    "dev:backend": "cd backend && python app.py",
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "install:frontend": "cd frontend && npm install",
+    "install:backend": "cd backend && pip install -r requirements.txt",
+    "install:all": "npm run install:frontend && npm run install:backend",
+    "build:frontend": "cd frontend && npm run build",
+    "test:frontend": "cd frontend && npm test",
+    "lint:frontend": "cd frontend && npm run lint",
+    "setup": "npm run install:all && echo 'Please copy .env.example files and configure your environment variables'"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": [
+    "travel",
+    "planning",
+    "react",
+    "flask",
+    "mongodb",
+    "jwt"
+  ],
+  "author": "Tripook Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tdat10052499/VLU_Tripook.git"
+  }
+}
