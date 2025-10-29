@@ -146,6 +146,24 @@ class RegisterResource(Resource):
                         'success': False,
                         'message': error_msg
                     }, 400
+
+            # Validate age (16+)
+            if date_of_birth:
+                is_valid, error_msg = User.validate_age(date_of_birth)
+                if not is_valid:
+                    return {
+                        'success': False,
+                        'message': error_msg
+                    }, 400
+
+            # Validate phone number
+            if phone:
+                is_valid, error_msg = User.validate_phone(phone)
+                if not is_valid:
+                    return {
+                        'success': False,
+                        'message': error_msg
+                    }, 400
             # Check if user already exists
             existing_user = User.find_by_email(email)
             if existing_user:
@@ -173,6 +191,14 @@ class RegisterResource(Resource):
                 date_of_birth=date_of_birth,
                 gender=gender
             )
+
+            # Validate all registration data
+            is_valid, validation_errors = user.validate_registration_data()
+            if not is_valid:
+                return {
+                    'success': False,
+                    'message': '; '.join(validation_errors)
+                }, 400
             # Generate verification token
             verification_token = secrets.token_urlsafe(32)
             user.verification_token = verification_token

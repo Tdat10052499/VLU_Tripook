@@ -13,7 +13,32 @@ const Login: React.FC = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState(() => {
+    // Initialize error from sessionStorage to persist across re-mounts
+    return sessionStorage.getItem('login_error') || '';
+  });
+
+  // Persist error to sessionStorage
+  const setErrorPersistent = (newError: string) => {
+    setError(newError);
+    if (newError) {
+      sessionStorage.setItem('login_error', newError);
+    } else {
+      sessionStorage.removeItem('login_error');
+    }
+  };
+
+  // Clear error when component unmounts
+  React.useEffect(() => {
+    return () => {
+      // Clear error from sessionStorage when component unmounts
+      // This happens when user successfully navigates away
+      const currentPath = window.location.pathname;
+      if (currentPath !== '/auth/login') {
+        sessionStorage.removeItem('login_error');
+      }
+    };
+  }, []);
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
 
   const { login } = useContext(AuthContext);
@@ -26,33 +51,36 @@ const Login: React.FC = () => {
       ...formData,
       [e.target.name]: e.target.value
     });
+    // Clear error when user starts typing to fix their input
+    if (error) {
+      setErrorPersistent('');
+    }
   };
 
   const handleRecaptchaVerify = (token: string | null) => {
     setRecaptchaToken(token);
-    if (!token) {
-      setError('');
-    }
+    // Don't clear error automatically when reCAPTCHA is reset
+    // Let user see the error message until they fix the issue
   };
 
   const handleRecaptchaError = () => {
-    setError('Bạn là Robot');
+    setErrorPersistent('Bạn là Robot');
     setRecaptchaToken(null);
   };
 
   const handleRecaptchaExpired = () => {
-    setError('reCAPTCHA đã hết hạn, vui lòng thử lại');
+    setErrorPersistent('reCAPTCHA đã hết hạn, vui lòng thử lại');
     setRecaptchaToken(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
+    // Don't clear error immediately - let it show until success or new error
 
     // Check reCAPTCHA
     if (!recaptchaToken) {
-      setError('Vui lòng hoàn thành reCAPTCHA');
+      setErrorPersistent('Vui lòng hoàn thành reCAPTCHA');
       setIsLoading(false);
       return;
     }
@@ -60,13 +88,16 @@ const Login: React.FC = () => {
     try {
       await login(formData.login, formData.password, formData.rememberMe, recaptchaToken);
       
+      // Clear error only on successful login
+      setErrorPersistent('');
+      
       // Use setTimeout to ensure state update completes
       setTimeout(() => {
         navigate('/', { replace: true });
       }, 100);
     } catch (err: any) {
       console.error('Login error:', err);
-      setError(err.message || 'Login failed. Please try again.');
+      setErrorPersistent(err.message || 'Login failed. Please try again.');
       
       // Reset reCAPTCHA on error
       if (recaptchaRef.current) {

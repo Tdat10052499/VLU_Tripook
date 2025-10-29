@@ -66,6 +66,66 @@ class User:
             return False
         return True
 
+    @staticmethod
+    def validate_age(date_of_birth):
+        """Validate age (must be 16 or older)"""
+        if not date_of_birth:
+            return False, "Date of birth is required"
+        
+        try:
+            if isinstance(date_of_birth, str):
+                birth_date = datetime.strptime(date_of_birth, '%Y-%m-%d')
+            else:
+                birth_date = date_of_birth
+            
+            today = datetime.now()
+            age = today.year - birth_date.year
+            
+            # Adjust if birthday hasn't occurred this year
+            if today.month < birth_date.month or (today.month == birth_date.month and today.day < birth_date.day):
+                age -= 1
+            
+            if age < 16:
+                return False, "You must be at least 16 years old to register"
+            
+            return True, "Valid age"
+            
+        except (ValueError, TypeError):
+            return False, "Invalid date format"
+
+    @staticmethod
+    def validate_phone(phone):
+        """Validate Vietnamese phone number (10 digits, starts with 0)"""
+        if not phone:
+            return False, "Phone number is required"
+        
+        # Remove spaces and dashes
+        clean_phone = re.sub(r'[\s-]', '', phone)
+        
+        # Check format: exactly 10 digits, starts with 0
+        phone_pattern = r'^0\d{9}$'
+        
+        if not re.match(phone_pattern, clean_phone):
+            return False, "Phone number must be exactly 10 digits and start with 0"
+        
+        return True, "Valid phone number"
+
+    def validate_registration_data(self):
+        """Validate all registration data"""
+        errors = []
+        
+        # Validate age
+        age_valid, age_msg = self.validate_age(self.date_of_birth)
+        if not age_valid:
+            errors.append(age_msg)
+        
+        # Validate phone
+        phone_valid, phone_msg = self.validate_phone(self.phone)
+        if not phone_valid:
+            errors.append(phone_msg)
+        
+        return len(errors) == 0, errors
+
     def to_dict(self, include_sensitive=False):
         user_dict = {
             'email': self.email,

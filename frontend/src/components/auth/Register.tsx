@@ -29,6 +29,10 @@ const Register: React.FC = () => {
     notUsername: false,
     match: false
   });
+  const [formValidation, setFormValidation] = useState({
+    ageValid: false,
+    phoneValid: false
+  });
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
 
   const { register } = useContext(AuthContext);
@@ -78,6 +82,33 @@ const Register: React.FC = () => {
         notUsername: notContainsUsername
       }));
     }
+
+    // Age validation (16+ years old)
+    if (name === 'date_of_birth') {
+      const today = new Date();
+      const birthDate = new Date(value);
+      const age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      
+      // Adjust age if birthday hasn't occurred this year
+      const isValidAge = age > 16 || (age === 16 && monthDiff >= 0 && (monthDiff > 0 || today.getDate() >= birthDate.getDate()));
+      
+      setFormValidation(prev => ({
+        ...prev,
+        ageValid: isValidAge
+      }));
+    }
+
+    // Phone validation (exactly 10 digits)
+    if (name === 'phone') {
+      const phoneRegex = /^0\d{9}$/; // Vietnamese phone format: starts with 0, total 10 digits
+      const isValidPhone = phoneRegex.test(value);
+      
+      setFormValidation(prev => ({
+        ...prev,
+        phoneValid: isValidPhone
+      }));
+    }
   };
 
   const handleRecaptchaVerify = (token: string | null) => {
@@ -109,7 +140,21 @@ const Register: React.FC = () => {
       return;
     }
 
-    // Validation
+    // Age validation
+    if (!formValidation.ageValid) {
+      setError('Bạn phải từ 16 tuổi trở lên để đăng ký tài khoản');
+      setIsLoading(false);
+      return;
+    }
+
+    // Phone validation
+    if (!formValidation.phoneValid) {
+      setError('Số điện thoại phải có đúng 10 chữ số và bắt đầu bằng số 0');
+      setIsLoading(false);
+      return;
+    }
+
+    // Password validation
     if (formData.password !== formData.confirmPassword) {
       setError('Mật khẩu và xác nhận mật khẩu không khớp');
       setIsLoading(false);
@@ -231,36 +276,70 @@ const Register: React.FC = () => {
               <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
                 Phone Number
               </label>
-              <input
-                id="phone"
-                name="phone"
-                type="tel"
-                autoComplete="tel"
-                required
-                value={formData.phone}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="Enter your phone number"
-              />
+              <div className="relative">
+                <input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  autoComplete="tel"
+                  required
+                  value={formData.phone}
+                  onChange={handleChange}
+                  className={`w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
+                    formData.phone 
+                      ? formValidation.phoneValid 
+                        ? 'border-green-300 bg-green-50' 
+                        : 'border-red-300 bg-red-50'
+                      : 'border-gray-300'
+                  }`}
+                  placeholder="0xxxxxxxxx"
+                  maxLength={10}
+                />
+                {formData.phone && formValidation.phoneValid && (
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                    <FaCheck className="text-green-500" />
+                  </div>
+                )}
+              </div>
+              {formData.phone && !formValidation.phoneValid && (
+                <p className="text-red-600 text-xs mt-1">Số điện thoại phải có đúng 10 chữ số và bắt đầu bằng số 0</p>
+              )}
             </div>
 
             <div>
               <label htmlFor="date_of_birth" className="block text-sm font-medium text-gray-700 mb-2">
                 Date of Birth
               </label>
-              <input
-                id="date_of_birth"
-                name="date_of_birth"
-                type="date"
-                value={formData.date_of_birth}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              />
+              <div className="relative">
+                <input
+                  id="date_of_birth"
+                  name="date_of_birth"
+                  type="date"
+                  value={formData.date_of_birth}
+                  onChange={handleChange}
+                  className={`w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
+                    formData.date_of_birth 
+                      ? formValidation.ageValid 
+                        ? 'border-green-300 bg-green-50' 
+                        : 'border-red-300 bg-red-50'
+                      : 'border-gray-300'
+                  }`}
+                  required
+                />
+                {formData.date_of_birth && formValidation.ageValid && (
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                    <FaCheck className="text-green-500" />
+                  </div>
+                )}
+              </div>
+              {formData.date_of_birth && !formValidation.ageValid && (
+                <p className="text-red-600 text-xs mt-1">Bạn phải từ 16 tuổi trở lên</p>
+              )}
             </div>
 
             <div>
               <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-2">
-                Gender (Optional)
+                Gender
               </label>
               <select
                 id="gender"
