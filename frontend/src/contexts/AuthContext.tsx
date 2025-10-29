@@ -18,8 +18,8 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (loginIdentifier: string, password: string, rememberMe?: boolean) => Promise<void>;
-  register: (userData: any) => Promise<void>;
+  login: (loginIdentifier: string, password: string, rememberMe?: boolean, recaptchaToken?: string) => Promise<void>;
+  register: (userData: any, recaptchaToken?: string) => Promise<void>;
   logout: () => void;
   checkAuth: () => Promise<void>;
 }
@@ -43,9 +43,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const login = async (loginIdentifier: string, password: string, rememberMe: boolean = false): Promise<void> => {
+  const login = async (loginIdentifier: string, password: string, rememberMe: boolean = false, recaptchaToken?: string): Promise<void> => {
     try {
-      const response = await authAPI.login(loginIdentifier, password, rememberMe);
+      const response = await authAPI.login(loginIdentifier, password, rememberMe, recaptchaToken);
       
       if (response.success) {
         const { token, user, remember_me } = response.data;
@@ -64,9 +64,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const register = async (userData: any): Promise<void> => {
+  const register = async (userData: any, recaptchaToken?: string): Promise<void> => {
     try {
-      const response = await authAPI.register(userData);
+      const response = await authAPI.register(userData, recaptchaToken);
       
       if (!response.success) {
         throw new Error(response.message || 'Registration failed');

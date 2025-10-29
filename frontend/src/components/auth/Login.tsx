@@ -1,7 +1,9 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthContext';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import RecaptchaComponent, { RecaptchaComponentRef } from '../RecaptchaComponent';
+import { useRecaptchaConfig } from '../../hooks/useRecaptchaConfig';
 
 const Login: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -12,9 +14,12 @@ const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
 
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
+  const recaptchaRef = useRef<RecaptchaComponentRef>(null);
+  const { siteKey, isLoading: configLoading, error: configError } = useRecaptchaConfig();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -23,13 +28,37 @@ const Login: React.FC = () => {
     });
   };
 
+  const handleRecaptchaVerify = (token: string | null) => {
+    setRecaptchaToken(token);
+    if (!token) {
+      setError('');
+    }
+  };
+
+  const handleRecaptchaError = () => {
+    setError('Bạn là Robot');
+    setRecaptchaToken(null);
+  };
+
+  const handleRecaptchaExpired = () => {
+    setError('reCAPTCHA đã hết hạn, vui lòng thử lại');
+    setRecaptchaToken(null);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
 
+    // Check reCAPTCHA
+    if (!recaptchaToken) {
+      setError('Vui lòng hoàn thành reCAPTCHA');
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      await login(formData.login, formData.password, formData.rememberMe);
+      await login(formData.login, formData.password, formData.rememberMe, recaptchaToken);
       
       // Use setTimeout to ensure state update completes
       setTimeout(() => {
@@ -38,6 +67,12 @@ const Login: React.FC = () => {
     } catch (err: any) {
       console.error('Login error:', err);
       setError(err.message || 'Login failed. Please try again.');
+      
+      // Reset reCAPTCHA on error
+      if (recaptchaRef.current) {
+        recaptchaRef.current.reset();
+      }
+      setRecaptchaToken(null);
     } finally {
       setIsLoading(false);
     }
@@ -134,9 +169,30 @@ const Login: React.FC = () => {
               </div>
             </div>
 
+            {/* reCAPTCHA */}
+            {configLoading ? (
+              <div className="flex justify-center py-4">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
+              </div>
+            ) : configError ? (
+              <div className="text-red-500 text-sm text-center">
+                {configError}
+              </div>
+            ) : (
+              <RecaptchaComponent
+                ref={recaptchaRef}
+                siteKey={siteKey}
+                onVerify={handleRecaptchaVerify}
+                onError={handleRecaptchaError}
+                onExpired={handleRecaptchaExpired}
+                theme="light"
+                size="normal"
+              />
+            )}
+
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || !recaptchaToken}
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (

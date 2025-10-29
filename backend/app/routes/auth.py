@@ -3,6 +3,7 @@ from flask_restful import Resource
 from app.utils.jwt_auth import generate_token, token_required
 from app.models.user import User
 from app.services.email_service import email_service
+from app.utils.recaptcha import RecaptchaVerifier
 from email_validator import validate_email, EmailNotValidError
 import secrets
 from datetime import datetime, timedelta
@@ -22,6 +23,19 @@ class LoginResource(Resource):
             login_identifier = data['login'].lower().strip()
             password = data['password']
             remember_me = data.get('remember_me', False)
+            recaptcha_response = data.get('recaptcha_token')
+            
+            # Verify reCAPTCHA
+            recaptcha_result = RecaptchaVerifier.verify_recaptcha(
+                recaptcha_response, 
+                request.environ.get('REMOTE_ADDR')
+            )
+            
+            if not recaptcha_result['success']:
+                return {
+                    'success': False,
+                    'message': recaptcha_result['message']
+                }, 400
             
             # Find user by email or username
             user = User.find_by_login(login_identifier)
@@ -94,6 +108,19 @@ class RegisterResource(Resource):
             phone = data.get('phone', '').strip()
             date_of_birth = data.get('date_of_birth')
             gender = data.get('gender')
+            recaptcha_response = data.get('recaptcha_token')
+            
+            # Verify reCAPTCHA
+            recaptcha_result = RecaptchaVerifier.verify_recaptcha(
+                recaptcha_response, 
+                request.environ.get('REMOTE_ADDR')
+            )
+            
+            if not recaptcha_result['success']:
+                return {
+                    'success': False,
+                    'message': recaptcha_result['message']
+                }, 400
             
             # Validate email format
             is_valid, error_msg = User.validate_email(email)
@@ -103,8 +130,8 @@ class RegisterResource(Resource):
                     'message': error_msg
                 }, 400
             
-            # Validate password strength
-            is_valid, error_msg = User.validate_password(password)
+            # Validate password strength (pass username for validation)
+            is_valid, error_msg = User.validate_password(password, username)
             if not is_valid:
                 return {
                     'success': False,

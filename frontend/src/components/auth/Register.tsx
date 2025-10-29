@@ -1,7 +1,9 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthContext';
 import { FaEye, FaEyeSlash, FaCheck, FaTimes } from 'react-icons/fa';
+import RecaptchaComponent, { RecaptchaComponentRef } from '../RecaptchaComponent';
+import { useRecaptchaConfig } from '../../hooks/useRecaptchaConfig';
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -20,11 +22,19 @@ const Register: React.FC = () => {
   const [error, setError] = useState('');
   const [passwordValidation, setPasswordValidation] = useState({
     length: false,
+    uppercase: false,
+    hasDigit: false,
+    hasLetter: false,
+    special: false,
+    notUsername: false,
     match: false
   });
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
 
   const { register } = useContext(AuthContext);
   const navigate = useNavigate();
+  const recaptchaRef = useRef<RecaptchaComponentRef>(null);
+  const { siteKey, isLoading: configLoading, error: configError } = useRecaptchaConfig();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -35,9 +45,20 @@ const Register: React.FC = () => {
 
     // Password validation
     if (name === 'password') {
+      const hasUppercase = /[A-Z]/.test(value);
+      const hasDigit = /\d/.test(value);
+      const hasLetter = /[a-zA-Z]/.test(value);
+      const hasSpecial = /[!@#$%^&*()_+\-=[\]{}|;:,.<>?]/.test(value);
+      const notContainsUsername = formData.username ? !value.toLowerCase().includes(formData.username.toLowerCase()) : true;
+      
       setPasswordValidation(prev => ({
         ...prev,
         length: value.length >= 6,
+        uppercase: hasUppercase,
+        hasDigit: hasDigit,
+        hasLetter: hasLetter,
+        special: hasSpecial,
+        notUsername: notContainsUsername,
         match: formData.confirmPassword === value
       }));
     }
@@ -48,6 +69,32 @@ const Register: React.FC = () => {
         match: formData.password === value
       }));
     }
+
+    // Re-validate password when username changes
+    if (name === 'username' && formData.password) {
+      const notContainsUsername = value ? !formData.password.toLowerCase().includes(value.toLowerCase()) : true;
+      setPasswordValidation(prev => ({
+        ...prev,
+        notUsername: notContainsUsername
+      }));
+    }
+  };
+
+  const handleRecaptchaVerify = (token: string | null) => {
+    setRecaptchaToken(token);
+    if (!token) {
+      setError('');
+    }
+  };
+
+  const handleRecaptchaError = () => {
+    setError('Bạn là Robot');
+    setRecaptchaToken(null);
+  };
+
+  const handleRecaptchaExpired = () => {
+    setError('reCAPTCHA đã hết hạn, vui lòng thử lại');
+    setRecaptchaToken(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -55,15 +102,28 @@ const Register: React.FC = () => {
     setIsLoading(true);
     setError('');
 
-    // Validation
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+    // Check reCAPTCHA
+    if (!recaptchaToken) {
+      setError('Vui lòng hoàn thành reCAPTCHA');
       setIsLoading(false);
       return;
     }
 
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters long');
+    // Validation
+    if (formData.password !== formData.confirmPassword) {
+      setError('Mật khẩu và xác nhận mật khẩu không khớp');
+      setIsLoading(false);
+      return;
+    }
+
+    // Kiểm tra tất cả các yêu cầu mật khẩu
+    if (!passwordValidation.length || 
+        !passwordValidation.uppercase || 
+        !passwordValidation.hasDigit ||
+        !passwordValidation.hasLetter ||
+        !passwordValidation.special || 
+        !passwordValidation.notUsername) {
+      setError('Mật khẩu không đáp ứng tất cả các yêu cầu bảo mật');
       setIsLoading(false);
       return;
     }
@@ -80,12 +140,18 @@ const Register: React.FC = () => {
         password: formData.password
       };
 
-      await register(userData);
+      await register(userData, recaptchaToken);
       navigate('/auth/login', { 
         state: { message: 'Registration successful! Please log in with your new account.' }
       });
     } catch (err: any) {
       setError(err.message || 'Registration failed. Please try again.');
+      
+      // Reset reCAPTCHA on error
+      if (recaptchaRef.current) {
+        recaptchaRef.current.reset();
+      }
+      setRecaptchaToken(null);
     } finally {
       setIsLoading(false);
     }
@@ -240,16 +306,67 @@ const Register: React.FC = () => {
               </div>
               
               {/* Password validation indicators */}
-              <div className="mt-2 space-y-1">
-                <div className={`flex items-center text-sm ${passwordValidation.length ? 'text-green-600' : 'text-gray-500'}`}>
-                  {passwordValidation.length ? (
-                    <FaCheck className="h-3 w-3 mr-2" />
-                  ) : (
-                    <FaTimes className="h-3 w-3 mr-2" />
+              {formData.password && (
+                <div className="mt-3 p-3 bg-gray-50 rounded-md space-y-2">
+                  <p className="text-sm font-medium text-gray-700 mb-2">Yêu cầu mật khẩu:</p>
+                  
+                  <div className={`flex items-center text-sm ${passwordValidation.length ? 'text-green-600' : 'text-red-500'}`}>
+                    {passwordValidation.length ? (
+                      <FaCheck className="h-3 w-3 mr-2" />
+                    ) : (
+                      <FaTimes className="h-3 w-3 mr-2" />
+                    )}
+                    Ít nhất 6 ký tự
+                  </div>
+                  
+                  <div className={`flex items-center text-sm ${passwordValidation.uppercase ? 'text-green-600' : 'text-red-500'}`}>
+                    {passwordValidation.uppercase ? (
+                      <FaCheck className="h-3 w-3 mr-2" />
+                    ) : (
+                      <FaTimes className="h-3 w-3 mr-2" />
+                    )}
+                    Có ít nhất 1 chữ cái viết hoa (A-Z)
+                  </div>
+                  
+                  <div className={`flex items-center text-sm ${passwordValidation.hasDigit ? 'text-green-600' : 'text-red-500'}`}>
+                    {passwordValidation.hasDigit ? (
+                      <FaCheck className="h-3 w-3 mr-2" />
+                    ) : (
+                      <FaTimes className="h-3 w-3 mr-2" />
+                    )}
+                    Có ít nhất 1 chữ số (0-9)
+                  </div>
+                  
+                  <div className={`flex items-center text-sm ${passwordValidation.hasLetter ? 'text-green-600' : 'text-red-500'}`}>
+                    {passwordValidation.hasLetter ? (
+                      <FaCheck className="h-3 w-3 mr-2" />
+                    ) : (
+                      <FaTimes className="h-3 w-3 mr-2" />
+                    )}
+                    Có ít nhất 1 chữ cái (a-z, A-Z)
+                  </div>
+                  
+                  <div className={`flex items-center text-sm ${passwordValidation.special ? 'text-green-600' : 'text-red-500'}`}>
+                    {passwordValidation.special ? (
+                      <FaCheck className="h-3 w-3 mr-2" />
+                    ) : (
+                      <FaTimes className="h-3 w-3 mr-2" />
+                    )}
+                    Có ít nhất 1 ký tự đặc biệt (!@#$%^&*)
+                  </div>
+                  
+                  {formData.username && (
+                    <div className={`flex items-center text-sm ${passwordValidation.notUsername ? 'text-green-600' : 'text-red-500'}`}>
+                      {passwordValidation.notUsername ? (
+                        <FaCheck className="h-3 w-3 mr-2" />
+                      ) : (
+                        <FaTimes className="h-3 w-3 mr-2" />
+                      )}
+                      Không được chứa tên người dùng
+                    </div>
                   )}
-                  At least 6 characters
                 </div>
-              </div>
+              )}
             </div>
 
             <div>
@@ -283,21 +400,42 @@ const Register: React.FC = () => {
               
               {formData.confirmPassword && (
                 <div className="mt-2">
-                  <div className={`flex items-center text-sm ${passwordValidation.match ? 'text-green-600' : 'text-red-600'}`}>
+                  <div className={`flex items-center text-sm ${passwordValidation.match ? 'text-green-600' : 'text-red-500'}`}>
                     {passwordValidation.match ? (
                       <FaCheck className="h-3 w-3 mr-2" />
                     ) : (
                       <FaTimes className="h-3 w-3 mr-2" />
                     )}
-                    Passwords match
+                    {passwordValidation.match ? 'Mật khẩu khớp' : 'Mật khẩu không khớp'}
                   </div>
                 </div>
               )}
             </div>
 
+            {/* reCAPTCHA */}
+            {configLoading ? (
+              <div className="flex justify-center py-4">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
+              </div>
+            ) : configError ? (
+              <div className="text-red-500 text-sm text-center">
+                {configError}
+              </div>
+            ) : (
+              <RecaptchaComponent
+                ref={recaptchaRef}
+                siteKey={siteKey}
+                onVerify={handleRecaptchaVerify}
+                onError={handleRecaptchaError}
+                onExpired={handleRecaptchaExpired}
+                theme="light"
+                size="normal"
+              />
+            )}
+
             <button
               type="submit"
-              disabled={isLoading || !passwordValidation.length || !passwordValidation.match}
+              disabled={isLoading || !passwordValidation.length || !passwordValidation.match || !recaptchaToken}
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (

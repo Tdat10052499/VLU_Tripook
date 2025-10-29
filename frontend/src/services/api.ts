@@ -84,17 +84,22 @@ export const activityService = {
 
 // Authentication API
 export const authAPI = {
-  login: async (loginIdentifier: string, password: string, rememberMe: boolean = false) => {
+  login: async (loginIdentifier: string, password: string, rememberMe: boolean = false, recaptchaToken?: string) => {
     const response = await api.post('/auth/login', { 
       login: loginIdentifier, 
       password, 
-      remember_me: rememberMe 
+      remember_me: rememberMe,
+      recaptcha_token: recaptchaToken
     });
     return response.data;
   },
   
-  register: async (userData: any) => {
-    const response = await api.post('/auth/register', userData);
+  register: async (userData: any, recaptchaToken?: string) => {
+    const requestData = {
+      ...userData,
+      recaptcha_token: recaptchaToken
+    };
+    const response = await api.post('/auth/register', requestData);
     return response.data;
   },
   

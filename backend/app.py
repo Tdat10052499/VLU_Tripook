@@ -6,6 +6,7 @@ import os
 
 # Import routes
 from app.routes.auth import LoginResource, RegisterResource, VerifyEmailResource, ResendVerificationResource
+from app.routes.recaptcha import RecaptchaConfigResource
 from app.routes.trips import TripsResource, TripResource
 from app.routes.activities import ActivitiesResource, ActivityResource
 from app.routes.users import UserResource
@@ -47,6 +48,7 @@ def create_app():
     api.add_resource(RegisterResource, '/auth/register')
     api.add_resource(VerifyEmailResource, '/auth/verify')
     api.add_resource(ResendVerificationResource, '/auth/resend-verification')
+    api.add_resource(RecaptchaConfigResource, '/auth/recaptcha-config')
     api.add_resource(UserResource, '/user')
     api.add_resource(TripsResource, '/trips')
     api.add_resource(TripResource, '/trips/<string:trip_id>')
@@ -64,4 +66,4 @@ def create_app():
 
 if __name__ == '__main__':
     app = create_app()
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5001)

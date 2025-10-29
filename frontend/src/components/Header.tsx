@@ -62,22 +62,22 @@ const Header: React.FC = () => {
           {/* Navigation */}
           <nav className="hidden md:flex space-x-8">
             <Link 
-              to="/" 
+              to="/about" 
               className="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors"
             >
-              Home
+              Về chúng tôi
             </Link>
             <Link 
-              to="/trips" 
+              to="/services" 
               className="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors"
             >
-              My Trips
+              Dịch vụ
             </Link>
             <Link 
-              to="/explore" 
+              to="/partner" 
               className="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors"
             >
-              Explore
+              Trở thành đối tác
             </Link>
           </nav>
 

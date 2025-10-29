@@ -122,35 +122,44 @@ class User:
 
     def save(self):
         """Save user to database"""
-        db = get_db()
-        collection = db.users
-        
-        self.updated_at = datetime.utcnow()
-        user_data = self.to_dict(include_sensitive=True)
-        
-        if hasattr(self, '_id') and self._id:
-            # Update existing user
-            collection.update_one(
-                {'_id': self._id},
-                {'$set': user_data}
-            )
-        else:
-            # Create new user
-            result = collection.insert_one(user_data)
-            self._id = result.inserted_id
-        
-        return self
+        try:
+            db = get_db()
+            collection = db.users
+            
+            self.updated_at = datetime.utcnow()
+            user_data = self.to_dict(include_sensitive=True)
+            
+            if hasattr(self, '_id') and self._id:
+                # Update existing user
+                collection.update_one(
+                    {'_id': self._id},
+                    {'$set': user_data}
+                )
+            else:
+                # Create new user
+                result = collection.insert_one(user_data)
+                self._id = result.inserted_id
+            
+            return self
+            
+        except Exception as e:
+            print(f"Database error in User.save(): {e}")
+            raise Exception(f"Could not save user to database: {str(e)}")
 
     @staticmethod
     def find_by_email(email):
         """Find user by email"""
-        db = get_db()
-        collection = db.users
-        
-        user_data = collection.find_one({'email': email})
-        if user_data:
-            return User.from_dict(user_data)
-        return None
+        try:
+            db = get_db()
+            collection = db.users
+            
+            user_data = collection.find_one({'email': email})
+            if user_data:
+                return User.from_dict(user_data)
+            return None
+        except Exception as e:
+            print(f"Database error in User.find_by_email(): {e}")
+            return None
 
     @staticmethod
     def find_by_id(user_id):
@@ -167,10 +176,32 @@ class User:
         return None
     
     @staticmethod
-    def validate_password(password):
+    def validate_password(password, username=None):
         """Validate password requirements"""
         if len(password) < 6:
-            return False, "Password must be at least 6 characters long"
+            return False, "Mật khẩu phải có ít nhất 6 ký tự"
+        
+        # Check for at least one uppercase letter
+        if not any(c.isupper() for c in password):
+            return False, "Mật khẩu phải có ít nhất 1 chữ cái viết hoa"
+        
+        # Check for at least one digit
+        if not any(c.isdigit() for c in password):
+            return False, "Mật khẩu phải có ít nhất 1 chữ số"
+        
+        # Check for at least one letter (a-z or A-Z)
+        if not any(c.isalpha() for c in password):
+            return False, "Mật khẩu phải có ít nhất 1 chữ cái"
+        
+        # Check for at least one special character
+        special_chars = "!@#$%^&*()_+-=[]{}|;:,.<>?"
+        if not any(c in special_chars for c in password):
+            return False, "Mật khẩu phải có ít nhất 1 ký tự đặc biệt (!@#$%^&*()_+-=[]{}|;:,.<>?)"
+        
+        # Check if password contains username
+        if username and username.lower() in password.lower():
+            return False, "Mật khẩu không được chứa tên người dùng"
+        
         return True, ""
     
     @staticmethod
