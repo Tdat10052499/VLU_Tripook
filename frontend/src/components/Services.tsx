@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Header from './Header';
 import Footer from './Footer';
 import SimpleMap from './SimpleMap';
@@ -6,11 +6,11 @@ import { FaSearch, FaMapMarkerAlt, FaHeart, FaRegHeart, FaChevronLeft, FaChevron
 
 const Services: React.FC = () => {
   const [activeService, setActiveService] = useState('accommodation');
-  const [currentBannerSlide, setCurrentBannerSlide] = useState(0);
   const [searchData, setSearchData] = useState({
     destination: '',
     checkIn: '',
-    checkOut: ''
+    checkOut: '',
+    city: ''
   });
 
   // Sample data for different services
@@ -46,6 +46,38 @@ const Services: React.FC = () => {
       rating: 4.7,
       image: 'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=400&h=300&fit=crop',
       isFavorite: false
+    },
+    {
+      id: 5,
+      name: 'InterContinental Danang Sun Peninsula',
+      price: '6.800.000đ/đêm',
+      rating: 4.9,
+      image: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=400&h=300&fit=crop',
+      isFavorite: true
+    },
+    {
+      id: 6,
+      name: 'Flamingo Cát Bà Beach Resort',
+      price: '1.800.000đ/đêm',
+      rating: 4.5,
+      image: 'https://images.unsplash.com/photo-1584132967334-10e028bd69f7?w=400&h=300&fit=crop',
+      isFavorite: false
+    },
+    {
+      id: 7,
+      name: 'JW Marriott Hotel Hanoi',
+      price: '5.200.000đ/đêm',
+      rating: 4.8,
+      image: 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=400&h=300&fit=crop',
+      isFavorite: false
+    },
+    {
+      id: 8,
+      name: 'Anantara Hoi An Resort',
+      price: '4.900.000đ/đêm',
+      rating: 4.7,
+      image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=400&h=300&fit=crop',
+      isFavorite: true
     }
   ];
 
@@ -80,6 +112,38 @@ const Services: React.FC = () => {
       price: '8.900.000đ/người',
       rating: 4.6,
       image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop',
+      isFavorite: true
+    },
+    {
+      id: 5,
+      name: 'Tour Maldives Trọn Gói 5N4Đ',
+      price: '25.900.000đ/người',
+      rating: 4.9,
+      image: 'https://images.unsplash.com/photo-1573843981267-be1999ff37cd?w=400&h=300&fit=crop',
+      isFavorite: true
+    },
+    {
+      id: 6,
+      name: 'Tour Singapore - Malaysia 6N5Đ',
+      price: '12.500.000đ/người',
+      rating: 4.6,
+      image: 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=400&h=300&fit=crop',
+      isFavorite: false
+    },
+    {
+      id: 7,
+      name: 'Tour Nhật Bản Mùa Hoa Anh Đào 7N6Đ',
+      price: '35.000.000đ/người',
+      rating: 4.8,
+      image: 'https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?w=400&h=300&fit=crop',
+      isFavorite: false
+    },
+    {
+      id: 8,
+      name: 'Tour Đài Loan Khám Phá 4N3Đ',
+      price: '14.900.000đ/người',
+      rating: 4.7,
+      image: 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=400&h=300&fit=crop',
       isFavorite: true
     }
   ];
@@ -116,38 +180,52 @@ const Services: React.FC = () => {
       rating: 4.4,
       image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop',
       isFavorite: false
+    },
+    {
+      id: 5,
+      name: 'Vé máy bay TP.HCM - Phú Quốc',
+      price: '950.000đ/chiều',
+      rating: 4.6,
+      image: 'https://images.unsplash.com/photo-1569154941061-e231b4725ef1?w=400&h=300&fit=crop',
+      isFavorite: true
+    },
+    {
+      id: 6,
+      name: 'Thuê xe bus 45 chỗ có tài xế',
+      price: '3.500.000đ/ngày',
+      rating: 4.5,
+      image: 'https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=400&h=300&fit=crop',
+      isFavorite: false
+    },
+    {
+      id: 7,
+      name: 'Vé tàu cao tốc TP.HCM - Vũng Tàu',
+      price: '280.000đ/người',
+      rating: 4.2,
+      image: 'https://images.unsplash.com/photo-1474487548417-781cb71495f3?w=400&h=300&fit=crop',
+      isFavorite: false
+    },
+    {
+      id: 8,
+      name: 'Thuê xe limousine VIP',
+      price: '2.800.000đ/ngày',
+      rating: 4.8,
+      image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400&h=300&fit=crop',
+      isFavorite: true
     }
   ];
 
-  const bannerSlides = [
-    {
-      id: 1,
-      title: "Ưu đãi mùa hè 2025!",
-      description: "Giảm giá lên đến 40% cho tất cả dịch vụ du lịch. Đặt ngay để nhận ưu đãi tốt nhất!",
-      gradient: "from-orange-400 to-pink-500",
-      icon: "🌞"
-    },
-    {
-      id: 2,
-      title: "Tour Châu Âu Khuyến Mãi",
-      description: "Khám phá 5 nước châu Âu chỉ từ 45.999.000đ. Bao gồm vé máy bay và khách sạn 4 sao!",
-      gradient: "from-blue-500 to-cyan-400",
-      icon: "🇪🇺"
-    },
-    {
-      id: 3,
-      title: "Combo Nghỉ Dưỡng Phú Quốc",
-      description: "Resort 5 sao + Tour 4 đảo + Ăn uống không giới hạn. Ưu đãi đặc biệt 30%!",
-      gradient: "from-green-500 to-emerald-400",
-      icon: "🏖️"
-    },
-    {
-      id: 4,
-      title: "Đặt Sớm Tiết Kiệm Nhiều",
-      description: "Đặt tour trước 60 ngày nhận ngay voucher 2.000.000đ. Áp dụng cho mọi điểm đến!",
-      gradient: "from-purple-500 to-violet-400",
-      icon: "💰"
-    }
+  // Danh sách thành phố
+  const cities = [
+    { value: '', label: 'Tất cả thành phố' },
+    { value: 'ho-chi-minh', label: 'TP. Hồ Chí Minh' },
+    { value: 'ha-noi', label: 'Hà Nội' },
+    { value: 'da-nang', label: 'Đà Nẵng' },
+    { value: 'nha-trang', label: 'Nha Trang' },
+    { value: 'phu-quoc', label: 'Phú Quốc' },
+    { value: 'hoi-an', label: 'Hội An' },
+    { value: 'can-tho', label: 'Cần Thơ' },
+    { value: 'vung-tau', label: 'Vũng Tàu' }
   ];
 
   const getCurrentData = () => {
@@ -163,13 +241,21 @@ const Services: React.FC = () => {
     setSearchData(prev => ({ ...prev, [field]: value }));
   };
 
-  // Auto-slide banner every 5 seconds
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentBannerSlide(prev => (prev + 1) % bannerSlides.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, [bannerSlides.length]);
+  const getServiceName = () => {
+    switch (activeService) {
+      case 'accommodation': return 'Chỗ ở';
+      case 'tour': return 'Tour du lịch';
+      case 'transport': return 'Vận chuyển';
+      default: return 'Dịch vụ';
+    }
+  };
+
+  const getCityName = () => {
+    const selectedCity = cities.find(city => city.value === searchData.city);
+    return selectedCity ? selectedCity.label : 'Tất cả thành phố';
+  };
+
+
 
   return (
     <div className="bg-gray-50">
@@ -283,7 +369,27 @@ const Services: React.FC = () => {
               {activeService === 'transport' && '🔍 Tìm kiếm phương tiện vận chuyển'}
             </h3>
             
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+              {/* City Filter */}
+              <div className="relative">
+                <select
+                  value={searchData.city}
+                  onChange={(e) => handleSearchChange('city', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white"
+                >
+                  {cities.map((city) => (
+                    <option key={city.value} value={city.value}>
+                      {city.label}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+
               {/* Destination Search */}
               <div className="relative">
                 <FaMapMarkerAlt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 z-10" />
@@ -330,50 +436,16 @@ const Services: React.FC = () => {
             </div>
           </div>
 
-          {/* Banner Quảng Cáo */}
-          <div className="mb-8">
-            <div className="relative bg-gradient-to-r overflow-hidden rounded-2xl shadow-xl h-32 md:h-40">
-              {bannerSlides.map((slide, index) => (
-                <div
-                  key={slide.id}
-                  className={`absolute inset-0 bg-gradient-to-r ${slide.gradient} transition-opacity duration-1000 ${
-                    index === currentBannerSlide ? 'opacity-100' : 'opacity-0'
-                  }`}
-                >
-                  <div className="flex items-center h-full px-8">
-                    <div className="text-white">
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="text-3xl">{slide.icon}</span>
-                        <h3 className="text-xl md:text-2xl font-bold">{slide.title}</h3>
-                      </div>
-                      <p className="text-sm md:text-base text-white/90">{slide.description}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-              
-              {/* Banner Navigation Dots */}
-              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
-                {bannerSlides.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentBannerSlide(index)}
-                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                      index === currentBannerSlide ? 'bg-white scale-125' : 'bg-white/50'
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
 
-          {/* Service Suggestions */}
-          <div className="bg-white rounded-2xl shadow-xl p-6">
+
+          {/* Container 1: Service được ưa chuộng tại [Thành phố] */}
+          <div className="bg-white rounded-2xl shadow-xl p-6 mb-8">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-2xl font-bold text-gray-900">
-                {activeService === 'accommodation' && '🏨 Chỗ ở được đề xuất'}
-                {activeService === 'tour' && '🗺️ Tour du lịch phổ biến'}
-                {activeService === 'transport' && '✈️ Phương tiện vận chuyển'}
+                {searchData.city ? 
+                  `${getServiceName()} được ưa chuộng tại ${getCityName()}` : 
+                  `${getServiceName()} được ưa chuộng tại Việt Nam`
+                }
               </h3>
               <div className="flex gap-2">
                 <button className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
@@ -386,13 +458,75 @@ const Services: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {getCurrentData().map((item) => (
+              {getCurrentData().slice(0, 4).map((item) => (
                 <div
                   key={item.id}
-                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-200"
+                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-200 flex flex-col h-full"
+                >
+                  <div className="relative flex-shrink-0">
+                    <img 
+                      src={item.image} 
+                      alt={item.name}
+                      className="w-full h-48 object-cover"
+                    />
+                    <button className="absolute top-3 right-3 p-2 rounded-full bg-white/80 hover:bg-white transition-colors">
+                      {item.isFavorite ? (
+                        <FaHeart className="text-red-500" />
+                      ) : (
+                        <FaRegHeart className="text-gray-600" />
+                      )}
+                    </button>
+                  </div>
+                  
+                  <div className="p-4 flex flex-col flex-grow">
+                    <h4 className="font-bold text-gray-900 mb-2 line-clamp-2 min-h-[3rem]">{item.name}</h4>
+                    <div className="flex items-center gap-1 mb-3">
+                      <FaStar className="text-yellow-400 text-sm" />
+                      <span className="text-sm font-medium text-gray-700">{item.rating}</span>
+                    </div>
+                    <div className="flex items-center justify-between mb-4 flex-grow">
+                      <span className="text-lg font-bold text-blue-600">{item.price}</span>
+                    </div>
+                    
+                    {/* Action Buttons - Always at bottom */}
+                    <div className="flex gap-2 mt-auto">
+                      <button className="flex-1 bg-blue-50 text-blue-600 py-2 px-4 rounded-lg font-medium hover:bg-blue-100 transition-colors">
+                        Xem chi tiết
+                      </button>
+                      <button className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+                        Đặt ngay
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Container 2: Service được đặt nhiều nhất trên Tripook */}
+          <div className="bg-white rounded-2xl shadow-xl p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-2xl font-bold text-gray-900">
+                {getServiceName()} được đặt nhiều nhất trên Tripook
+              </h3>
+              <div className="flex gap-2">
+                <button className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
+                  <FaChevronLeft className="text-gray-600" />
+                </button>
+                <button className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
+                  <FaChevronRight className="text-gray-600" />
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {getCurrentData().slice(4, 8).map((item) => (
+                <div
+                  key={item.id}
+                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-200 flex flex-col h-full"
                 >
                   {/* Image */}
-                  <div className="relative h-48 overflow-hidden">
+                  <div className="relative h-48 overflow-hidden flex-shrink-0">
                     <img
                       src={item.image}
                       alt={item.name}
@@ -408,8 +542,8 @@ const Services: React.FC = () => {
                   </div>
 
                   {/* Content */}
-                  <div className="p-4">
-                    <h4 className="font-semibold text-gray-900 mb-2 line-clamp-2">
+                  <div className="p-4 flex flex-col flex-grow">
+                    <h4 className="font-semibold text-gray-900 mb-2 line-clamp-2 min-h-[3rem]">
                       {item.name}
                     </h4>
                     
@@ -422,14 +556,14 @@ const Services: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center justify-between mb-4 flex-grow">
                       <span className="text-lg font-bold text-blue-600">
                         {item.price}
                       </span>
                     </div>
 
-                    {/* Action Buttons */}
-                    <div className="flex gap-2">
+                    {/* Action Buttons - Always at bottom */}
+                    <div className="flex gap-2 mt-auto">
                       <button className="flex-1 bg-blue-50 text-blue-600 py-2 px-4 rounded-lg font-medium hover:bg-blue-100 transition-colors">
                         Xem chi tiết
                       </button>
