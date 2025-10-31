@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
 import SimpleMap from './SimpleMap';
@@ -490,9 +491,12 @@ const Services: React.FC = () => {
                     
                     {/* Action Buttons - Always at bottom */}
                     <div className="flex gap-2 mt-auto">
-                      <button className="flex-1 bg-blue-50 text-blue-600 py-2 px-4 rounded-lg font-medium hover:bg-blue-100 transition-colors">
+                      <Link 
+                        to={`/services/detail/${item.id}`} 
+                        className="flex-1 bg-blue-50 text-blue-600 py-2 px-4 rounded-lg font-medium hover:bg-blue-100 transition-colors text-center"
+                      >
                         Xem chi tiết
-                      </button>
+                      </Link>
                       <button className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors">
                         Đặt ngay
                       </button>
@@ -564,9 +568,12 @@ const Services: React.FC = () => {
 
                     {/* Action Buttons - Always at bottom */}
                     <div className="flex gap-2 mt-auto">
-                      <button className="flex-1 bg-blue-50 text-blue-600 py-2 px-4 rounded-lg font-medium hover:bg-blue-100 transition-colors">
+                      <Link 
+                        to={`/services/detail/${item.id}`} 
+                        className="flex-1 bg-blue-50 text-blue-600 py-2 px-4 rounded-lg font-medium hover:bg-blue-100 transition-colors text-center"
+                      >
                         Xem chi tiết
-                      </button>
+                      </Link>
                       <button className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors">
                         Đặt ngay
                       </button>

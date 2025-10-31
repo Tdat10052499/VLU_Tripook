@@ -423,38 +423,41 @@ const Home: React.FC = () => {
 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {sampleAccommodations.map((item) => (
-                <div key={item.id} className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer">
-                  <div className="relative">
+                <div key={item.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col h-full">
+                  <div className="relative flex-shrink-0">
                     <img
                       src={item.image}
                       alt={item.name}
                       className="w-full h-48 object-cover"
                     />
-                    <button className="absolute top-2 right-2 p-2 rounded-full bg-white/80 hover:bg-white transition-colors">
+                    <button className="absolute top-3 right-3 p-2 rounded-full bg-white/80 hover:bg-white transition-colors">
                       {item.isFavorite ? (
-                        <FaHeart className="w-4 h-4 text-red-500" />
+                        <FaHeart className="text-red-500" />
                       ) : (
-                        <FaRegHeart className="w-4 h-4 text-gray-600" />
+                        <FaRegHeart className="text-gray-600" />
                       )}
                     </button>
-                    <div className="absolute top-2 left-2 px-2 py-1 bg-white/90 rounded-md">
-                      <span className="text-xs font-medium text-gray-700">Guest favorite</span>
-                    </div>
                   </div>
-                  <div className="p-3">
-                    <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">{item.name}</h3>
-                    <div className="flex items-center mb-2">
-                      <div className="flex items-center">
-                        <FaStar className="w-3 h-3 text-yellow-400 mr-1" />
-                        <span className="text-sm font-medium text-gray-900">{item.rating}</span>
-                      </div>
+                  
+                  <div className="p-4 flex flex-col flex-grow">
+                    <h4 className="font-bold text-gray-900 mb-2 line-clamp-2 min-h-[3rem]">{item.name}</h4>
+                    <div className="flex items-center gap-1 mb-3">
+                      <FaStar className="text-yellow-400 text-sm" />
+                      <span className="text-sm font-medium text-gray-700">{item.rating}</span>
                     </div>
-                    <p className="text-sm font-medium text-gray-900 mb-3">{item.price}</p>
-                    <div className="flex gap-2">
-                      <button className="flex-1 px-2 py-1.5 text-xs font-medium text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                    <div className="flex items-center justify-between mb-4 flex-grow">
+                      <span className="text-lg font-bold text-blue-600">{item.price}</span>
+                    </div>
+                    
+                    {/* Action Buttons - Always at bottom */}
+                    <div className="flex gap-2 mt-auto">
+                      <Link 
+                        to={`/services/detail/${item.id}`} 
+                        className="flex-1 bg-blue-50 text-blue-600 py-2 px-4 rounded-lg font-medium hover:bg-blue-100 transition-colors text-center"
+                      >
                         Xem chi tiết
-                      </button>
-                      <button className="flex-1 px-2 py-1.5 text-xs font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 transition-colors">
+                      </Link>
+                      <button className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors">
                         Đặt ngay
                       </button>
                     </div>
@@ -498,38 +501,41 @@ const Home: React.FC = () => {
 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {sampleTours.map((item) => (
-                <div key={item.id} className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer">
-                  <div className="relative">
+                <div key={item.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col h-full">
+                  <div className="relative flex-shrink-0">
                     <img
                       src={item.image}
                       alt={item.name}
                       className="w-full h-48 object-cover"
                     />
-                    <button className="absolute top-2 right-2 p-2 rounded-full bg-white/80 hover:bg-white transition-colors">
+                    <button className="absolute top-3 right-3 p-2 rounded-full bg-white/80 hover:bg-white transition-colors">
                       {item.isFavorite ? (
-                        <FaHeart className="w-4 h-4 text-red-500" />
+                        <FaHeart className="text-red-500" />
                       ) : (
-                        <FaRegHeart className="w-4 h-4 text-gray-600" />
+                        <FaRegHeart className="text-gray-600" />
                       )}
                     </button>
-                    <div className="absolute top-2 left-2 px-2 py-1 bg-white/90 rounded-md">
-                      <span className="text-xs font-medium text-gray-700">Guest favorite</span>
-                    </div>
                   </div>
-                  <div className="p-3">
-                    <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">{item.name}</h3>
-                    <div className="flex items-center mb-2">
-                      <div className="flex items-center">
-                        <FaStar className="w-3 h-3 text-yellow-400 mr-1" />
-                        <span className="text-sm font-medium text-gray-900">{item.rating}</span>
-                      </div>
+                  
+                  <div className="p-4 flex flex-col flex-grow">
+                    <h4 className="font-bold text-gray-900 mb-2 line-clamp-2 min-h-[3rem]">{item.name}</h4>
+                    <div className="flex items-center gap-1 mb-3">
+                      <FaStar className="text-yellow-400 text-sm" />
+                      <span className="text-sm font-medium text-gray-700">{item.rating}</span>
                     </div>
-                    <p className="text-sm font-medium text-gray-900 mb-3">{item.price}</p>
-                    <div className="flex gap-2">
-                      <button className="flex-1 px-2 py-1.5 text-xs font-medium text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                    <div className="flex items-center justify-between mb-4 flex-grow">
+                      <span className="text-lg font-bold text-blue-600">{item.price}</span>
+                    </div>
+                    
+                    {/* Action Buttons - Always at bottom */}
+                    <div className="flex gap-2 mt-auto">
+                      <Link 
+                        to={`/services/detail/${item.id}`} 
+                        className="flex-1 bg-blue-50 text-blue-600 py-2 px-4 rounded-lg font-medium hover:bg-blue-100 transition-colors text-center"
+                      >
                         Xem chi tiết
-                      </button>
-                      <button className="flex-1 px-2 py-1.5 text-xs font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 transition-colors">
+                      </Link>
+                      <button className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors">
                         Đặt ngay
                       </button>
                     </div>
@@ -571,40 +577,40 @@ const Home: React.FC = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {sampleTransports.map((item) => (
-                <div key={item.id} className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+                <div key={item.id} className="group bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col">
                   <div className="relative">
                     <img
                       src={item.image}
                       alt={item.name}
                       className="w-full h-48 object-cover"
                     />
-                    <button className="absolute top-2 right-2 p-2 rounded-full bg-white/80 hover:bg-white transition-colors">
+                    <button className="absolute top-3 right-3 p-2.5 rounded-full bg-white/90 hover:bg-white transition-all duration-200 shadow-sm">
                       {item.isFavorite ? (
                         <FaHeart className="w-4 h-4 text-red-500" />
                       ) : (
-                        <FaRegHeart className="w-4 h-4 text-gray-600" />
+                        <FaRegHeart className="w-4 h-4 text-gray-600 hover:text-red-400" />
                       )}
                     </button>
-                    <div className="absolute top-2 left-2 px-2 py-1 bg-white/90 rounded-md">
-                      <span className="text-xs font-medium text-gray-700">Guest favorite</span>
+                    <div className="absolute top-3 left-3 px-3 py-1.5 bg-white/95 backdrop-blur-sm rounded-full shadow-sm">
+                      <span className="text-xs font-semibold text-gray-700">Guest favorite</span>
                     </div>
                   </div>
-                  <div className="p-3">
-                    <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">{item.name}</h3>
-                    <div className="flex items-center mb-2">
-                      <div className="flex items-center">
-                        <FaStar className="w-3 h-3 text-yellow-400 mr-1" />
-                        <span className="text-sm font-medium text-gray-900">{item.rating}</span>
+                  <div className="p-5 flex flex-col flex-1">
+                    <h3 className="font-semibold text-gray-900 mb-3 line-clamp-2 text-base leading-tight">{item.name}</h3>
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-1.5">
+                        <FaStar className="w-4 h-4 text-yellow-400" />
+                        <span className="text-sm font-semibold text-gray-900">{item.rating}</span>
                       </div>
                     </div>
-                    <p className="text-sm font-medium text-gray-900 mb-3">{item.price}</p>
-                    <div className="flex gap-2">
-                      <button className="flex-1 px-2 py-1.5 text-xs font-medium text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                    <p className="text-lg font-bold text-indigo-600 mb-4">{item.price}</p>
+                    <div className="flex gap-2 mt-auto">
+                      <button className="flex-1 px-3 py-2.5 text-sm font-medium text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-200">
                         Xem chi tiết
                       </button>
-                      <button className="flex-1 px-2 py-1.5 text-xs font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 transition-colors">
+                      <button className="flex-1 px-3 py-2.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-all duration-200 shadow-sm hover:shadow-md">
                         Đặt ngay
                       </button>
                     </div>

@@ -5,13 +5,15 @@ interface SimpleMapProps {
   longitude: number;
   zoom?: number;
   className?: string;
+  popupContent?: string;
 }
 
 const SimpleMap: React.FC<SimpleMapProps> = ({ 
   latitude, 
   longitude, 
   zoom = 15, 
-  className = "" 
+  className = "",
+  popupContent
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
@@ -82,9 +84,19 @@ const SimpleMap: React.FC<SimpleMapProps> = ({
         });
 
         // Add marker
-        L.marker([latitude, longitude], { icon: customIcon })
-          .addTo(map)
-          .bindPopup(`
+        const marker = L.marker([latitude, longitude], { icon: customIcon })
+          .addTo(map);
+
+        // Add popup if content is provided
+        if (popupContent) {
+          marker.bindPopup(`
+            <div style="text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
+              <strong style="color: #1e40af;">📍 ${popupContent}</strong>
+            </div>
+          `).openPopup();
+        } else {
+          // Default Tripook popup
+          marker.bindPopup(`
             <div style="text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
               <strong style="color: #1e40af;">🏢 Trụ sở Tripook</strong><br/>
               <small style="color: #6b7280;">
@@ -94,8 +106,8 @@ const SimpleMap: React.FC<SimpleMapProps> = ({
                 📞 1900 1234
               </small>
             </div>
-          `)
-          .openPopup();
+          `).openPopup();
+        }
 
       } catch (error) {
         console.warn('Map initialization error:', error);
@@ -120,7 +132,7 @@ const SimpleMap: React.FC<SimpleMapProps> = ({
         }
       }
     };
-  }, [latitude, longitude, zoom]);
+  }, [latitude, longitude, zoom, popupContent]);
 
   return (
     <div className={`relative ${className}`}>
