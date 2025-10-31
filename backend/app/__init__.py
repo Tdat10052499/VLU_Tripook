@@ -1,4 +1,4 @@
-from flask import Flask
+# App packagefrom flask import Flask
 from flask_cors import CORS
 from app.routes.auth import AuthResource, LoginResource, RegisterResource, ForgotPasswordResource, ResetPasswordResource
 

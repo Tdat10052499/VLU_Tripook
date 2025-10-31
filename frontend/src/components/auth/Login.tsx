@@ -110,15 +110,23 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div 
+      className="min-h-screen bg-cover bg-center bg-no-repeat flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative"
+      style={{
+        backgroundImage: `url('/images/Backgroud_Home_Filter.png')`,
+        backgroundAttachment: 'fixed'
+      }}
+    >
+      {/* Dark overlay for better contrast */}
+      <div className="absolute inset-0 bg-black/50"></div>
+      <div className="max-w-md w-full space-y-8 relative z-10">
         <div className="bg-white rounded-lg shadow-lg p-8">
           <div className="text-center">
             <h2 className="text-3xl font-bold text-gray-900 mb-2">
               Welcome Back
             </h2>
             <p className="text-gray-600 mb-8">
-              Sign in to your Tripook account
+              Đăng nhập vào tài khoản Tripook của bạn
             </p>
           </div>
 
@@ -229,21 +237,21 @@ const Login: React.FC = () => {
               {isLoading ? (
                 <div className="flex items-center">
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                  Signing in...
+                  Đang đăng nhập...
                 </div>
               ) : (
-                'Sign In'
+                'Đăng nhập'
               )}
             </button>
 
             <div className="text-center">
               <p className="text-sm text-gray-600">
-                Don't have an account?{' '}
+                Chưa có tài khoản?{' '}
                 <Link
                   to="/auth/register"
                   className="font-medium text-indigo-600 hover:text-indigo-500"
                 >
-                  Sign up here
+                  Đăng ký tại đây
                 </Link>
               </p>
             </div>

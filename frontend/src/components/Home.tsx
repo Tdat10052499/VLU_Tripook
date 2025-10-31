@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import Header from '../components/Header';
-import { FaSearch, FaMapMarkerAlt, FaCalendarAlt, FaStar } from 'react-icons/fa';
+import Footer from '../components/Footer';
+import { FaSearch, FaMapMarkerAlt, FaHeart, FaRegHeart, FaChevronLeft, FaChevronRight, FaStar } from 'react-icons/fa';
 
 const Home: React.FC = () => {
   const [searchData, setSearchData] = useState({
@@ -14,6 +16,97 @@ const Home: React.FC = () => {
 
   // Banner carousel state
   const [currentSlide, setCurrentSlide] = useState(0);
+
+  // Service carousel states
+  const [accommodationSlide, setAccommodationSlide] = useState(0);
+  const [tourSlide, setTourSlide] = useState(0);
+  const [transportSlide, setTransportSlide] = useState(0);
+
+  // Random locations for accommodation title
+  const locations = ['Hà Nội', 'Hồ Chí Minh', 'Đà Nẵng', 'Hạ Long', 'Nha Trang', 'Hội An', 'Phú Quốc', 'Sapa'];
+  const [randomLocation] = useState(locations[Math.floor(Math.random() * locations.length)]);
+
+  // Sample data
+  const sampleAccommodations = [
+    {
+      id: 1,
+      name: 'Apartment in Quận Ba Đình',
+      price: '900.000đ/2 đêm',
+      rating: 4.78,
+      image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&h=300&fit=crop',
+      isFavorite: false
+    },
+    {
+      id: 2,
+      name: 'Villa sang trọng Tây Hồ',
+      price: '1.395.000đ/2 đêm',
+      rating: 5.0,
+      image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=300&fit=crop',
+      isFavorite: true
+    },
+    {
+      id: 3,
+      name: 'Homestay cozy Hoàn Kiếm',
+      price: '597.000đ/2 đêm',
+      rating: 4.94,
+      image: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=400&h=300&fit=crop',
+      isFavorite: false
+    }
+  ];
+
+  const sampleTours = [
+    {
+      id: 1,
+      name: 'Tour Hạ Long 3N2Đ',
+      price: '2.500.000đ/người',
+      rating: 4.8,
+      image: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=400&h=300&fit=crop',
+      isFavorite: false
+    },
+    {
+      id: 2,
+      name: 'Sapa trekking 4N3Đ',
+      price: '1.800.000đ/người',
+      rating: 4.9,
+      image: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400&h=300&fit=crop',
+      isFavorite: false
+    },
+    {
+      id: 3,
+      name: 'Phú Quốc tropical 5N4Đ',
+      price: '3.200.000đ/người',
+      rating: 4.7,
+      image: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=400&h=300&fit=crop',
+      isFavorite: true
+    }
+  ];
+
+  const sampleTransports = [
+    {
+      id: 1,
+      name: 'Xe limousine VIP Hà Nội - Sapa',
+      price: '350.000đ/người',
+      rating: 4.6,
+      image: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=400&h=300&fit=crop',
+      isFavorite: false
+    },
+    {
+      id: 2,
+      name: 'Máy bay private charter',
+      price: '15.000.000đ/chuyến',
+      rating: 5.0,
+      image: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=400&h=300&fit=crop',
+      isFavorite: false
+    },
+    {
+      id: 3,
+      name: 'Xe bus sleeping cao cấp',
+      price: '180.000đ/người',
+      rating: 4.4,
+      image: 'https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=400&h=300&fit=crop',
+      isFavorite: true
+    }
+  ];
   const bannerSlides = [
     {
       id: 1,
@@ -75,84 +168,133 @@ const Home: React.FC = () => {
       <Header />
       
       {/* BHeader - Body Header Section */}
-      <section className="bg-gradient-to-br from-blue-600 to-indigo-700 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Search & Filter Bar - Compact Version */}
-          <div className="bg-white rounded-xl shadow-lg p-4 mb-6">
+      <section 
+        className="relative py-16 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `url('/images/Backgroud_Home_Filter.png')`,
+          backgroundAttachment: 'fixed'
+        }}
+      >
+        {/* Dark overlay for better contrast */}
+        <div className="absolute inset-0 bg-black/50"></div>
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Search & Filter Bar - Clean Version */}
+          <div className="bg-white/90 rounded-2xl shadow-2xl p-6 mb-8 border border-gray-200">
             {/* Top Row - Main Search */}
-            <div className="flex flex-col md:flex-row gap-3 mb-4">
+            <div className="flex flex-col md:flex-row gap-4 mb-6">
               <div className="flex-1">
+                <label className="text-sm font-semibold text-gray-800 mb-2 flex items-center">
+                  <span className="text-blue-600 mr-2 text-lg">📍</span>
+                  Tìm kiếm địa điểm
+                </label>
                 <div className="relative">
-                  <FaMapMarkerAlt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
+                  <FaMapMarkerAlt className="absolute left-4 top-1/2 transform -translate-y-1/2 text-indigo-500 text-lg" />
                   <input
                     type="text"
-                    placeholder="Tìm kiếm địa điểm..."
+                    placeholder="Nhập tên thành phố, điểm đến..."
                     value={searchData.destination}
                     onChange={(e) => handleSearchChange('destination', e.target.value)}
-                    className="w-full pl-9 pr-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full pl-12 pr-4 py-4 text-base border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-indigo-500/30 focus:border-indigo-500 bg-white shadow-lg transition-all duration-300 hover:shadow-xl"
                   />
                 </div>
               </div>
-              <div className="flex gap-3">
-                <div className="relative">
-                  <FaCalendarAlt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
-                  <input
-                    type="date"
-                    value={searchData.checkIn}
-                    onChange={(e) => handleSearchChange('checkIn', e.target.value)}
-                    className="pl-9 pr-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                  />
+              <div className="flex gap-4">
+                {/* Ngày đi */}
+                <div className="flex flex-col">
+                  <label className="text-sm font-semibold text-gray-800 mb-2 flex items-center">
+                    <span className="text-green-600 mr-2 text-lg">✈️</span>
+                    Ngày đi
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="date"
+                      value={searchData.checkIn}
+                      onChange={(e) => handleSearchChange('checkIn', e.target.value)}
+                      className="px-4 py-4 text-base border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-green-500/30 focus:border-green-500 bg-gradient-to-r from-green-50 to-emerald-50 focus:bg-white transition-all duration-300 shadow-lg hover:shadow-xl min-w-[180px]"
+                    />
+                  </div>
                 </div>
-                <div className="relative">
-                  <FaCalendarAlt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
-                  <input
-                    type="date"
-                    value={searchData.checkOut}
-                    onChange={(e) => handleSearchChange('checkOut', e.target.value)}
-                    className="pl-9 pr-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                  />
+
+                {/* Ngày về */}
+                <div className="flex flex-col">
+                  <label className="text-sm font-semibold text-gray-800 mb-2 flex items-center">
+                    <span className="text-orange-600 mr-2 text-lg">🏠</span>
+                    Ngày về
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="date"
+                      value={searchData.checkOut}
+                      onChange={(e) => handleSearchChange('checkOut', e.target.value)}
+                      className="px-4 py-4 text-base border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-orange-500/30 focus:border-orange-500 bg-gradient-to-r from-orange-50 to-amber-50 focus:bg-white transition-all duration-300 shadow-lg hover:shadow-xl min-w-[180px]"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Bottom Row - Filters & Search */}
-            <div className="flex flex-col sm:flex-row gap-3">
-              <div className="flex flex-1 gap-3">
-                <select
-                  value={searchData.serviceType}
-                  onChange={(e) => handleSearchChange('serviceType', e.target.value)}
-                  className="flex-1 px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                >
-                  <option value="">Loại dịch vụ</option>
-                  <option value="hotel">Khách sạn</option>
-                  <option value="tour">Tour du lịch</option>
-                  <option value="transport">Vận chuyển</option>
-                </select>
-                <select
-                  value={searchData.priceRange}
-                  onChange={(e) => handleSearchChange('priceRange', e.target.value)}
-                  className="flex-1 px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                >
-                  <option value="">Khoảng giá</option>
-                  <option value="0-1000000">{'<'} 1 triệu</option>
-                  <option value="1000000-3000000">1-3 triệu</option>
-                  <option value="3000000-5000000">3-5 triệu</option>
-                  <option value="5000000+">{'>'} 5 triệu</option>
-                </select>
-                <select
-                  value={searchData.rating}
-                  onChange={(e) => handleSearchChange('rating', e.target.value)}
-                  className="flex-1 px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                >
-                  <option value="">Đánh giá</option>
-                  <option value="5">5 sao</option>
-                  <option value="4">4+ sao</option>
-                  <option value="3">3+ sao</option>
-                </select>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-1 gap-4">
+                {/* Loại dịch vụ */}
+                <div className="flex-1">
+                  <label className="text-sm font-semibold text-gray-800 mb-2 flex items-center">
+                    <span className="text-purple-600 mr-2 text-lg">🏷️</span>
+                    Loại dịch vụ
+                  </label>
+                  <select
+                    value={searchData.serviceType}
+                    onChange={(e) => handleSearchChange('serviceType', e.target.value)}
+                    className="w-full px-4 py-4 text-base border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/30 focus:border-purple-500 bg-gradient-to-r from-purple-50 to-violet-50 focus:bg-white transition-all duration-300 shadow-lg hover:shadow-xl cursor-pointer"
+                  >
+                    <option value="">Chọn loại dịch vụ</option>
+                    <option value="hotel">Chỗ ở</option>
+                    <option value="tour">Tour du lịch</option>
+                    <option value="transport">Vận chuyển</option>
+                  </select>
+                </div>
+
+                {/* Khoảng giá */}
+                <div className="flex-1">
+                  <label className="text-sm font-semibold text-gray-800 mb-2 flex items-center">
+                    <span className="text-red-600 mr-2 text-lg">💰</span>
+                    Khoảng giá
+                  </label>
+                  <select
+                    value={searchData.priceRange}
+                    onChange={(e) => handleSearchChange('priceRange', e.target.value)}
+                    className="w-full px-4 py-4 text-base border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-red-500/30 focus:border-red-500 bg-gradient-to-r from-red-50 to-rose-50 focus:bg-white transition-all duration-300 shadow-lg hover:shadow-xl cursor-pointer"
+                  >
+                    <option value="">Chọn khoảng giá</option>
+                    <option value="0-1000000">{'<'} 1 triệu</option>
+                    <option value="1000000-3000000">1-3 triệu</option>
+                    <option value="3000000-5000000">3-5 triệu</option>
+                    <option value="5000000+">{'>'} 5 triệu</option>
+                  </select>
+                </div>
+
+                {/* Đánh giá */}
+                <div className="flex-1">
+                  <label className="text-sm font-semibold text-gray-800 mb-2 flex items-center">
+                    <span className="text-yellow-600 mr-2 text-lg">⭐</span>
+                    Đánh giá
+                  </label>
+                  <select
+                    value={searchData.rating}
+                    onChange={(e) => handleSearchChange('rating', e.target.value)}
+                    className="w-full px-4 py-4 text-base border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-yellow-500/30 focus:border-yellow-500 bg-gradient-to-r from-yellow-50 to-amber-50 focus:bg-white transition-all duration-300 shadow-lg hover:shadow-xl cursor-pointer"
+                  >
+                    <option value="">Chọn mức đánh giá</option>
+                    <option value="5">5 sao</option>
+                    <option value="4">4+ sao</option>
+                    <option value="3">3+ sao</option>
+                  </select>
+                </div>
               </div>
-              <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center">
-                <FaSearch className="mr-2 text-sm" />
-                Tìm kiếm
+              <button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                <FaSearch className="mr-3 text-lg" />
+                Tìm kiếm ngay
               </button>
             </div>
           </div>
@@ -223,114 +365,26 @@ const Home: React.FC = () => {
               </div>
             </div>
 
-            {/* Service Providers (1/4 width) - Compact */}
+            {/* Service Providers (1/4 width) - Dynamic based on ratings */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-xl shadow-lg p-3 h-72 overflow-y-auto">
-                <h3 className="font-bold text-gray-800 mb-3 text-sm sticky top-0 bg-white pb-1">Đối tác nổi bật</h3>
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2 p-1.5 hover:bg-gray-50 rounded transition-colors cursor-pointer">
-                    <div className="w-6 h-6 bg-blue-100 rounded flex items-center justify-center flex-shrink-0">
-                      <span className="text-xs font-bold text-blue-600">S</span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-gray-800 text-xs truncate leading-tight">Saigon Tourist</h4>
-                      <div className="flex items-center">
-                        <div className="flex text-yellow-400 space-x-0.5">
-                          {[...Array(5)].map((_, i) => (
-                            <FaStar key={i} className="w-2 h-2" />
-                          ))}
-                        </div>
-                        <span className="text-xs text-gray-600 ml-1 font-medium">4.8</span>
-                      </div>
-                    </div>
-                  </div>
+              <div className="bg-white rounded-xl shadow-lg h-72 overflow-hidden">
+                {/* Header Section */}
+                <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-3">
+                  <h3 className="font-bold text-white text-sm text-center">
+                    🏆 Nhà cung cấp dịch vụ nổi bật
+                  </h3>
+                </div>
 
-                  <div className="flex items-center space-x-2 p-1.5 hover:bg-gray-50 rounded transition-colors cursor-pointer">
-                    <div className="w-6 h-6 bg-green-100 rounded flex items-center justify-center flex-shrink-0">
-                      <span className="text-xs font-bold text-green-600">V</span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-gray-800 text-xs truncate leading-tight">Vietravel</h4>
-                      <div className="flex items-center">
-                        <div className="flex text-yellow-400 space-x-0.5">
-                          {[...Array(5)].map((_, i) => (
-                            <FaStar key={i} className="w-2 h-2" />
-                          ))}
-                        </div>
-                        <span className="text-xs text-gray-600 ml-1 font-medium">4.9</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-2 p-1.5 hover:bg-gray-50 rounded transition-colors cursor-pointer">
-                    <div className="w-6 h-6 bg-purple-100 rounded flex items-center justify-center flex-shrink-0">
-                      <span className="text-xs font-bold text-purple-600">F</span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-gray-800 text-xs truncate leading-tight">Fiditour</h4>
-                      <div className="flex items-center">
-                        <div className="flex text-yellow-400 space-x-0.5">
-                          {[...Array(4)].map((_, i) => (
-                            <FaStar key={i} className="w-2 h-2" />
-                          ))}
-                          <FaStar className="w-2 h-2 text-gray-300" />
-                        </div>
-                        <span className="text-xs text-gray-600 ml-1 font-medium">4.7</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-2 p-1.5 hover:bg-gray-50 rounded transition-colors cursor-pointer">
-                    <div className="w-6 h-6 bg-red-100 rounded flex items-center justify-center flex-shrink-0">
-                      <span className="text-xs font-bold text-red-600">T</span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-gray-800 text-xs truncate leading-tight">TST Tourist</h4>
-                      <div className="flex items-center">
-                        <div className="flex text-yellow-400 space-x-0.5">
-                          {[...Array(4)].map((_, i) => (
-                            <FaStar key={i} className="w-2 h-2" />
-                          ))}
-                          <FaStar className="w-2 h-2 text-gray-300" />
-                        </div>
-                        <span className="text-xs text-gray-600 ml-1 font-medium">4.6</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-2 p-1.5 hover:bg-gray-50 rounded transition-colors cursor-pointer">
-                    <div className="w-6 h-6 bg-indigo-100 rounded flex items-center justify-center flex-shrink-0">
-                      <span className="text-xs font-bold text-indigo-600">A</span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-gray-800 text-xs truncate leading-tight">Asia Travel</h4>
-                      <div className="flex items-center">
-                        <div className="flex text-yellow-400 space-x-0.5">
-                          {[...Array(4)].map((_, i) => (
-                            <FaStar key={i} className="w-2 h-2" />
-                          ))}
-                          <FaStar className="w-2 h-2 text-gray-300" />
-                        </div>
-                        <span className="text-xs text-gray-600 ml-1 font-medium">4.5</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-2 p-1.5 hover:bg-gray-50 rounded transition-colors cursor-pointer">
-                    <div className="w-6 h-6 bg-teal-100 rounded flex items-center justify-center flex-shrink-0">
-                      <span className="text-xs font-bold text-teal-600">H</span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-gray-800 text-xs truncate leading-tight">HanoiRedtour</h4>
-                      <div className="flex items-center">
-                        <div className="flex text-yellow-400 space-x-0.5">
-                          {[...Array(4)].map((_, i) => (
-                            <FaStar key={i} className="w-2 h-2" />
-                          ))}
-                          <FaStar className="w-2 h-2 text-gray-300" />
-                        </div>
-                        <span className="text-xs text-gray-600 ml-1 font-medium">4.4</span>
-                      </div>
+                {/* Body Section */}
+                <div className="p-3 h-60 overflow-y-auto">
+                  <div className="flex flex-col items-center justify-center h-full text-gray-500">
+                    <div className="text-4xl mb-3">📊</div>
+                    <p className="text-sm text-center">
+                      Danh sách nhà cung cấp sẽ được hiển thị<br />
+                      dựa trên đánh giá của khách hàng
+                    </p>
+                    <div className="mt-3 text-xs text-gray-400">
+                      Sắp xếp theo số sao đánh giá
                     </div>
                   </div>
                 </div>
@@ -340,138 +394,337 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Main Content Area - BBody and BFooter will be added here */}
-      <main className="min-h-screen">
-        {/* Placeholder for BBody and BFooter */}
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <div className="text-center py-20">
-            <h2 className="text-2xl text-gray-800 font-semibold mb-4">
-              🚧 BBody và BFooter sẽ được thêm vào tiếp theo
-            </h2>
-            <p className="text-lg text-gray-600">
-              BHeader đã hoàn thành với Searching/Filter và Banner + Service Providers
-            </p>
-          </div>
-        </div>
-      </main>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-16">
+      {/* BBody - Services Section */}
+      <main className="bg-gray-50 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Main Footer Content */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-            {/* Logo and Description */}
-            <div className="md:col-span-1 text-center md:text-left">
-              <div className="flex items-center justify-center md:justify-start space-x-3 mb-6">
-                <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">T</span>
-                </div>
-                <span className="text-2xl font-bold tracking-wider">TRIPOOK</span>
-              </div>
-              <p className="text-gray-300 text-sm leading-relaxed max-w-xs mx-auto md:mx-0">
-                Nền tảng đặt tour du lịch hàng đầu, mang đến những trải nghiệm tuyệt vời và kỷ niệm khó quên cho mọi chuyến đi của bạn.
-              </p>
-              <p className="text-gray-400 text-xs mt-4 italic">
-                * Đây là sản phẩm học tập không dùng để kinh doanh
-              </p>
-            </div>
-
-            {/* Liên kết nhanh */}
-            <div className="text-center md:text-left">
-              <h3 className="text-lg font-semibold mb-6 text-white">Liên kết nhanh</h3>
-              <ul className="space-y-3">
-                <li><a href="#about" className="text-gray-300 hover:text-indigo-400 transition-colors duration-200 text-sm">Về chúng tôi</a></li>
-                <li><a href="#services" className="text-gray-300 hover:text-indigo-400 transition-colors duration-200 text-sm">Dịch vụ</a></li>
-                <li><a href="#support" className="text-gray-300 hover:text-indigo-400 transition-colors duration-200 text-sm">Trở thành đối tác</a></li>
-                <li><a href="#tours" className="text-gray-300 hover:text-indigo-400 transition-colors duration-200 text-sm">Đặt tour</a></li>
-                <li><a href="#contact" className="text-gray-300 hover:text-indigo-400 transition-colors duration-200 text-sm">Liên hệ</a></li>
-              </ul>
-            </div>
-
-            {/* Hỗ trợ khách hàng */}
-            <div className="text-center md:text-left">
-              <h3 className="text-lg font-semibold mb-6 text-white">Hỗ trợ khách hàng</h3>
-              <ul className="space-y-3">
-                <li><a href="#help-center" className="text-gray-300 hover:text-indigo-400 transition-colors duration-200 text-sm">Trung tâm trợ giúp</a></li>
-                <li><a href="#faq" className="text-gray-300 hover:text-indigo-400 transition-colors duration-200 text-sm">Câu hỏi thường gặp</a></li>
-                <li><a href="#terms" className="text-gray-300 hover:text-indigo-400 transition-colors duration-200 text-sm">Điều khoản sử dụng</a></li>
-                <li><a href="#privacy" className="text-gray-300 hover:text-indigo-400 transition-colors duration-200 text-sm">Chính sách bảo mật</a></li>
-                <li><a href="#cancellation" className="text-gray-300 hover:text-indigo-400 transition-colors duration-200 text-sm">Chính sách hủy tour</a></li>
-              </ul>
-            </div>
-
-            {/* Newsletter */}
-            <div className="text-center md:text-left">
-              <h3 className="text-lg font-semibold mb-6 text-white">Theo dõi chúng tôi</h3>
-              <p className="text-gray-300 text-sm mb-4">
-                Đăng ký nhận tin tức và ưu đãi mới nhất từ Tripook
-              </p>
-              <div className="flex flex-col space-y-3">
-                <input
-                  type="email"
-                  placeholder="Nhập email của bạn"
-                  className="px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
-                />
-                <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors duration-200 text-sm font-medium">
-                  Đăng ký
+          {/* Accommodations Section */}
+          <section className="mb-12">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 flex items-center">
+                🏠 Chỗ ở phổ biến ở {randomLocation}
+              </h2>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => setAccommodationSlide(Math.max(0, accommodationSlide - 1))}
+                  disabled={accommodationSlide === 0}
+                  className="p-2 rounded-full border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <FaChevronLeft className="w-4 h-4 text-gray-600" />
+                </button>
+                <button
+                  onClick={() => setAccommodationSlide(Math.min(sampleAccommodations.length - 1, accommodationSlide + 1))}
+                  disabled={accommodationSlide >= sampleAccommodations.length - 1}
+                  className="p-2 rounded-full border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <FaChevronRight className="w-4 h-4 text-gray-600" />
                 </button>
               </div>
             </div>
-          </div>
 
-          {/* Contact Info Bar */}
-          <div className="border-t border-gray-800 pt-8">
-            <div className="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-12">
-              {/* Hotline */}
-              <div className="flex items-center space-x-3">
-                <div className="flex items-center justify-center w-8 h-8 bg-indigo-600 rounded-full">
-                  <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-                  </svg>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {sampleAccommodations.map((item) => (
+                <div key={item.id} className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+                  <div className="relative">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-full h-48 object-cover"
+                    />
+                    <button className="absolute top-2 right-2 p-2 rounded-full bg-white/80 hover:bg-white transition-colors">
+                      {item.isFavorite ? (
+                        <FaHeart className="w-4 h-4 text-red-500" />
+                      ) : (
+                        <FaRegHeart className="w-4 h-4 text-gray-600" />
+                      )}
+                    </button>
+                    <div className="absolute top-2 left-2 px-2 py-1 bg-white/90 rounded-md">
+                      <span className="text-xs font-medium text-gray-700">Guest favorite</span>
+                    </div>
+                  </div>
+                  <div className="p-3">
+                    <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">{item.name}</h3>
+                    <div className="flex items-center mb-2">
+                      <div className="flex items-center">
+                        <FaStar className="w-3 h-3 text-yellow-400 mr-1" />
+                        <span className="text-sm font-medium text-gray-900">{item.rating}</span>
+                      </div>
+                    </div>
+                    <p className="text-sm font-medium text-gray-900 mb-3">{item.price}</p>
+                    <div className="flex gap-2">
+                      <button className="flex-1 px-2 py-1.5 text-xs font-medium text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                        Xem chi tiết
+                      </button>
+                      <button className="flex-1 px-2 py-1.5 text-xs font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 transition-colors">
+                        Đặt ngay
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-gray-400 text-xs">Hotline:</p>
-                  <p className="text-white text-sm font-medium">1900-1234</p>
+              ))}
+              
+              {/* Show "Chưa có dịch vụ" if no data */}
+              {sampleAccommodations.length === 0 && (
+                <div className="col-span-full flex flex-col items-center justify-center py-12 text-gray-500">
+                  <div className="text-4xl mb-3">🏠</div>
+                  <p className="text-sm">Chưa có dịch vụ</p>
                 </div>
+              )}
+            </div>
+          </section>
+
+          {/* Tours Section */}
+          <section className="mb-12">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 flex items-center">
+                🗺️ Tour nổi bật
+              </h2>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => setTourSlide(Math.max(0, tourSlide - 1))}
+                  disabled={tourSlide === 0}
+                  className="p-2 rounded-full border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <FaChevronLeft className="w-4 h-4 text-gray-600" />
+                </button>
+                <button
+                  onClick={() => setTourSlide(Math.min(sampleTours.length - 1, tourSlide + 1))}
+                  disabled={tourSlide >= sampleTours.length - 1}
+                  className="p-2 rounded-full border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <FaChevronRight className="w-4 h-4 text-gray-600" />
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {sampleTours.map((item) => (
+                <div key={item.id} className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+                  <div className="relative">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-full h-48 object-cover"
+                    />
+                    <button className="absolute top-2 right-2 p-2 rounded-full bg-white/80 hover:bg-white transition-colors">
+                      {item.isFavorite ? (
+                        <FaHeart className="w-4 h-4 text-red-500" />
+                      ) : (
+                        <FaRegHeart className="w-4 h-4 text-gray-600" />
+                      )}
+                    </button>
+                    <div className="absolute top-2 left-2 px-2 py-1 bg-white/90 rounded-md">
+                      <span className="text-xs font-medium text-gray-700">Guest favorite</span>
+                    </div>
+                  </div>
+                  <div className="p-3">
+                    <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">{item.name}</h3>
+                    <div className="flex items-center mb-2">
+                      <div className="flex items-center">
+                        <FaStar className="w-3 h-3 text-yellow-400 mr-1" />
+                        <span className="text-sm font-medium text-gray-900">{item.rating}</span>
+                      </div>
+                    </div>
+                    <p className="text-sm font-medium text-gray-900 mb-3">{item.price}</p>
+                    <div className="flex gap-2">
+                      <button className="flex-1 px-2 py-1.5 text-xs font-medium text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                        Xem chi tiết
+                      </button>
+                      <button className="flex-1 px-2 py-1.5 text-xs font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 transition-colors">
+                        Đặt ngay
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              
+              {/* Show "Chưa có dịch vụ" if no data */}
+              {sampleTours.length === 0 && (
+                <div className="col-span-full flex flex-col items-center justify-center py-12 text-gray-500">
+                  <div className="text-4xl mb-3">🗺️</div>
+                  <p className="text-sm">Chưa có dịch vụ</p>
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* Transportation Section */}
+          <section className="mb-12">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 flex items-center">
+                🚗 Dịch vụ vận chuyển
+              </h2>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => setTransportSlide(Math.max(0, transportSlide - 1))}
+                  disabled={transportSlide === 0}
+                  className="p-2 rounded-full border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <FaChevronLeft className="w-4 h-4 text-gray-600" />
+                </button>
+                <button
+                  onClick={() => setTransportSlide(Math.min(sampleTransports.length - 1, transportSlide + 1))}
+                  disabled={transportSlide >= sampleTransports.length - 1}
+                  className="p-2 rounded-full border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <FaChevronRight className="w-4 h-4 text-gray-600" />
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {sampleTransports.map((item) => (
+                <div key={item.id} className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+                  <div className="relative">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-full h-48 object-cover"
+                    />
+                    <button className="absolute top-2 right-2 p-2 rounded-full bg-white/80 hover:bg-white transition-colors">
+                      {item.isFavorite ? (
+                        <FaHeart className="w-4 h-4 text-red-500" />
+                      ) : (
+                        <FaRegHeart className="w-4 h-4 text-gray-600" />
+                      )}
+                    </button>
+                    <div className="absolute top-2 left-2 px-2 py-1 bg-white/90 rounded-md">
+                      <span className="text-xs font-medium text-gray-700">Guest favorite</span>
+                    </div>
+                  </div>
+                  <div className="p-3">
+                    <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">{item.name}</h3>
+                    <div className="flex items-center mb-2">
+                      <div className="flex items-center">
+                        <FaStar className="w-3 h-3 text-yellow-400 mr-1" />
+                        <span className="text-sm font-medium text-gray-900">{item.rating}</span>
+                      </div>
+                    </div>
+                    <p className="text-sm font-medium text-gray-900 mb-3">{item.price}</p>
+                    <div className="flex gap-2">
+                      <button className="flex-1 px-2 py-1.5 text-xs font-medium text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                        Xem chi tiết
+                      </button>
+                      <button className="flex-1 px-2 py-1.5 text-xs font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 transition-colors">
+                        Đặt ngay
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              
+              {/* Show "Chưa có dịch vụ" if no data */}
+              {sampleTransports.length === 0 && (
+                <div className="col-span-full flex flex-col items-center justify-center py-12 text-gray-500">
+                  <div className="text-4xl mb-3">🚗</div>
+                  <p className="text-sm">Chưa có dịch vụ</p>
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* BFooter - Call to Action Section */}
+          <section className="relative bg-gradient-to-br from-blue-500 to-indigo-600 rounded-3xl py-12 px-8 overflow-hidden">
+            {/* Background Decorative Elements */}
+            <div className="absolute inset-0">
+              {/* Yellow/Orange decorative shapes */}
+              <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full opacity-20 -translate-x-1/2 -translate-y-1/2"></div>
+              <div className="absolute bottom-0 left-1/4 w-20 h-20 bg-gradient-to-br from-yellow-300 to-orange-300 rounded-full opacity-30"></div>
+              <div className="absolute top-1/3 right-0 w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full opacity-25 translate-x-1/2"></div>
+              
+              {/* Blue accent shapes */}
+              <div className="absolute bottom-8 right-8 w-6 h-6 bg-blue-300 rounded-full opacity-40"></div>
+              <div className="absolute top-8 right-1/4 w-4 h-4 bg-blue-200 rounded-full opacity-50"></div>
+            </div>
+
+            <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              {/* Left Content */}
+              <div className="text-left">
+                <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 text-white leading-tight">
+                  Cảm giác như ở nhà cho chuyến đi tiếp theo của bạn?
+                </h2>
+                <Link
+                  to="/services"
+                  className="inline-block bg-white text-blue-600 font-semibold px-8 py-4 rounded-lg text-lg hover:bg-gray-50 hover:shadow-lg transform transition-all duration-300"
+                >
+                  Khám phá dịch vụ du lịch
+                </Link>
               </div>
 
-              {/* Email */}
-              <div className="flex items-center space-x-3">
-                <div className="flex items-center justify-center w-8 h-8 bg-indigo-600 rounded-full">
-                  <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                  </svg>
-                </div>
-                <div>
-                  <p className="text-gray-400 text-xs">Email:</p>
-                  <p className="text-white text-sm font-medium">info@tripook.vn</p>
-                </div>
-              </div>
+              {/* Right Illustration */}
+              <div className="relative flex justify-center lg:justify-end">
+                <div className="relative">
+                  {/* Room Background */}
+                  <div className="w-80 h-64 bg-gradient-to-br from-blue-400 to-blue-500 rounded-2xl relative overflow-hidden">
+                    {/* Floor */}
+                    <div className="absolute bottom-0 left-0 right-0 h-16 bg-blue-300 rounded-b-2xl"></div>
+                    
+                    {/* Chair */}
+                    <div className="absolute bottom-16 left-12">
+                      {/* Chair back */}
+                      <div className="w-16 h-20 bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-t-2xl relative">
+                        {/* Chair curves */}
+                        <div className="absolute top-2 left-2 right-2 h-12 bg-gradient-to-br from-yellow-300 to-yellow-400 rounded-t-xl"></div>
+                      </div>
+                      {/* Chair seat */}
+                      <div className="w-20 h-4 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-lg -mt-1"></div>
+                      {/* Chair legs */}
+                      <div className="flex justify-between mt-1">
+                        <div className="w-1 h-6 bg-yellow-600 rounded-full"></div>
+                        <div className="w-1 h-6 bg-yellow-600 rounded-full"></div>
+                      </div>
+                    </div>
 
-              {/* Address */}
-              <div className="flex items-center space-x-3">
-                <div className="flex items-center justify-center w-8 h-8 bg-indigo-600 rounded-full">
-                  <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div>
-                  <p className="text-gray-400 text-xs">Địa chỉ:</p>
-                  <p className="text-white text-sm font-medium">TP. Hồ Chí Minh</p>
+                    {/* Side Table */}
+                    <div className="absolute bottom-16 right-16">
+                      {/* Table top */}
+                      <div className="w-12 h-2 bg-blue-800 rounded-lg mb-1"></div>
+                      {/* Table leg */}
+                      <div className="w-1 h-8 bg-blue-800 rounded-full mx-auto"></div>
+                      {/* Cup on table */}
+                      <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-4 h-3 bg-white rounded-b-lg"></div>
+                    </div>
+
+                    {/* Plant */}
+                    <div className="absolute bottom-16 left-2">
+                      {/* Pot */}
+                      <div className="w-6 h-4 bg-gray-600 rounded-b-full"></div>
+                      {/* Plant leaves */}
+                      <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
+                        <div className="w-2 h-6 bg-green-600 rounded-full transform -rotate-12"></div>
+                        <div className="w-2 h-5 bg-green-500 rounded-full transform rotate-12 absolute top-0 left-1"></div>
+                        <div className="w-2 h-4 bg-green-600 rounded-full transform rotate-45 absolute top-1 left-2"></div>
+                      </div>
+                    </div>
+
+                    {/* Character */}
+                    <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2">
+                      {/* Head */}
+                      <div className="w-8 h-8 bg-orange-200 rounded-full relative mx-auto mb-1">
+                        {/* Hair */}
+                        <div className="absolute -top-2 left-1 w-6 h-4 bg-yellow-600 rounded-t-full"></div>
+                        {/* Face */}
+                        <div className="absolute top-2 left-2 w-1 h-1 bg-black rounded-full"></div>
+                        <div className="absolute top-2 right-2 w-1 h-1 bg-black rounded-full"></div>
+                        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 w-2 h-1 bg-orange-400 rounded-full"></div>
+                      </div>
+                      {/* Body */}
+                      <div className="w-6 h-8 bg-white rounded-lg mx-auto"></div>
+                    </div>
+
+                    {/* Window */}
+                    <div className="absolute top-8 right-8 w-16 h-12 bg-blue-200 rounded-lg">
+                      <div className="w-full h-0.5 bg-blue-300 absolute top-1/2"></div>
+                      <div className="h-full w-0.5 bg-blue-300 absolute left-1/2"></div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* Copyright */}
-          <div className="border-t border-gray-800 mt-8 pt-6">
-            <p className="text-center text-gray-400 text-sm">
-              © 2025 Tripook. All rights reserved. Plan your perfect adventure with us.
-            </p>
-          </div>
+          </section>
         </div>
-      </footer>
+      </main>
+
+      <Footer />
     </div>
   );
 };

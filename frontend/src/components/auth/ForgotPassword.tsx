@@ -25,8 +25,16 @@ const ForgotPassword: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div 
+      className="min-h-screen bg-cover bg-center bg-no-repeat flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative"
+      style={{
+        backgroundImage: `url('/images/Backgroud_Home_Filter.png')`,
+        backgroundAttachment: 'fixed'
+      }}
+    >
+      {/* Dark overlay for better contrast */}
+      <div className="absolute inset-0 bg-black/50"></div>
+      <div className="max-w-md w-full space-y-8 relative z-10">
         <div className="bg-white rounded-lg shadow-lg p-8">
           <div className="text-center">
             <h2 className="text-3xl font-bold text-gray-900 mb-2">
@@ -84,21 +92,21 @@ const ForgotPassword: React.FC = () => {
 
             <div className="text-center space-y-2">
               <p className="text-sm text-gray-600">
-                Remember your password?{' '}
+                Nhớ mật khẩu rồi?{' '}
                 <Link
                   to="/auth/login"
                   className="font-medium text-indigo-600 hover:text-indigo-500"
                 >
-                  Sign in
+                  Đăng nhập
                 </Link>
               </p>
               <p className="text-sm text-gray-600">
-                Don't have an account?{' '}
+                Chưa có tài khoản?{' '}
                 <Link
                   to="/auth/register"
                   className="font-medium text-indigo-600 hover:text-indigo-500"
                 >
-                  Sign up
+                  Đăng ký
                 </Link>
               </p>
             </div>

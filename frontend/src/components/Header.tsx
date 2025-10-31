@@ -161,13 +161,13 @@ const Header: React.FC = () => {
                   to="/auth/login"
                   className="text-gray-700 hover:text-indigo-600 text-sm font-medium transition-colors"
                 >
-                  Sign In
+                  Đăng nhập
                 </Link>
                 <Link
                   to="/auth/register"
                   className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
                 >
-                  Sign Up
+                  Đăng ký
                 </Link>
               </div>
             )}
