@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import SimpleMap from '../components/SimpleMap';
+import BookingModal from '../components/BookingModal';
 import { 
   FaStar, 
   FaRegStar, 
@@ -90,6 +91,7 @@ const ServiceDetail: React.FC<ServiceDetailProps> = () => {
   const [reviewFilter, setReviewFilter] = useState('all');
   const [displayedReviews, setDisplayedReviews] = useState(5);
   const [relatedServices, setRelatedServices] = useState<RelatedService[]>([]);
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
 
   useEffect(() => {
     // Mock data - In real app, this would be fetched from API
@@ -618,6 +620,7 @@ const ServiceDetail: React.FC<ServiceDetailProps> = () => {
               <button
                 className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors mb-3"
                 disabled={!checkInDate || !checkOutDate}
+                onClick={() => setIsBookingModalOpen(true)}
               >
                 Đặt ngay
               </button>
@@ -789,6 +792,27 @@ const ServiceDetail: React.FC<ServiceDetailProps> = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Booking Modal */}
+      {service && (
+        <BookingModal
+          isOpen={isBookingModalOpen}
+          onClose={() => setIsBookingModalOpen(false)}
+          item={{
+            id: service.id,
+            name: service.name,
+            price: `${(service.discountPrice || service.basePrice).toLocaleString()}đ/đêm`,
+            rating: service.averageRating,
+            image: service.images[0]
+          }}
+          serviceType={service.type}
+          preFilledData={{
+            checkIn: checkInDate,
+            checkOut: checkOutDate,
+            guests: guestCount
+          }}
+        />
       )}
 
       <Footer />

@@ -1,18 +1,30 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import Header from './Header';
 import Footer from './Footer';
-import SimpleMap from './SimpleMap';
+import BookingModal from './BookingModal';
 import { FaSearch, FaMapMarkerAlt, FaHeart, FaRegHeart, FaChevronLeft, FaChevronRight, FaStar } from 'react-icons/fa';
 
 const Services: React.FC = () => {
   const [activeService, setActiveService] = useState('accommodation');
+  const [currentBannerSlide, setCurrentBannerSlide] = useState(0);
   const [searchData, setSearchData] = useState({
     destination: '',
     checkIn: '',
-    checkOut: '',
-    city: ''
+    checkOut: ''
   });
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+
+  // Handle booking modal
+  const handleBookNow = (item: any) => {
+    setSelectedItem(item);
+    setIsBookingModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsBookingModalOpen(false);
+    setSelectedItem(null);
+  };
 
   // Sample data for different services
   const accommodationData = [
@@ -47,38 +59,6 @@ const Services: React.FC = () => {
       rating: 4.7,
       image: 'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=400&h=300&fit=crop',
       isFavorite: false
-    },
-    {
-      id: 5,
-      name: 'InterContinental Danang Sun Peninsula',
-      price: '6.800.000đ/đêm',
-      rating: 4.9,
-      image: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=400&h=300&fit=crop',
-      isFavorite: true
-    },
-    {
-      id: 6,
-      name: 'Flamingo Cát Bà Beach Resort',
-      price: '1.800.000đ/đêm',
-      rating: 4.5,
-      image: 'https://images.unsplash.com/photo-1584132967334-10e028bd69f7?w=400&h=300&fit=crop',
-      isFavorite: false
-    },
-    {
-      id: 7,
-      name: 'JW Marriott Hotel Hanoi',
-      price: '5.200.000đ/đêm',
-      rating: 4.8,
-      image: 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=400&h=300&fit=crop',
-      isFavorite: false
-    },
-    {
-      id: 8,
-      name: 'Anantara Hoi An Resort',
-      price: '4.900.000đ/đêm',
-      rating: 4.7,
-      image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=400&h=300&fit=crop',
-      isFavorite: true
     }
   ];
 
@@ -113,38 +93,6 @@ const Services: React.FC = () => {
       price: '8.900.000đ/người',
       rating: 4.6,
       image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop',
-      isFavorite: true
-    },
-    {
-      id: 5,
-      name: 'Tour Maldives Trọn Gói 5N4Đ',
-      price: '25.900.000đ/người',
-      rating: 4.9,
-      image: 'https://images.unsplash.com/photo-1573843981267-be1999ff37cd?w=400&h=300&fit=crop',
-      isFavorite: true
-    },
-    {
-      id: 6,
-      name: 'Tour Singapore - Malaysia 6N5Đ',
-      price: '12.500.000đ/người',
-      rating: 4.6,
-      image: 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=400&h=300&fit=crop',
-      isFavorite: false
-    },
-    {
-      id: 7,
-      name: 'Tour Nhật Bản Mùa Hoa Anh Đào 7N6Đ',
-      price: '35.000.000đ/người',
-      rating: 4.8,
-      image: 'https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?w=400&h=300&fit=crop',
-      isFavorite: false
-    },
-    {
-      id: 8,
-      name: 'Tour Đài Loan Khám Phá 4N3Đ',
-      price: '14.900.000đ/người',
-      rating: 4.7,
-      image: 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=400&h=300&fit=crop',
       isFavorite: true
     }
   ];
@@ -181,52 +129,38 @@ const Services: React.FC = () => {
       rating: 4.4,
       image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop',
       isFavorite: false
-    },
-    {
-      id: 5,
-      name: 'Vé máy bay TP.HCM - Phú Quốc',
-      price: '950.000đ/chiều',
-      rating: 4.6,
-      image: 'https://images.unsplash.com/photo-1569154941061-e231b4725ef1?w=400&h=300&fit=crop',
-      isFavorite: true
-    },
-    {
-      id: 6,
-      name: 'Thuê xe bus 45 chỗ có tài xế',
-      price: '3.500.000đ/ngày',
-      rating: 4.5,
-      image: 'https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=400&h=300&fit=crop',
-      isFavorite: false
-    },
-    {
-      id: 7,
-      name: 'Vé tàu cao tốc TP.HCM - Vũng Tàu',
-      price: '280.000đ/người',
-      rating: 4.2,
-      image: 'https://images.unsplash.com/photo-1474487548417-781cb71495f3?w=400&h=300&fit=crop',
-      isFavorite: false
-    },
-    {
-      id: 8,
-      name: 'Thuê xe limousine VIP',
-      price: '2.800.000đ/ngày',
-      rating: 4.8,
-      image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400&h=300&fit=crop',
-      isFavorite: true
     }
   ];
 
-  // Danh sách thành phố
-  const cities = [
-    { value: '', label: 'Tất cả thành phố' },
-    { value: 'ho-chi-minh', label: 'TP. Hồ Chí Minh' },
-    { value: 'ha-noi', label: 'Hà Nội' },
-    { value: 'da-nang', label: 'Đà Nẵng' },
-    { value: 'nha-trang', label: 'Nha Trang' },
-    { value: 'phu-quoc', label: 'Phú Quốc' },
-    { value: 'hoi-an', label: 'Hội An' },
-    { value: 'can-tho', label: 'Cần Thơ' },
-    { value: 'vung-tau', label: 'Vũng Tàu' }
+  const bannerSlides = [
+    {
+      id: 1,
+      title: "Ưu đãi mùa hè 2025!",
+      description: "Giảm giá lên đến 40% cho tất cả dịch vụ du lịch. Đặt ngay để nhận ưu đãi tốt nhất!",
+      gradient: "from-orange-400 to-pink-500",
+      icon: "🌞"
+    },
+    {
+      id: 2,
+      title: "Tour Châu Âu Khuyến Mãi",
+      description: "Khám phá 5 nước châu Âu chỉ từ 45.999.000đ. Bao gồm vé máy bay và khách sạn 4 sao!",
+      gradient: "from-blue-500 to-cyan-400",
+      icon: "🇪🇺"
+    },
+    {
+      id: 3,
+      title: "Combo Nghỉ Dưỡng Phú Quốc",
+      description: "Resort 5 sao + Tour 4 đảo + Ăn uống không giới hạn. Ưu đãi đặc biệt 30%!",
+      gradient: "from-green-500 to-emerald-400",
+      icon: "🏖️"
+    },
+    {
+      id: 4,
+      title: "Đặt Sớm Tiết Kiệm Nhiều",
+      description: "Đặt tour trước 60 ngày nhận ngay voucher 2.000.000đ. Áp dụng cho mọi điểm đến!",
+      gradient: "from-purple-500 to-violet-400",
+      icon: "💰"
+    }
   ];
 
   const getCurrentData = () => {
@@ -242,21 +176,13 @@ const Services: React.FC = () => {
     setSearchData(prev => ({ ...prev, [field]: value }));
   };
 
-  const getServiceName = () => {
-    switch (activeService) {
-      case 'accommodation': return 'Chỗ ở';
-      case 'tour': return 'Tour du lịch';
-      case 'transport': return 'Vận chuyển';
-      default: return 'Dịch vụ';
-    }
-  };
-
-  const getCityName = () => {
-    const selectedCity = cities.find(city => city.value === searchData.city);
-    return selectedCity ? selectedCity.label : 'Tất cả thành phố';
-  };
-
-
+  // Auto-slide banner every 5 seconds
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentBannerSlide(prev => (prev + 1) % bannerSlides.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [bannerSlides.length]);
 
   return (
     <div className="bg-gray-50">
@@ -370,27 +296,7 @@ const Services: React.FC = () => {
               {activeService === 'transport' && '🔍 Tìm kiếm phương tiện vận chuyển'}
             </h3>
             
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-              {/* City Filter */}
-              <div className="relative">
-                <select
-                  value={searchData.city}
-                  onChange={(e) => handleSearchChange('city', e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white"
-                >
-                  {cities.map((city) => (
-                    <option key={city.value} value={city.value}>
-                      {city.label}
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
-              </div>
-
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               {/* Destination Search */}
               <div className="relative">
                 <FaMapMarkerAlt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 z-10" />
@@ -437,81 +343,50 @@ const Services: React.FC = () => {
             </div>
           </div>
 
-
-
-          {/* Container 1: Service được ưa chuộng tại [Thành phố] */}
-          <div className="bg-white rounded-2xl shadow-xl p-6 mb-8">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-bold text-gray-900">
-                {searchData.city ? 
-                  `${getServiceName()} được ưa chuộng tại ${getCityName()}` : 
-                  `${getServiceName()} được ưa chuộng tại Việt Nam`
-                }
-              </h3>
-              <div className="flex gap-2">
-                <button className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
-                  <FaChevronLeft className="text-gray-600" />
-                </button>
-                <button className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
-                  <FaChevronRight className="text-gray-600" />
-                </button>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {getCurrentData().slice(0, 4).map((item) => (
+          {/* Banner Quảng Cáo */}
+          <div className="mb-8">
+            <div className="relative bg-gradient-to-r overflow-hidden rounded-2xl shadow-xl h-32 md:h-40">
+              {bannerSlides.map((slide, index) => (
                 <div
-                  key={item.id}
-                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-200 flex flex-col h-full"
+                  key={slide.id}
+                  className={`absolute inset-0 bg-gradient-to-r ${slide.gradient} transition-opacity duration-1000 ${
+                    index === currentBannerSlide ? 'opacity-100' : 'opacity-0'
+                  }`}
                 >
-                  <div className="relative flex-shrink-0">
-                    <img 
-                      src={item.image} 
-                      alt={item.name}
-                      className="w-full h-48 object-cover"
-                    />
-                    <button className="absolute top-3 right-3 p-2 rounded-full bg-white/80 hover:bg-white transition-colors">
-                      {item.isFavorite ? (
-                        <FaHeart className="text-red-500" />
-                      ) : (
-                        <FaRegHeart className="text-gray-600" />
-                      )}
-                    </button>
-                  </div>
-                  
-                  <div className="p-4 flex flex-col flex-grow">
-                    <h4 className="font-bold text-gray-900 mb-2 line-clamp-2 min-h-[3rem]">{item.name}</h4>
-                    <div className="flex items-center gap-1 mb-3">
-                      <FaStar className="text-yellow-400 text-sm" />
-                      <span className="text-sm font-medium text-gray-700">{item.rating}</span>
-                    </div>
-                    <div className="flex items-center justify-between mb-4 flex-grow">
-                      <span className="text-lg font-bold text-blue-600">{item.price}</span>
-                    </div>
-                    
-                    {/* Action Buttons - Always at bottom */}
-                    <div className="flex gap-2 mt-auto">
-                      <Link 
-                        to={`/services/detail/${item.id}`} 
-                        className="flex-1 bg-blue-50 text-blue-600 py-2 px-4 rounded-lg font-medium hover:bg-blue-100 transition-colors text-center"
-                      >
-                        Xem chi tiết
-                      </Link>
-                      <button className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors">
-                        Đặt ngay
-                      </button>
+                  <div className="flex items-center h-full px-8">
+                    <div className="text-white">
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="text-3xl">{slide.icon}</span>
+                        <h3 className="text-xl md:text-2xl font-bold">{slide.title}</h3>
+                      </div>
+                      <p className="text-sm md:text-base text-white/90">{slide.description}</p>
                     </div>
                   </div>
                 </div>
               ))}
+              
+              {/* Banner Navigation Dots */}
+              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+                {bannerSlides.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentBannerSlide(index)}
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                      index === currentBannerSlide ? 'bg-white scale-125' : 'bg-white/50'
+                    }`}
+                  />
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* Container 2: Service được đặt nhiều nhất trên Tripook */}
+          {/* Service Suggestions */}
           <div className="bg-white rounded-2xl shadow-xl p-6">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-2xl font-bold text-gray-900">
-                {getServiceName()} được đặt nhiều nhất trên Tripook
+                {activeService === 'accommodation' && '🏨 Chỗ ở được đề xuất'}
+                {activeService === 'tour' && '🗺️ Tour du lịch phổ biến'}
+                {activeService === 'transport' && '✈️ Phương tiện vận chuyển'}
               </h3>
               <div className="flex gap-2">
                 <button className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
@@ -524,13 +399,13 @@ const Services: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {getCurrentData().slice(4, 8).map((item) => (
+              {getCurrentData().map((item) => (
                 <div
                   key={item.id}
-                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-200 flex flex-col h-full"
+                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-200"
                 >
                   {/* Image */}
-                  <div className="relative h-48 overflow-hidden flex-shrink-0">
+                  <div className="relative h-48 overflow-hidden">
                     <img
                       src={item.image}
                       alt={item.name}
@@ -546,8 +421,8 @@ const Services: React.FC = () => {
                   </div>
 
                   {/* Content */}
-                  <div className="p-4 flex flex-col flex-grow">
-                    <h4 className="font-semibold text-gray-900 mb-2 line-clamp-2 min-h-[3rem]">
+                  <div className="p-4">
+                    <h4 className="font-semibold text-gray-900 mb-2 line-clamp-2">
                       {item.name}
                     </h4>
                     
@@ -560,21 +435,21 @@ const Services: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between mb-4 flex-grow">
+                    <div className="flex items-center justify-between mb-4">
                       <span className="text-lg font-bold text-blue-600">
                         {item.price}
                       </span>
                     </div>
 
-                    {/* Action Buttons - Always at bottom */}
-                    <div className="flex gap-2 mt-auto">
-                      <Link 
-                        to={`/services/detail/${item.id}`} 
-                        className="flex-1 bg-blue-50 text-blue-600 py-2 px-4 rounded-lg font-medium hover:bg-blue-100 transition-colors text-center"
-                      >
+                    {/* Action Buttons */}
+                    <div className="flex gap-2">
+                      <button className="flex-1 bg-blue-50 text-blue-600 py-2 px-4 rounded-lg font-medium hover:bg-blue-100 transition-colors">
                         Xem chi tiết
-                      </Link>
-                      <button className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+                      </button>
+                      <button 
+                        onClick={() => handleBookNow(item)}
+                        className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                      >
                         Đặt ngay
                       </button>
                     </div>
@@ -607,90 +482,121 @@ const Services: React.FC = () => {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             
-            {/* Left side - Contact Information */}
+            {/* Left side - Text content */}
             <div className="text-white space-y-6">
               <div className="space-y-4">
                 <h2 className="text-4xl lg:text-5xl font-bold leading-tight">
-                  Liên hệ trực tiếp
-                  <span className="block text-yellow-300">với chúng tôi</span>
+                  Khám phá
+                  <span className="block text-yellow-300">dịch vụ du lịch</span>
+                  <span className="block">tuyệt vời nhất!</span>
                 </h2>
                 
                 <p className="text-xl text-blue-100 leading-relaxed">
-                  Hãy để chúng tôi tư vấn và hỗ trợ bạn lên kế hoạch cho chuyến đi hoàn hảo. 
-                  Đội ngũ chuyên gia của chúng tôi luôn sẵn sàng giúp đỡ bạn 24/7.
+                  Từ chỗ ở sang trọng đến những chuyến tour khám phá, 
+                  chúng tôi mang đến trải nghiệm hoàn hảo cho mọi chuyến đi của bạn.
                 </p>
 
-                <div className="space-y-4 pt-4">
-                  <div className="flex items-start gap-4">
-                    <div className="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                      <span className="text-blue-900 font-bold text-sm">📍</span>
+                <div className="flex flex-wrap gap-4 pt-4">
+                  <div className="flex items-center gap-3 text-blue-100">
+                    <div className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
+                      <span className="text-blue-900 font-bold text-sm">✓</span>
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-yellow-300 mb-1">Địa chỉ trụ sở:</h3>
-                      <p className="text-blue-100 leading-relaxed">
-                        69/68 Đ. Đặng Thuỳ Trâm, Phường 13, Bình Thạnh,<br/>
-                        Thành phố Hồ Chí Minh 70000, Việt Nam
-                      </p>
-                    </div>
+                    <span>Đặt chỗ dễ dàng</span>
                   </div>
-
-                  <div className="flex items-center gap-4">
-                    <div className="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center flex-shrink-0">
-                      <span className="text-blue-900 font-bold text-sm">📞</span>
+                  
+                  <div className="flex items-center gap-3 text-blue-100">
+                    <div className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
+                      <span className="text-blue-900 font-bold text-sm">✓</span>
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-yellow-300 mb-1">Hotline:</h3>
-                      <p className="text-blue-100">1900 1234 (24/7)</p>
-                    </div>
+                    <span>Giá cả hợp lý</span>
                   </div>
-
-                  <div className="flex items-center gap-4">
-                    <div className="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center flex-shrink-0">
-                      <span className="text-blue-900 font-bold text-sm">✉️</span>
+                  
+                  <div className="flex items-center gap-3 text-blue-100">
+                    <div className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
+                      <span className="text-blue-900 font-bold text-sm">✓</span>
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-yellow-300 mb-1">Email:</h3>
-                      <p className="text-blue-100">support@tripook.com</p>
-                    </div>
+                    <span>Hỗ trợ 24/7</span>
                   </div>
                 </div>
               </div>
 
               <div className="pt-6">
                 <button className="bg-yellow-400 text-blue-900 px-8 py-4 rounded-2xl font-bold text-lg hover:bg-yellow-300 transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-yellow-400/30">
-                  Liên hệ ngay
-                  <span className="ml-2">📞</span>
+                  Khám phá ngay
+                  <span className="ml-2">→</span>
                 </button>
               </div>
             </div>
 
-            {/* Right side - Office Location Map */}
+            {/* Right side - Illustration */}
             <div className="relative">
-              <div className="bg-white rounded-2xl shadow-xl p-6">
-                <h3 className="text-xl font-semibold text-gray-900 mb-4 text-center">
-                  Vị trí trụ sở chính
-                </h3>
-                <div className="relative">
-                  <div className="rounded-xl overflow-hidden shadow-lg border-2 border-gray-100">
-                    <SimpleMap
-                      latitude={10.827643}
-                      longitude={106.703349}
-                      zoom={16}
-                      className="w-full h-96"
-                    />
-                  </div>
+              <div className="relative bg-white/10 backdrop-blur-sm rounded-3xl p-8 border border-white/20">
+                {/* Room illustration */}
+                <div className="aspect-square bg-gradient-to-br from-yellow-100 to-orange-100 rounded-2xl p-6 relative overflow-hidden">
                   
-                  {/* Overlay thông tin */}
-                  <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-sm rounded-lg p-3 shadow-lg">
-                    <p className="text-sm font-medium text-gray-900">Tripook Vietnam</p>
-                    <p className="text-xs text-gray-600">Phường 13, Bình Thạnh, TP.HCM</p>
+                  {/* Window */}
+                  <div className="absolute top-4 right-4 w-16 h-12 bg-sky-200 rounded-lg border-2 border-white">
+                    <div className="w-full h-full bg-gradient-to-b from-sky-100 to-sky-300 rounded opacity-80"></div>
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-0.5 h-8 bg-white"></div>
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-0.5 bg-white"></div>
                   </div>
+
+                  {/* Bed */}
+                  <div className="absolute bottom-4 left-4 right-4">
+                    {/* Bed frame */}
+                    <div className="h-8 bg-amber-600 rounded-lg mb-1"></div>
+                    {/* Mattress */}
+                    <div className="h-6 bg-white rounded-t-lg border-2 border-gray-200"></div>
+                    {/* Pillows */}
+                    <div className="flex gap-2 -mt-2">
+                      <div className="w-12 h-4 bg-blue-200 rounded-full"></div>
+                      <div className="w-12 h-4 bg-pink-200 rounded-full"></div>
+                    </div>
+                  </div>
+
+                  {/* Lamp */}
+                  <div className="absolute top-1/3 left-6">
+                    <div className="w-1 h-8 bg-gray-600"></div>
+                    <div className="w-6 h-4 bg-yellow-200 rounded-full -mt-1 -ml-2.5 border border-gray-400"></div>
+                  </div>
+
+                  {/* Decorative plants */}
+                  <div className="absolute top-6 left-12">
+                    <div className="w-3 h-6 bg-green-400 rounded-full"></div>
+                    <div className="w-2 h-2 bg-amber-700 rounded-full mx-auto"></div>
+                  </div>
+
+                  {/* Heart floating elements */}
+                  <div className="absolute top-8 right-8 text-red-400 animate-pulse">�</div>
+                  <div className="absolute bottom-16 right-6 text-yellow-400 animate-bounce">✨</div>
+                  <div className="absolute top-1/2 left-1/3 text-pink-400">🌸</div>
+                </div>
+
+                {/* Floating service icons */}
+                <div className="absolute -top-4 -left-4 bg-white rounded-full p-3 shadow-lg animate-float">
+                  <span className="text-2xl">🏨</span>
+                </div>
+                
+                <div className="absolute -top-2 -right-2 bg-white rounded-full p-3 shadow-lg animate-float" style={{animationDelay: '1s'}}>
+                  <span className="text-2xl">✈️</span>
+                </div>
+                
+                <div className="absolute -bottom-4 -right-4 bg-white rounded-full p-3 shadow-lg animate-float" style={{animationDelay: '2s'}}>
+                  <span className="text-2xl">🗺️</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </section>
+
+      {/* Booking Modal */}
+      <BookingModal
+        isOpen={isBookingModalOpen}
+        onClose={handleCloseModal}
+        item={selectedItem}
+        serviceType={activeService}
+      />
 
       {/* Footer Component */}
       <Footer />
