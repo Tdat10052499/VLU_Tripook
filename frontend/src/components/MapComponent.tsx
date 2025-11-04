@@ -1,4 +1,6 @@
 import React, { useEffect, useRef } from 'react';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
 interface MapComponentProps {
   latitude: number;
@@ -17,11 +19,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const mapInstanceRef = useRef<any>(null);
 
   useEffect(() => {
-    // Check if Leaflet is already loaded
-    const L = (window as any).L;
-    
     const initializeMap = () => {
-      if (!L || !mapRef.current) return;
+      if (!mapRef.current) return;
       
       // Clean up existing map instance
       if (mapInstanceRef.current) {
@@ -68,37 +67,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
       }
     };
 
-    if (L) {
-      // Leaflet is already loaded
-      initializeMap();
-    } else {
-      // Check if CSS is already loaded
-      const existingCss = document.querySelector('link[href="/leaflet/dist/leaflet.css"]');
-      if (!existingCss) {
-        const cssLink = document.createElement('link');
-        cssLink.rel = 'stylesheet';
-        cssLink.href = '/leaflet/dist/leaflet.css';
-        document.head.appendChild(cssLink);
-      }
-
-      // Check if JS is already loaded
-      const existingScript = document.querySelector('script[src="/leaflet/dist/leaflet.js"]');
-      if (!existingScript) {
-        const script = document.createElement('script');
-        script.src = '/leaflet/dist/leaflet.js';
-        script.async = true;
-        script.onload = initializeMap;
-        document.head.appendChild(script);
-      } else {
-        // Script exists but may not be loaded yet
-        const checkLeaflet = setInterval(() => {
-          if ((window as any).L) {
-            clearInterval(checkLeaflet);
-            initializeMap();
-          }
-        }, 100);
-      }
-    }
+    // Initialize map directly since Leaflet is imported
+    initializeMap();
     
     // Cleanup function
     return () => {

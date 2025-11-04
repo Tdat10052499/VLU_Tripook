@@ -1,4 +1,6 @@
 import React, { useEffect, useRef } from 'react';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
 interface SimpleMapProps {
   latitude: number;
@@ -21,33 +23,8 @@ const SimpleMap: React.FC<SimpleMapProps> = ({
   useEffect(() => {
     let isMounted = true;
 
-    const loadLeaflet = async () => {
-      // Load CSS first
-      if (!document.querySelector('link[href*="leaflet.css"]')) {
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = '/leaflet/dist/leaflet.css';
-        document.head.appendChild(link);
-      }
-
-      // Check if Leaflet is already loaded
-      if (!(window as any).L) {
-        const script = document.createElement('script');
-        script.src = '/leaflet/dist/leaflet.js';
-        script.async = true;
-        
-        return new Promise<void>((resolve) => {
-          script.onload = () => resolve();
-          document.head.appendChild(script);
-        });
-      }
-    };
-
     const initializeMap = () => {
       if (!isMounted || !mapRef.current) return;
-      
-      const L = (window as any).L;
-      if (!L) return;
 
       // Clean up existing map
       if (mapInstanceRef.current) {
@@ -94,19 +71,6 @@ const SimpleMap: React.FC<SimpleMapProps> = ({
               <strong style="color: #1e40af;">📍 ${popupContent}</strong>
             </div>
           `).openPopup();
-        } else {
-          // Default Tripook popup
-          marker.bindPopup(`
-            <div style="text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
-              <strong style="color: #1e40af;">🏢 Trụ sở Tripook</strong><br/>
-              <small style="color: #6b7280;">
-                69/68 Đ. Đặng Thuỳ Trâm<br/>
-                Phường 13, Bình Thạnh<br/>
-                TP. Hồ Chí Minh<br/>
-                📞 1900 1234
-              </small>
-            </div>
-          `).openPopup();
         }
 
       } catch (error) {
@@ -114,12 +78,11 @@ const SimpleMap: React.FC<SimpleMapProps> = ({
       }
     };
 
-    loadLeaflet().then(() => {
-      if (isMounted) {
-        // Small delay to ensure DOM is ready
-        setTimeout(initializeMap, 100);
-      }
-    });
+    // Initialize map directly since Leaflet is imported
+    if (isMounted) {
+      // Small delay to ensure DOM is ready
+      setTimeout(initializeMap, 100);
+    }
 
     return () => {
       isMounted = false;
@@ -141,33 +104,6 @@ const SimpleMap: React.FC<SimpleMapProps> = ({
         className="w-full h-full rounded-2xl overflow-hidden shadow-2xl border-4 border-white/30"
         style={{ minHeight: '400px', backgroundColor: '#f3f4f6' }}
       />
-      
-      {/* Map overlay with company info */}
-      <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm rounded-xl p-4 shadow-lg max-w-xs z-[1000]">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-            <span className="text-white font-bold text-lg">T</span>
-          </div>
-          <div>
-            <h3 className="font-bold text-blue-900">Tripook</h3>
-            <p className="text-xs text-gray-600">Trụ sở chính</p>
-          </div>
-        </div>
-        <p className="text-xs text-gray-700 leading-relaxed">
-          📍 69/68 Đặng Thuỳ Trâm<br/>
-          Phường 13, Bình Thạnh<br/>
-          📞 1900 1234
-        </p>
-      </div>
-      
-      {/* Decorative elements */}
-      <div className="absolute -top-2 -right-2 bg-yellow-400 rounded-full p-3 shadow-lg animate-bounce z-[1000]">
-        <span className="text-blue-900 text-xl">🗺️</span>
-      </div>
-      
-      <div className="absolute -bottom-2 -left-2 bg-blue-500 rounded-full p-3 shadow-lg animate-pulse z-[1000]">
-        <span className="text-white text-xl">📍</span>
-      </div>
     </div>
   );
 };

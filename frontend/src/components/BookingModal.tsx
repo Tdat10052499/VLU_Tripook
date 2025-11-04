@@ -2,8 +2,8 @@ import React, { useState, useContext, useEffect } from 'react';
 import { FaTimes, FaShieldAlt, FaUser, FaPhone, FaEnvelope, FaStar } from 'react-icons/fa';
 import { AuthContext } from '../contexts/AuthContext';
 // Import payment logos
-const VNPayLogo = require('../assets/images/vnpay-logo.png');
-const InternetPaymentLogo = require('../assets/images/internet-payment.png');
+import VNPayLogo from '../assets/images/vnpay-logo.png';
+import InternetPaymentLogo from '../assets/images/internet-payment.png';
 
 interface BookingItem {
   id: number;

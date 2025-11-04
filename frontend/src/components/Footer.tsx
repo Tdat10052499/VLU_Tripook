@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Footer: React.FC = () => {
   return (
@@ -26,8 +27,8 @@ const Footer: React.FC = () => {
           <div className="text-center md:text-left">
             <h3 className="text-lg font-semibold mb-6 text-white">Liên kết nhanh</h3>
             <ul className="space-y-3">
-              <li><a href="#about" className="text-gray-300 hover:text-indigo-400 transition-colors duration-200 text-sm">Về chúng tôi</a></li>
-              <li><a href="#services" className="text-gray-300 hover:text-indigo-400 transition-colors duration-200 text-sm">Dịch vụ</a></li>
+              <li><Link to="/about" className="text-gray-300 hover:text-indigo-400 transition-colors duration-200 text-sm">Về chúng tôi</Link></li>
+              <li><Link to="/services" className="text-gray-300 hover:text-indigo-400 transition-colors duration-200 text-sm">Dịch vụ</Link></li>
               <li><a href="#support" className="text-gray-300 hover:text-indigo-400 transition-colors duration-200 text-sm">Trở thành đối tác</a></li>
               <li><a href="#tours" className="text-gray-300 hover:text-indigo-400 transition-colors duration-200 text-sm">Đặt tour</a></li>
               <li><a href="#contact" className="text-gray-300 hover:text-indigo-400 transition-colors duration-200 text-sm">Liên hệ</a></li>

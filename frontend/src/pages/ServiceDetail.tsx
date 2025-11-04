@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import SimpleMap from '../components/SimpleMap';
@@ -78,6 +78,7 @@ interface RelatedService {
 const ServiceDetail: React.FC<ServiceDetailProps> = () => {
   const { serviceId } = useParams<{ serviceId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const [service, setService] = useState<ServiceData | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -94,13 +95,16 @@ const ServiceDetail: React.FC<ServiceDetailProps> = () => {
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
 
   useEffect(() => {
+    // Check if data was passed via navigation state
+    const navigationData = location.state as { item: any; serviceType: string } | null;
+    
     // Mock data - In real app, this would be fetched from API
     const mockServiceData: ServiceData = {
       id: parseInt(serviceId || '1'),
-      name: 'Khách sạn Mường Thanh Luxury Nha Trang',
-      type: 'accommodation',
+      name: navigationData?.item?.name || 'Khách sạn Mường Thanh Luxury Nha Trang',
+      type: (navigationData?.serviceType as 'accommodation' | 'tour' | 'transport') || 'accommodation',
       images: [
-        'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=600&fit=crop',
+        navigationData?.item?.image || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=600&fit=crop',
         'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&h=600&fit=crop',
         'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=800&h=600&fit=crop',
         'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800&h=600&fit=crop',
@@ -217,7 +221,7 @@ const ServiceDetail: React.FC<ServiceDetailProps> = () => {
       setRelatedServices(mockRelatedServices);
       setLoading(false);
     }, 1000);
-  }, [serviceId]);
+  }, [serviceId, location.state]);
 
   const calculatePrice = () => {
     if (!service || !checkInDate || !checkOutDate) return service?.discountPrice || service?.basePrice || 0;

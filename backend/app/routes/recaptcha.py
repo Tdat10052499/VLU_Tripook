@@ -10,10 +10,10 @@ class RecaptchaConfigResource(Resource):
         try:
             site_key = RecaptchaVerifier.get_site_key()
             
-            if not site_key:
+            if not site_key or site_key == 'your-recaptcha-site-key-here':
                 return {
                     'success': False,
-                    'message': 'reCAPTCHA not configured'
+                    'message': 'reCAPTCHA not configured. Please set RECAPTCHA_SITE_KEY in .env file'
                 }, 500
             
             return {
@@ -22,7 +22,8 @@ class RecaptchaConfigResource(Resource):
             }, 200
             
         except Exception as e:
+            print(f"Error in RecaptchaConfigResource: {str(e)}")
             return {
                 'success': False,
-                'message': 'Error getting reCAPTCHA configuration'
+                'message': f'Error getting reCAPTCHA configuration: {str(e)}'
             }, 500

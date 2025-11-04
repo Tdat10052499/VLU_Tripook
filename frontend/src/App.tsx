@@ -4,6 +4,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import Home from './components/Home';
 import Services from './components/Services';
 import ServiceDetail from './pages/ServiceDetail';
+import About from './pages/About';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
@@ -24,6 +25,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/services" element={<Services />} />
               <Route path="/services/detail/:serviceId" element={<ServiceDetail />} />
+              <Route path="/about" element={<About />} />
               <Route path="/auth/login" element={<Login />} />
               <Route path="/auth/register" element={<Register />} />
               <Route path="/auth/forgot-password" element={<ForgotPassword />} />

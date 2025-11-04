@@ -1,4 +1,6 @@
 import React, { useEffect, useRef } from 'react';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
 const BFooter: React.FC = () => {
   // Tọa độ của địa chỉ: 69/68 Đ. Đặng Thuỳ Trâm, Phường 13, Bình Thạnh, TP.HCM
@@ -18,9 +20,7 @@ const BFooter: React.FC = () => {
 
   useEffect(() => {
     const initializeMap = () => {
-      const L = (window as any).L;
-      
-      if (!L || !mapRef.current) return;
+      if (!mapRef.current) return;
       
       // Clean up existing map instance
       if (mapInstanceRef.current) {
@@ -64,38 +64,8 @@ const BFooter: React.FC = () => {
       }
     };
 
-    const L = (window as any).L;
-    if (L) {
-      // Leaflet is already loaded
-      initializeMap();
-    } else {
-      // Check if CSS is already loaded
-      const existingCss = document.querySelector('link[href="/leaflet/dist/leaflet.css"]');
-      if (!existingCss) {
-        const cssLink = document.createElement('link');
-        cssLink.rel = 'stylesheet';
-        cssLink.href = '/leaflet/dist/leaflet.css';
-        document.head.appendChild(cssLink);
-      }
-
-      // Check if JS is already loaded
-      const existingScript = document.querySelector('script[src="/leaflet/dist/leaflet.js"]');
-      if (!existingScript) {
-        const script = document.createElement('script');
-        script.src = '/leaflet/dist/leaflet.js';
-        script.async = true;
-        script.onload = initializeMap;
-        document.head.appendChild(script);
-      } else {
-        // Script exists but may not be loaded yet
-        const checkLeaflet = setInterval(() => {
-          if ((window as any).L) {
-            clearInterval(checkLeaflet);
-            initializeMap();
-          }
-        }, 100);
-      }
-    }
+    // Initialize map directly since Leaflet is imported
+    initializeMap();
     
     // Cleanup function
     return () => {

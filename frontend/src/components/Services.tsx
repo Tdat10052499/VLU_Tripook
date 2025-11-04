@@ -1,30 +1,30 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
-import BookingModal from './BookingModal';
-import { FaSearch, FaMapMarkerAlt, FaHeart, FaRegHeart, FaChevronLeft, FaChevronRight, FaStar } from 'react-icons/fa';
+import { FaSearch, FaMapMarkerAlt, FaHeart, FaRegHeart, FaStar } from 'react-icons/fa';
 
 const Services: React.FC = () => {
+  const navigate = useNavigate();
   const [activeService, setActiveService] = useState('accommodation');
   const [currentBannerSlide, setCurrentBannerSlide] = useState(0);
   const [searchData, setSearchData] = useState({
-    destination: '',
-    checkIn: '',
-    checkOut: ''
+    destination: ''
   });
-  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [submittedSearch, setSubmittedSearch] = useState(''); // Lưu trữ search query đã được submit
+  const [visibleRows, setVisibleRows] = useState(1); // Số hàng hiển thị (mặc định 1 hàng = 4 items)
 
-  // Handle booking modal
-  const handleBookNow = (item: any) => {
-    setSelectedItem(item);
-    setIsBookingModalOpen(true);
+  // Handle navigation to service detail
+  const handleViewDetail = (item: any) => {
+    navigate(`/services/detail/${item.id}`, { 
+      state: { 
+        item, 
+        serviceType: activeService 
+      } 
+    });
   };
 
-  const handleCloseModal = () => {
-    setIsBookingModalOpen(false);
-    setSelectedItem(null);
-  };
+
 
   // Sample data for different services
   const accommodationData = [
@@ -58,6 +58,70 @@ const Services: React.FC = () => {
       price: '3.500.000đ/đêm',
       rating: 4.7,
       image: 'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=400&h=300&fit=crop',
+      isFavorite: false
+    },
+    {
+      id: 5,
+      name: 'Khách sạn Rex Sài Gòn',
+      price: '1.800.000đ/đêm',
+      rating: 4.5,
+      image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=400&h=300&fit=crop',
+      isFavorite: false
+    },
+    {
+      id: 6,
+      name: 'Resort Anantara Hội An',
+      price: '6.500.000đ/đêm',
+      rating: 4.9,
+      image: 'https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=400&h=300&fit=crop',
+      isFavorite: true
+    },
+    {
+      id: 7,
+      name: 'Khách sạn De L\'Opera Hà Nội',
+      price: '2.200.000đ/đêm',
+      rating: 4.6,
+      image: 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=400&h=300&fit=crop',
+      isFavorite: false
+    },
+    {
+      id: 8,
+      name: 'InterContinental Danang Sun Peninsula',
+      price: '8.900.000đ/đêm',
+      rating: 5.0,
+      image: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=400&h=300&fit=crop',
+      isFavorite: true
+    },
+    {
+      id: 9,
+      name: 'Flamingo Cát Bà Beach Resort',
+      price: '1.500.000đ/đêm',
+      rating: 4.4,
+      image: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=400&h=300&fit=crop',
+      isFavorite: false
+    },
+    {
+      id: 10,
+      name: 'Pullman Vung Tau',
+      price: '2.800.000đ/đêm',
+      rating: 4.7,
+      image: 'https://images.unsplash.com/photo-1445019980597-93fa8acb246c?w=400&h=300&fit=crop',
+      isFavorite: false
+    },
+    {
+      id: 11,
+      name: 'Sheraton Hanoi Hotel',
+      price: '3.200.000đ/đêm',
+      rating: 4.8,
+      image: 'https://images.unsplash.com/photo-1566195992011-5f6b21e539aa?w=400&h=300&fit=crop',
+      isFavorite: true
+    },
+    {
+      id: 12,
+      name: 'Liberty Central Saigon Citypoint',
+      price: '2.100.000đ/đêm',
+      rating: 4.5,
+      image: 'https://images.unsplash.com/photo-1590490360182-c33d57733427?w=400&h=300&fit=crop',
       isFavorite: false
     }
   ];
@@ -94,6 +158,38 @@ const Services: React.FC = () => {
       rating: 4.6,
       image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop',
       isFavorite: true
+    },
+    {
+      id: 5,
+      name: 'Tour Đà Nẵng - Bà Nà Hills 3N2Đ',
+      price: '2.800.000đ/người',
+      rating: 4.8,
+      image: 'https://images.unsplash.com/photo-1534067783941-51c9c23ecefd?w=400&h=300&fit=crop',
+      isFavorite: false
+    },
+    {
+      id: 6,
+      name: 'Tour Singapore - Malaysia 6N5Đ',
+      price: '12.500.000đ/người',
+      rating: 4.9,
+      image: 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=400&h=300&fit=crop',
+      isFavorite: true
+    },
+    {
+      id: 7,
+      name: 'Tour Mù Cang Chải - Yên Bái 2N1Đ',
+      price: '1.800.000đ/người',
+      rating: 4.5,
+      image: 'https://images.unsplash.com/photo-1586798271252-e2abca2ec247?w=400&h=300&fit=crop',
+      isFavorite: false
+    },
+    {
+      id: 8,
+      name: 'Tour Nhật Bản - Tokyo Osaka 7N6Đ',
+      price: '28.900.000đ/người',
+      rating: 4.9,
+      image: 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400&h=300&fit=crop',
+      isFavorite: true
     }
   ];
 
@@ -129,6 +225,38 @@ const Services: React.FC = () => {
       rating: 4.4,
       image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop',
       isFavorite: false
+    },
+    {
+      id: 5,
+      name: 'Vé máy bay Hà Nội - Đà Nẵng',
+      price: '900.000đ/chiều',
+      rating: 4.6,
+      image: 'https://images.unsplash.com/photo-1569154941061-e231b4725ef1?w=400&h=300&fit=crop',
+      isFavorite: true
+    },
+    {
+      id: 6,
+      name: 'Thuê xe limousine Sài Gòn - Vũng Tàu',
+      price: '800.000đ/chuyến',
+      rating: 4.8,
+      image: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=400&h=300&fit=crop',
+      isFavorite: false
+    },
+    {
+      id: 7,
+      name: 'Vé tàu cao tốc Cần Thơ - Phú Quốc',
+      price: '450.000đ/người',
+      rating: 4.2,
+      image: 'https://images.unsplash.com/photo-1572098812516-beea72cc0f6d?w=400&h=300&fit=crop',
+      isFavorite: false
+    },
+    {
+      id: 8,
+      name: 'Charter máy bay riêng',
+      price: '25.000.000đ/chuyến',
+      rating: 5.0,
+      image: 'https://images.unsplash.com/photo-1540962351504-03099e0a754b?w=400&h=300&fit=crop',
+      isFavorite: true
     }
   ];
 
@@ -164,16 +292,64 @@ const Services: React.FC = () => {
   ];
 
   const getCurrentData = () => {
+    let data;
     switch (activeService) {
-      case 'accommodation': return accommodationData;
-      case 'tour': return tourData;
-      case 'transport': return transportData;
-      default: return accommodationData;
+      case 'accommodation': data = accommodationData; break;
+      case 'tour': data = tourData; break;
+      case 'transport': data = transportData; break;
+      default: data = accommodationData;
     }
+    // Giới hạn theo số hàng hiển thị (4 items per row)
+    const itemsPerRow = 4;
+    const maxItems = visibleRows * itemsPerRow;
+    return data.slice(0, maxItems);
   };
 
   const handleSearchChange = (field: string, value: string) => {
     setSearchData(prev => ({ ...prev, [field]: value }));
+  };
+
+  // Handle search submission
+  const handleSearch = () => {
+    setSubmittedSearch(searchData.destination.trim());
+    setVisibleRows(1); // Reset hiển thị về 1 hàng khi tìm kiếm mới
+  };
+
+  // Handle load more functionality
+  const handleLoadMore = () => {
+    setVisibleRows(prev => prev + 3); // Tăng thêm 3 hàng (12 items)
+  };
+
+  // Generate dynamic title based on submitted search and service type
+  const getContainerTitle = () => {
+    const hasDestination = submittedSearch !== '';
+    
+    let baseTitle = '';
+    let icon = '';
+    
+    switch (activeService) {
+      case 'accommodation':
+        baseTitle = 'Chỗ ở';
+        icon = '🏨';
+        break;
+      case 'tour':
+        baseTitle = 'Tour du lịch';
+        icon = '🗺️';
+        break;
+      case 'transport':
+        baseTitle = 'Phương tiện vận chuyển';
+        icon = '✈️';
+        break;
+      default:
+        baseTitle = 'Chỗ ở';
+        icon = '🏨';
+    }
+    
+    if (hasDestination) {
+      return `${icon} ${baseTitle} được đề xuất ở ${submittedSearch}`;
+    } else {
+      return `${icon} ${baseTitle} được đề xuất`;
+    }
   };
 
   // Auto-slide banner every 5 seconds
@@ -183,6 +359,12 @@ const Services: React.FC = () => {
     }, 5000);
     return () => clearInterval(timer);
   }, [bannerSlides.length]);
+
+  // Reset visible rows and search when service type changes
+  useEffect(() => {
+    setVisibleRows(1);
+    setSubmittedSearch(''); // Reset search khi chuyển loại dịch vụ
+  }, [activeService]);
 
   return (
     <div className="bg-gray-50">
@@ -296,47 +478,25 @@ const Services: React.FC = () => {
               {activeService === 'transport' && '🔍 Tìm kiếm phương tiện vận chuyển'}
             </h3>
             
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="flex flex-col md:flex-row gap-4 items-end">
               {/* Destination Search */}
-              <div className="relative">
+              <div className="relative flex-1">
                 <FaMapMarkerAlt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 z-10" />
                 <input
                   type="text"
                   placeholder="Điểm đến hoặc tên dịch vụ..."
                   value={searchData.destination}
                   onChange={(e) => handleSearchChange('destination', e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
-              {/* Check-in Date */}
-              <div className="relative">
-                <input
-                  type="date"
-                  value={searchData.checkIn}
-                  onChange={(e) => handleSearchChange('checkIn', e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-                <label className="absolute -top-2 left-3 bg-white px-1 text-xs text-gray-500 font-medium">
-                  {activeService === 'accommodation' ? 'Ngày nhận phòng' : 'Ngày đi'}
-                </label>
-              </div>
-
-              {/* Check-out Date */}
-              <div className="relative">
-                <input
-                  type="date"
-                  value={searchData.checkOut}
-                  onChange={(e) => handleSearchChange('checkOut', e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-                <label className="absolute -top-2 left-3 bg-white px-1 text-xs text-gray-500 font-medium">
-                  {activeService === 'accommodation' ? 'Ngày trả phòng' : 'Ngày về'}
-                </label>
-              </div>
-
               {/* Search Button */}
-              <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 flex items-center justify-center gap-2 shadow-lg">
+              <button 
+                onClick={handleSearch}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 flex items-center justify-center gap-2 shadow-lg whitespace-nowrap"
+              >
                 <FaSearch />
                 Tìm kiếm
               </button>
@@ -382,30 +542,20 @@ const Services: React.FC = () => {
 
           {/* Service Suggestions */}
           <div className="bg-white rounded-2xl shadow-xl p-6">
-            <div className="flex items-center justify-between mb-6">
+            <div className="mb-6">
               <h3 className="text-2xl font-bold text-gray-900">
-                {activeService === 'accommodation' && '🏨 Chỗ ở được đề xuất'}
-                {activeService === 'tour' && '🗺️ Tour du lịch phổ biến'}
-                {activeService === 'transport' && '✈️ Phương tiện vận chuyển'}
+                {getContainerTitle()}
               </h3>
-              <div className="flex gap-2">
-                <button className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
-                  <FaChevronLeft className="text-gray-600" />
-                </button>
-                <button className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
-                  <FaChevronRight className="text-gray-600" />
-                </button>
-              </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
               {getCurrentData().map((item) => (
                 <div
                   key={item.id}
-                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-200"
+                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-200 h-full flex flex-col"
                 >
                   {/* Image */}
-                  <div className="relative h-48 overflow-hidden">
+                  <div className="relative h-48 overflow-hidden flex-shrink-0">
                     <img
                       src={item.image}
                       alt={item.name}
@@ -421,10 +571,13 @@ const Services: React.FC = () => {
                   </div>
 
                   {/* Content */}
-                  <div className="p-4">
-                    <h4 className="font-semibold text-gray-900 mb-2 line-clamp-2">
-                      {item.name}
-                    </h4>
+                  <div className="p-4 flex flex-col flex-grow">
+                    {/* Title với chiều cao cố định */}
+                    <div className="h-12 mb-2">
+                      <h4 className="font-semibold text-gray-900 line-clamp-2 text-sm leading-tight">
+                        {item.name}
+                      </h4>
+                    </div>
                     
                     <div className="flex items-center gap-2 mb-3">
                       <div className="flex items-center gap-1">
@@ -435,6 +588,9 @@ const Services: React.FC = () => {
                       </div>
                     </div>
 
+                    {/* Flexible space */}
+                    <div className="flex-grow"></div>
+
                     <div className="flex items-center justify-between mb-4">
                       <span className="text-lg font-bold text-blue-600">
                         {item.price}
@@ -442,13 +598,16 @@ const Services: React.FC = () => {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex gap-2">
-                      <button className="flex-1 bg-blue-50 text-blue-600 py-2 px-4 rounded-lg font-medium hover:bg-blue-100 transition-colors">
+                    <div className="flex gap-2 mt-auto">
+                      <button 
+                        onClick={() => handleViewDetail(item)}
+                        className="flex-1 bg-blue-50 text-blue-600 py-2 px-4 rounded-lg font-medium hover:bg-blue-100 transition-colors text-sm"
+                      >
                         Xem chi tiết
                       </button>
                       <button 
-                        onClick={() => handleBookNow(item)}
-                        className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                        onClick={() => handleViewDetail(item)}
+                        className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors text-sm"
                       >
                         Đặt ngay
                       </button>
@@ -458,9 +617,12 @@ const Services: React.FC = () => {
               ))}
             </div>
 
-            {/* Load More Button */}
+            {/* Load More Button - Always visible */}
             <div className="text-center mt-8">
-              <button className="bg-gray-100 text-gray-700 px-8 py-3 rounded-xl font-semibold hover:bg-gray-200 transition-colors">
+              <button 
+                onClick={handleLoadMore}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
+              >
                 Xem thêm dịch vụ
               </button>
             </div>
@@ -590,13 +752,7 @@ const Services: React.FC = () => {
         </div>
       </section>
 
-      {/* Booking Modal */}
-      <BookingModal
-        isOpen={isBookingModalOpen}
-        onClose={handleCloseModal}
-        item={selectedItem}
-        serviceType={activeService}
-      />
+
 
       {/* Footer Component */}
       <Footer />
