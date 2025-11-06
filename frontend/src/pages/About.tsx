@@ -1,11 +1,9 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { FaUsers, FaHandshake, FaArrowRight, FaStar, FaGlobe, FaHeart } from 'react-icons/fa';
 
 const About: React.FC = () => {
-  const navigate = useNavigate();
 
   // Team members data
   const managementTeam = [

@@ -22,7 +22,7 @@ class User:
         self.verification_token = None
         self.reset_token = None
         self.reset_token_expires = None
-        self.role = "user"  # 'user', 'admin'
+        self.role = "user"  # 'user', 'provider', 'admin'
         self.status = "active"  # 'active', 'inactive', 'suspended'
         self.preferences = {
             "currency": "USD",
@@ -33,6 +33,10 @@ class User:
                 "sms": False
             }
         }
+        
+        # Provider-specific information (only set when role becomes 'provider')
+        self.provider_info = None
+        
         self.created_at = datetime.utcnow()
         self.updated_at = datetime.utcnow()
 
@@ -140,6 +144,7 @@ class User:
             'role': self.role,
             'status': self.status,
             'preferences': self.preferences,
+            'provider_info': self.provider_info,
             'created_at': self.created_at,
             'updated_at': self.updated_at
         }
@@ -176,6 +181,14 @@ class User:
         user.verification_token = data.get('verification_token')
         user.reset_token = data.get('reset_token')
         user.reset_token_expires = data.get('reset_token_expires')
+        user.role = data.get('role', 'user')
+        user.status = data.get('status', 'active')
+        user.preferences = data.get('preferences', {
+            "currency": "USD",
+            "language": "en",
+            "notifications": {"email": True, "push": True, "sms": False}
+        })
+        user.provider_info = data.get('provider_info')
         user.created_at = data.get('created_at', datetime.utcnow())
         user.updated_at = data.get('updated_at', datetime.utcnow())
         return user
@@ -348,3 +361,38 @@ class User:
         if user_data:
             return User.from_dict(user_data)
         return None
+    
+    def upgrade_to_provider(self, provider_data):
+        """Upgrade user to provider role with additional information"""
+        self.role = "provider"
+        self.provider_info = {
+            "company_name": provider_data.get("company_name", ""),
+            "business_type": provider_data.get("business_type", ""),  # "hotel", "tour", "transport"
+            "description": provider_data.get("description", ""),
+            "address": provider_data.get("address", ""),
+            "business_phone": provider_data.get("business_phone", ""),
+            "business_email": provider_data.get("business_email", ""),
+            "website": provider_data.get("website", ""),
+            "bank_account": {
+                "account_number": provider_data.get("bank_account", {}).get("account_number", ""),
+                "bank_name": provider_data.get("bank_account", {}).get("bank_name", ""),
+                "account_holder": provider_data.get("bank_account", {}).get("account_holder", "")
+            },
+            "vnpay_info": {
+                "merchant_id": provider_data.get("vnpay_info", {}).get("merchant_id", "")
+            },
+            "approved_at": datetime.utcnow(),
+            "is_active": True
+        }
+        self.updated_at = datetime.utcnow()
+        return self.save()
+    
+    def is_provider(self):
+        """Check if user is a provider"""
+        return self.role == "provider"
+    
+    def is_active_provider(self):
+        """Check if user is an active provider"""
+        return (self.role == "provider" and 
+                self.provider_info and 
+                self.provider_info.get("is_active", False))

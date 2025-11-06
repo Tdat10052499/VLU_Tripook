@@ -150,3 +150,48 @@ class Booking:
         if confirmation_code:
             self.confirmation_code = confirmation_code
         return self.save()
+    
+    @staticmethod
+    def count_by_provider(provider_id):
+        """Count bookings by provider"""
+        try:
+            db = get_db()
+            collection = db.bookings
+            return collection.count_documents({
+                'provider_id': ObjectId(provider_id)
+            })
+        except Exception:
+            return 0
+    
+    @staticmethod
+    def count_by_provider_and_date(provider_id, start_date):
+        """Count bookings by provider within date range"""
+        try:
+            db = get_db()
+            collection = db.bookings
+            return collection.count_documents({
+                'provider_id': ObjectId(provider_id),
+                'booking_date': {'$gte': start_date}
+            })
+        except Exception:
+            return 0
+    
+    @staticmethod
+    def find_by_provider(provider_id, skip=0, limit=10):
+        """Find bookings by provider with pagination"""
+        try:
+            db = get_db()
+            collection = db.bookings
+            
+            bookings_data = collection.find({
+                'provider_id': ObjectId(provider_id)
+            }).skip(skip).limit(limit).sort('booking_date', -1)
+            
+            bookings = []
+            for booking_data in bookings_data:
+                booking = Booking.from_dict(booking_data)
+                bookings.append(booking)
+            
+            return bookings
+        except Exception:
+            return []

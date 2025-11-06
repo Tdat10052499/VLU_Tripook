@@ -2,6 +2,26 @@ import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import { authAPI } from '../services/api';
 import Cookies from 'js-cookie';
 
+interface ProviderInfo {
+  company_name: string;
+  business_type: 'hotel' | 'tour' | 'transport';
+  description: string;
+  address: string;
+  business_phone: string;
+  business_email: string;
+  website: string;
+  bank_account: {
+    account_number: string;
+    bank_name: string;
+    account_holder: string;
+  };
+  vnpay_info: {
+    merchant_id: string;
+  };
+  approved_at: string;
+  is_active: boolean;
+}
+
 interface User {
   id: string;
   email: string;
@@ -12,6 +32,8 @@ interface User {
   gender?: string;
   picture?: string;
   is_verified: boolean;
+  role: 'user' | 'provider' | 'admin';
+  provider_info?: ProviderInfo;
 }
 
 interface AuthContextType {
@@ -22,6 +44,10 @@ interface AuthContextType {
   register: (userData: any, recaptchaToken?: string) => Promise<void>;
   logout: () => void;
   checkAuth: () => Promise<void>;
+  refreshUser: () => Promise<void>;
+  isProvider: () => boolean;
+  isActiveProvider: () => boolean;
+  isAdmin: () => boolean;
 }
 
 export const AuthContext = createContext<AuthContextType>({
@@ -31,7 +57,11 @@ export const AuthContext = createContext<AuthContextType>({
   login: async () => {},
   register: async () => {},
   logout: () => {},
-  checkAuth: async () => {}
+  checkAuth: async () => {},
+  refreshUser: async () => {},
+  isProvider: () => false,
+  isActiveProvider: () => false,
+  isAdmin: () => false
 });
 
 interface AuthProviderProps {
@@ -45,7 +75,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (loginIdentifier: string, password: string, rememberMe: boolean = false, recaptchaToken?: string): Promise<void> => {
     try {
-      const response = await authAPI.login(loginIdentifier, password, rememberMe, recaptchaToken);
+      // Use simple login endpoint without reCAPTCHA
+      const response = await authAPI.simpleLogin(loginIdentifier, password, rememberMe);
       
       if (response.success) {
         const { token, user, remember_me } = response.data;
@@ -60,6 +91,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         throw new Error(response.message || 'Login failed');
       }
     } catch (error: any) {
+      console.error('Login error details:', error.response?.data || error.message);
       throw new Error(error.response?.data?.message || error.message || 'Login failed');
     }
   };
@@ -112,9 +144,41 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const refreshUser = async (): Promise<void> => {
+    try {
+      const token = Cookies.get('auth_token');
+      
+      if (!token) {
+        return;
+      }
+
+      const response = await authAPI.getProfile();
+      
+      if (response.success) {
+        setUser(response.data.user);
+        setIsAuthenticated(true);
+      }
+    } catch (error) {
+      console.error('Failed to refresh user:', error);
+    }
+  };
+
   useEffect(() => {
     checkAuth();
   }, []);
+
+  // Helper functions for role checking
+  const isProvider = (): boolean => {
+    return user?.role === 'provider';
+  };
+
+  const isActiveProvider = (): boolean => {
+    return user?.role === 'provider' && user?.provider_info?.is_active === true;
+  };
+
+  const isAdmin = (): boolean => {
+    return user?.role === 'admin';
+  };
 
   const value: AuthContextType = {
     user,
@@ -123,7 +187,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     login,
     register,
     logout,
-    checkAuth
+    checkAuth,
+    refreshUser,
+    isProvider,
+    isActiveProvider,
+    isAdmin
   };
 
   return (

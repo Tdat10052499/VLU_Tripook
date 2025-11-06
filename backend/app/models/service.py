@@ -3,10 +3,68 @@ from bson import ObjectId
 from app.utils.database import get_db
 
 class Service:
-    def __init__(self, name, service_type, provider_id=None):
-        self.name = name
-        self.service_type = service_type  # 'accommodation', 'transportation', 'activity', 'food', 'guide', 'insurance'
-        self.provider_id = ObjectId(provider_id) if provider_id and isinstance(provider_id, str) else provider_id
+    def __init__(self, data=None, name=None, service_type=None, provider_id=None):
+        # Support both dictionary initialization and legacy parameters
+        if data and isinstance(data, dict):
+            # Initialize from dictionary (new form data)
+            self.name = data.get('name', '')
+            self.service_type = data.get('service_type', '')
+            self.provider_id = ObjectId(data.get('provider_id')) if data.get('provider_id') else None
+            
+            # Basic information from form
+            self.description = data.get('description', '')
+            self.category = data.get('category', '')
+            
+            # Location from form
+            self.location = data.get('location', {
+                "address": "",
+                "city": "",
+                "state": "",
+                "country": "Vietnam",
+                "coordinates": {"latitude": 0, "longitude": 0}
+            })
+            
+            # Pricing from form
+            self.pricing = data.get('pricing', {
+                "base_price": 0.0,
+                "currency": "VND",
+                "pricing_type": "per_night"
+            })
+            
+            # Capacity from form
+            self.capacity = data.get('capacity', {
+                "min_guests": 1,
+                "max_guests": 2
+            })
+            
+            # Amenities from form
+            self.amenities = data.get('amenities', [])
+            
+            # Images from form
+            self.images = data.get('images', [])
+            
+            # Availability from form
+            self.availability = data.get('availability', {
+                "check_in_time": "14:00",
+                "check_out_time": "12:00",
+                "cancellation_policy": "Standard"
+            })
+            
+            # Contact from form
+            self.contact = data.get('contact', {
+                "phone": "",
+                "email": ""
+            })
+            
+            # Status from form
+            self.is_active = data.get('is_active', True)
+            self.status = "active" if self.is_active else "inactive"
+            
+        else:
+            # Legacy initialization
+            self.name = name or ''
+            self.service_type = service_type or ''
+            self.provider_id = ObjectId(provider_id) if provider_id and isinstance(provider_id, str) else provider_id
         
         # Basic information
         self.description = ""
@@ -102,38 +160,34 @@ class Service:
 
     def to_dict(self):
         """Convert service to dictionary for MongoDB storage"""
-        return {
+        data = {
             'name': self.name,
             'service_type': self.service_type,
             'provider_id': self.provider_id,
             'description': self.description,
-            'short_description': self.short_description,
-            'category': self.category,
-            'subcategory': self.subcategory,
-            'images': self.images,
-            'videos': self.videos,
-            'thumbnail': self.thumbnail,
-            'location': self.location,
-            'pricing': self.pricing,
-            'availability': self.availability,
-            'features': self.features,
-            'included_items': self.included_items,
-            'excluded_items': self.excluded_items,
-            'requirements': self.requirements,
-            'policies': self.policies,
-            'contact': self.contact,
-            'status': self.status,
-            'verified': self.verified,
-            'featured': self.featured,
-            'popular': self.popular,
-            'total_bookings': self.total_bookings,
-            'total_revenue': self.total_revenue,
-            'average_rating': self.average_rating,
-            'total_reviews': self.total_reviews,
-            'seo': self.seo,
-            'created_at': self.created_at,
-            'updated_at': self.updated_at
+            'category': getattr(self, 'category', ''),
+            'location': getattr(self, 'location', {}),
+            'pricing': getattr(self, 'pricing', {}),
+            'availability': getattr(self, 'availability', {}),
+            'contact': getattr(self, 'contact', {}),
+            'status': getattr(self, 'status', 'active'),
+            'created_at': getattr(self, 'created_at', datetime.utcnow()),
+            'updated_at': getattr(self, 'updated_at', datetime.utcnow())
         }
+        
+        # Add optional fields if they exist
+        optional_fields = [
+            'short_description', 'subcategory', 'images', 'videos', 'thumbnail',
+            'features', 'included_items', 'excluded_items', 'requirements', 'policies',
+            'verified', 'featured', 'popular', 'total_bookings', 'total_revenue',
+            'average_rating', 'total_reviews', 'seo', 'amenities', 'capacity', 'is_active'
+        ]
+        
+        for field in optional_fields:
+            if hasattr(self, field):
+                data[field] = getattr(self, field)
+                
+        return data
 
     @classmethod
     def from_dict(cls, data):
@@ -150,6 +204,24 @@ class Service:
                 setattr(service, key, value)
         
         return service
+
+    def create(self):
+        """Create new service in database"""
+        try:
+            db = get_db()
+            collection = db.services
+            
+            # Set timestamps
+            self.created_at = datetime.utcnow()
+            self.updated_at = datetime.utcnow()
+            
+            # Create new service
+            result = collection.insert_one(self.to_dict())
+            self._id = result.inserted_id
+            return self._id
+        except Exception as e:
+            print(f"Error creating service: {e}")
+            return None
 
     def save(self):
         """Save service to database"""
@@ -320,3 +392,37 @@ class Service:
             self.status = "inactive"
             return self.save()
         return False
+    
+    @staticmethod
+    def count_by_provider(provider_id):
+        """Count services by provider"""
+        try:
+            db = get_db()
+            collection = db.services
+            return collection.count_documents({
+                'provider_id': ObjectId(provider_id),
+                'status': {'$ne': 'deleted'}
+            })
+        except Exception:
+            return 0
+    
+    @staticmethod
+    def find_by_provider(provider_id, skip=0, limit=10):
+        """Find services by provider with pagination"""
+        try:
+            db = get_db()
+            collection = db.services
+            
+            services_data = collection.find({
+                'provider_id': ObjectId(provider_id),
+                'status': {'$ne': 'deleted'}
+            }).skip(skip).limit(limit).sort('created_at', -1)
+            
+            services = []
+            for service_data in services_data:
+                service = Service.from_dict(service_data)
+                services.append(service)
+            
+            return services
+        except Exception:
+            return []

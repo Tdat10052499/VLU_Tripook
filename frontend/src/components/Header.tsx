@@ -1,10 +1,10 @@
 import React, { useState, useContext, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
-import { FaUser, FaSignOutAlt, FaCog, FaCaretDown } from 'react-icons/fa';
+import { FaUser, FaSignOutAlt, FaCog, FaCaretDown, FaBusinessTime, FaChartBar } from 'react-icons/fa';
 
 const Header: React.FC = () => {
-  const { user, isAuthenticated, logout } = useContext(AuthContext);
+  const { user, isAuthenticated, logout, isProvider, isActiveProvider } = useContext(AuthContext);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -73,12 +73,24 @@ const Header: React.FC = () => {
             >
               Dịch vụ
             </Link>
-            <Link 
-              to="/partner" 
-              className="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors"
-            >
-              Trở thành đối tác
-            </Link>
+            
+            {/* Provider/Partner Link */}
+            {isAuthenticated && isActiveProvider() ? (
+              <Link 
+                to="/provider/dashboard" 
+                className="text-blue-600 hover:text-blue-700 px-3 py-2 text-sm font-medium transition-colors flex items-center gap-1"
+              >
+                <FaBusinessTime className="w-4 h-4" />
+                Dashboard Provider
+              </Link>
+            ) : !isAuthenticated || !isProvider() ? (
+              <Link 
+                to="/become-provider" 
+                className="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors"
+              >
+                Trở thành đối tác
+              </Link>
+            ) : null}
           </nav>
 
           {/* Auth Section */}
@@ -141,6 +153,30 @@ const Header: React.FC = () => {
                         <FaCog className="w-4 h-4 mr-3" />
                         Settings
                       </Link>
+                      
+                      {/* Provider Dashboard */}
+                      {isActiveProvider() && (
+                        <Link
+                          to="/provider/dashboard"
+                          className="flex items-center px-4 py-2 text-sm text-blue-600 hover:bg-blue-50"
+                          onClick={() => setIsDropdownOpen(false)}
+                        >
+                          <FaChartBar className="w-4 h-4 mr-3" />
+                          Provider Dashboard
+                        </Link>
+                      )}
+                      
+                      {/* Become Provider if not yet a provider */}
+                      {!isProvider() && (
+                        <Link
+                          to="/become-provider"
+                          className="flex items-center px-4 py-2 text-sm text-green-600 hover:bg-green-50"
+                          onClick={() => setIsDropdownOpen(false)}
+                        >
+                          <FaBusinessTime className="w-4 h-4 mr-3" />
+                          Become Provider
+                        </Link>
+                      )}
                       
                       <div className="border-t border-gray-100">
                         <button

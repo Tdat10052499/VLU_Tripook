@@ -2,7 +2,7 @@ import axios, { InternalAxiosRequestConfig } from 'axios';
 import { Trip, Activity, ApiResponse } from '../types';
 import Cookies from 'js-cookie';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -90,6 +90,15 @@ export const authAPI = {
       password, 
       remember_me: rememberMe,
       recaptcha_token: recaptchaToken
+    });
+    return response.data;
+  },
+
+  simpleLogin: async (loginIdentifier: string, password: string, rememberMe: boolean = false) => {
+    const response = await api.post('/auth/simple-login', { 
+      login: loginIdentifier, 
+      password, 
+      remember_me: rememberMe
     });
     return response.data;
   },
