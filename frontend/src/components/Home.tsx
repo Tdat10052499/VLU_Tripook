@@ -180,22 +180,63 @@ const Home: React.FC = () => {
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Search & Filter Bar - Clean Version */}
-          <div className="bg-white/90 rounded-2xl shadow-2xl p-6 mb-8 border border-gray-200">
+          <div className="card" style={{ marginBottom: 'var(--space-2xl)' }}>
             {/* Top Row - Main Search */}
-            <div className="flex flex-col md:flex-row gap-4 mb-6">
+            <div className="flex flex-col md:flex-row gap-4" style={{ marginBottom: 'var(--space-xl)' }}>
               <div className="flex-1">
-                <label className="text-sm font-semibold text-gray-800 mb-2 flex items-center">
-                  <span className="text-blue-600 mr-2 text-lg">📍</span>
+                <label style={{
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: '600',
+                  color: 'var(--color-text-primary)',
+                  marginBottom: 'var(--space-sm)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  fontFamily: 'var(--font-sans)'
+                }}>
+                  <span style={{
+                    color: 'var(--color-brushed-bronze)',
+                    marginRight: 'var(--space-sm)',
+                    fontSize: 'var(--text-lg)'
+                  }}>📍</span>
                   Tìm kiếm địa điểm
                 </label>
                 <div className="relative">
-                  <FaMapMarkerAlt className="absolute left-4 top-1/2 transform -translate-y-1/2 text-indigo-500 text-lg" />
+                  <FaMapMarkerAlt style={{
+                    position: 'absolute',
+                    left: 'var(--space-md)',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    color: 'var(--color-brushed-bronze)',
+                    fontSize: 'var(--text-lg)'
+                  }} />
                   <input
                     type="text"
                     placeholder="Nhập tên thành phố, điểm đến..."
                     value={searchData.destination}
                     onChange={(e) => handleSearchChange('destination', e.target.value)}
-                    className="w-full pl-12 pr-4 py-4 text-base border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-indigo-500/30 focus:border-indigo-500 bg-white shadow-lg transition-all duration-300 hover:shadow-xl"
+                    style={{
+                      width: '100%',
+                      paddingLeft: '3rem',
+                      paddingRight: 'var(--space-md)',
+                      paddingTop: 'var(--space-md)',
+                      paddingBottom: 'var(--space-md)',
+                      fontSize: 'var(--text-base)',
+                      border: '2px solid var(--color-border-subtle)',
+                      borderRadius: '0.75rem',
+                      backgroundColor: 'var(--color-bg-main)',
+                      boxShadow: '0 4px 6px rgba(78, 74, 71, 0.1)',
+                      transition: 'all 0.3s ease-in-out',
+                      fontFamily: 'var(--font-sans)',
+                      color: 'var(--color-text-primary)'
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--color-brushed-bronze)';
+                      e.currentTarget.style.boxShadow = '0 0 0 4px rgba(161, 138, 104, 0.2), 0 4px 6px rgba(78, 74, 71, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--color-border-subtle)';
+                      e.currentTarget.style.boxShadow = '0 4px 6px rgba(78, 74, 71, 0.1)';
+                    }}
                   />
                 </div>
               </div>
@@ -292,8 +333,18 @@ const Home: React.FC = () => {
                   </select>
                 </div>
               </div>
-              <button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-                <FaSearch className="mr-3 text-lg" />
+              <button className="btn-primary" style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transform: 'translateY(0)',
+                transition: 'all 0.3s ease-in-out'
+              }} onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+              }} onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}>
+                <FaSearch style={{ marginRight: 'var(--space-sm)', fontSize: 'var(--text-lg)' }} />
                 Tìm kiếm ngay
               </button>
             </div>
@@ -423,30 +474,60 @@ const Home: React.FC = () => {
 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {sampleAccommodations.map((item) => (
-                <div key={item.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col h-full">
+                <div key={item.id} className="card hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col h-full">
                   <div className="relative flex-shrink-0">
                     <img
                       src={item.image}
                       alt={item.name}
                       className="w-full h-48 object-cover"
+                      style={{ borderRadius: '0.75rem 0.75rem 0 0' }}
                     />
-                    <button className="absolute top-3 right-3 p-2 rounded-full bg-white/80 hover:bg-white transition-colors">
+                    <button style={{
+                      position: 'absolute',
+                      top: 'var(--space-sm)',
+                      right: 'var(--space-sm)',
+                      padding: 'var(--space-sm)',
+                      borderRadius: '50%',
+                      backgroundColor: 'rgba(248, 245, 242, 0.9)',
+                      border: 'none',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease-in-out'
+                    }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-main)'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(248, 245, 242, 0.9)'}>
                       {item.isFavorite ? (
-                        <FaHeart className="text-red-500" />
+                        <FaHeart style={{ color: '#DC2626' }} />
                       ) : (
-                        <FaRegHeart className="text-gray-600" />
+                        <FaRegHeart style={{ color: 'var(--color-text-secondary)' }} />
                       )}
                     </button>
                   </div>
                   
-                  <div className="p-4 flex flex-col flex-grow">
-                    <h4 className="font-bold text-gray-900 mb-2 line-clamp-2 min-h-[3rem]">{item.name}</h4>
-                    <div className="flex items-center gap-1 mb-3">
-                      <FaStar className="text-yellow-400 text-sm" />
-                      <span className="text-sm font-medium text-gray-700">{item.rating}</span>
+                  <div style={{ padding: 'var(--space-md)', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+                    <h4 style={{
+                      fontFamily: 'var(--font-serif)',
+                      fontWeight: '500',
+                      color: 'var(--color-text-primary)',
+                      marginBottom: 'var(--space-sm)',
+                      fontSize: 'var(--text-base)',
+                      lineHeight: 'var(--leading-tight)',
+                      minHeight: '3rem'
+                    }} className="line-clamp-2">{item.name}</h4>
+                    <div className="flex items-center gap-1" style={{ marginBottom: 'var(--space-sm)' }}>
+                      <FaStar style={{ color: 'var(--color-brushed-bronze)', fontSize: 'var(--text-sm)' }} />
+                      <span style={{
+                        fontSize: 'var(--text-sm)',
+                        fontWeight: '500',
+                        color: 'var(--color-text-secondary)',
+                        fontFamily: 'var(--font-sans)'
+                      }}>{item.rating}</span>
                     </div>
-                    <div className="flex items-center justify-between mb-4 flex-grow">
-                      <span className="text-lg font-bold text-blue-600">{item.price}</span>
+                    <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-md)', flexGrow: 1 }}>
+                      <span style={{
+                        fontSize: 'var(--text-lg)',
+                        fontWeight: '600',
+                        color: 'var(--color-brushed-bronze)',
+                        fontFamily: 'var(--font-sans)'
+                      }}>{item.price}</span>
                     </div>
                     
                     {/* Action Buttons - Always at bottom */}

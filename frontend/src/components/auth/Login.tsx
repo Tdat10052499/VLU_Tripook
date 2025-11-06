@@ -120,26 +120,58 @@ const Login: React.FC = () => {
       {/* Dark overlay for better contrast */}
       <div className="absolute inset-0 bg-black/50"></div>
       <div className="max-w-md w-full space-y-8 relative z-10">
-        <div className="bg-white rounded-lg shadow-lg p-8">
+        <div style={{
+          backgroundColor: 'var(--color-bg-main)',
+          borderRadius: '0.75rem',
+          boxShadow: '0 20px 25px rgba(78, 74, 71, 0.1)',
+          padding: 'var(--space-2xl)'
+        }}>
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+            <h2 style={{
+              fontSize: 'var(--text-3xl)',
+              fontFamily: 'var(--font-serif)',
+              fontWeight: '500',
+              color: 'var(--color-text-primary)',
+              marginBottom: 'var(--space-sm)'
+            }}>
               Welcome Back
             </h2>
-            <p className="text-gray-600 mb-8">
+            <p style={{
+              color: 'var(--color-text-secondary)',
+              marginBottom: 'var(--space-2xl)',
+              fontFamily: 'var(--font-sans)',
+              fontSize: 'var(--text-base)'
+            }}>
               Đăng nhập vào tài khoản Tripook của bạn
             </p>
           </div>
 
           {error && (
-            <div className="mb-4 p-4 text-red-700 bg-red-100 border border-red-300 rounded-md">
+            <div style={{
+              marginBottom: 'var(--space-md)',
+              padding: 'var(--space-md)',
+              color: '#B91C1C',
+              backgroundColor: '#FEF2F2',
+              border: '1px solid #FECACA',
+              borderRadius: '0.375rem',
+              fontFamily: 'var(--font-sans)',
+              fontSize: 'var(--text-sm)'
+            }}>
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="login" className="block text-sm font-medium text-gray-700 mb-2">
-                Email or Username
+              <label htmlFor="login" style={{
+                display: 'block',
+                fontSize: 'var(--text-sm)',
+                fontWeight: '500',
+                color: 'var(--color-text-primary)',
+                marginBottom: 'var(--space-sm)',
+                fontFamily: 'var(--font-sans)'
+              }}>
+                Email hoặc Username
               </label>
               <input
                 id="login"
@@ -149,14 +181,40 @@ const Login: React.FC = () => {
                 required
                 value={formData.login}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="Enter your email or username"
+                style={{
+                  width: '100%',
+                  padding: 'var(--space-sm) var(--space-md)',
+                  border: '1px solid var(--color-border-subtle)',
+                  borderRadius: '0.375rem',
+                  boxShadow: '0 1px 2px rgba(78, 74, 71, 0.05)',
+                  fontSize: 'var(--text-base)',
+                  fontFamily: 'var(--font-sans)',
+                  color: 'var(--color-text-primary)',
+                  backgroundColor: 'var(--color-bg-main)',
+                  transition: 'all 0.2s ease-in-out'
+                }}
+                placeholder="Nhập email hoặc username của bạn"
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--color-brushed-bronze)';
+                  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(161, 138, 104, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--color-border-subtle)';
+                  e.currentTarget.style.boxShadow = '0 1px 2px rgba(78, 74, 71, 0.05)';
+                }}
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                Password
+              <label htmlFor="password" style={{
+                display: 'block',
+                fontSize: 'var(--text-sm)',
+                fontWeight: '500',
+                color: 'var(--color-text-primary)',
+                marginBottom: 'var(--space-sm)',
+                fontFamily: 'var(--font-sans)'
+              }}>
+                Mật khẩu
               </label>
               <div className="relative">
                 <input
@@ -167,18 +225,49 @@ const Login: React.FC = () => {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                  placeholder="Enter your password"
+                  style={{
+                    width: '100%',
+                    padding: 'var(--space-sm) var(--space-md)',
+                    paddingRight: '2.5rem',
+                    border: '1px solid var(--color-border-subtle)',
+                    borderRadius: '0.375rem',
+                    boxShadow: '0 1px 2px rgba(78, 74, 71, 0.05)',
+                    fontSize: 'var(--text-base)',
+                    fontFamily: 'var(--font-sans)',
+                    color: 'var(--color-text-primary)',
+                    backgroundColor: 'var(--color-bg-main)',
+                    transition: 'all 0.2s ease-in-out'
+                  }}
+                  placeholder="Nhập mật khẩu của bạn"
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--color-brushed-bronze)';
+                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(161, 138, 104, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--color-border-subtle)';
+                    e.currentTarget.style.boxShadow = '0 1px 2px rgba(78, 74, 71, 0.05)';
+                  }}
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  style={{
+                    position: 'absolute',
+                    top: '0',
+                    right: '0',
+                    bottom: '0',
+                    paddingRight: 'var(--space-sm)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer'
+                  }}
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
-                    <FaEyeSlash className="h-5 w-5 text-gray-400" />
+                    <FaEyeSlash style={{ width: '1.25rem', height: '1.25rem', color: 'var(--color-text-secondary)' }} />
                   ) : (
-                    <FaEye className="h-5 w-5 text-gray-400" />
+                    <FaEye style={{ width: '1.25rem', height: '1.25rem', color: 'var(--color-text-secondary)' }} />
                   )}
                 </button>
               </div>
@@ -192,18 +281,39 @@ const Login: React.FC = () => {
                   type="checkbox"
                   checked={formData.rememberMe}
                   onChange={(e) => setFormData({...formData, rememberMe: e.target.checked})}
-                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  style={{
+                    height: '1rem',
+                    width: '1rem',
+                    accentColor: 'var(--color-brushed-bronze)',
+                    marginRight: 'var(--space-sm)'
+                  }}
                 />
-                <label htmlFor="rememberMe" className="ml-2 block text-sm text-gray-700">
-                  Remember me
+                <label htmlFor="rememberMe" style={{
+                  fontSize: 'var(--text-sm)',
+                  color: 'var(--color-text-secondary)',
+                  fontFamily: 'var(--font-sans)'
+                }}>
+                  Ghi nhớ đăng nhập
                 </label>
               </div>
-              <div className="text-sm">
+              <div style={{ fontSize: 'var(--text-sm)' }}>
                 <Link
                   to="/auth/forgot-password"
-                  className="font-medium text-indigo-600 hover:text-indigo-500"
+                  style={{
+                    fontWeight: '500',
+                    color: 'var(--color-brushed-bronze)',
+                    textDecoration: 'none',
+                    fontFamily: 'var(--font-sans)',
+                    transition: 'all 0.2s ease-in-out'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = '#8F7A5A';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = 'var(--color-brushed-bronze)';
+                  }}
                 >
-                  Forgot your password?
+                  Quên mật khẩu?
                 </Link>
               </div>
             </div>
@@ -232,11 +342,23 @@ const Login: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading || !recaptchaToken}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-primary w-full"
+              style={{
+                opacity: (isLoading || !recaptchaToken) ? '0.5' : '1',
+                cursor: (isLoading || !recaptchaToken) ? 'not-allowed' : 'pointer'
+              }}
             >
               {isLoading ? (
-                <div className="flex items-center">
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{
+                    animation: 'spin 1s linear infinite',
+                    borderRadius: '50%',
+                    height: '20px',
+                    width: '20px',
+                    border: '2px solid transparent',
+                    borderTop: '2px solid var(--color-linen-white)',
+                    marginRight: '8px'
+                  }}></div>
                   Đang đăng nhập...
                 </div>
               ) : (
@@ -244,12 +366,24 @@ const Login: React.FC = () => {
               )}
             </button>
 
-            <div className="text-center">
-              <p className="text-sm text-gray-600">
+            <div style={{ textAlign: 'center' }}>
+              <p style={{ 
+                fontSize: 'var(--text-sm)',
+                color: 'var(--color-deep-taupe)',
+                marginBottom: '8px'
+              }}>
                 Chưa có tài khoản?{' '}
                 <Link
                   to="/auth/register"
-                  className="font-medium text-indigo-600 hover:text-indigo-500"
+                  style={{
+                    fontFamily: 'var(--font-inter)',
+                    fontWeight: '500',
+                    color: 'var(--color-brushed-bronze)',
+                    textDecoration: 'none',
+                    transition: 'color 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-deep-taupe)'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--color-brushed-bronze)'}
                 >
                   Đăng ký tại đây
                 </Link>

@@ -1,14 +1,156 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Quiet Luxury Color Palette */
+:root {
+  /* Main Colors */
+  --color-linen-white: #F8F5F2;     /* Main background */
+  --color-deep-taupe: #4E4A47;       /* Text & Footer background */
+  --color-warm-beige: #EAE0D5;       /* Cards & secondary backgrounds */
+  --color-brushed-bronze: #A18A68;   /* Buttons & accents */
+  --color-stone-gray: #C7C1B8;       /* Borders & subtle elements */
+  
+  /* Typography Colors */
+  --color-text-primary: var(--color-deep-taupe);
+  --color-text-secondary: rgba(78, 74, 71, 0.8);
+  --color-text-light: var(--color-linen-white);
+  
+  /* Background Colors */
+  --color-bg-main: var(--color-linen-white);
+  --color-bg-card: var(--color-warm-beige);
+  --color-bg-footer: var(--color-deep-taupe);
+  
+  /* Button Colors */
+  --color-btn-primary-bg: var(--color-brushed-bronze);
+  --color-btn-primary-text: var(--color-linen-white);
+  --color-btn-secondary-border: var(--color-brushed-bronze);
+  --color-btn-secondary-text: var(--color-brushed-bronze);
+  
+  /* Border Colors */
+  --color-border-subtle: var(--color-stone-gray);
+  
+  /* Typography */
+  --font-serif: 'Playfair Display', serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  
+  /* Spacing Scale (Based on 8px grid) */
+  --space-xs: 0.5rem;    /* 8px */
+  --space-sm: 0.75rem;   /* 12px */
+  --space-md: 1rem;      /* 16px */
+  --space-lg: 1.5rem;    /* 24px */
+  --space-xl: 2rem;      /* 32px */
+  --space-2xl: 3rem;     /* 48px */
+  --space-3xl: 4rem;     /* 64px */
+  --space-4xl: 6rem;     /* 96px */
+  
+  /* Typography Scale */
+  --text-xs: 0.75rem;    /* 12px */
+  --text-sm: 0.875rem;   /* 14px */
+  --text-base: 1rem;     /* 16px */
+  --text-lg: 1.125rem;   /* 18px */
+  --text-xl: 1.25rem;    /* 20px */
+  --text-2xl: 1.5rem;    /* 24px */
+  --text-3xl: 1.875rem;  /* 30px */
+  --text-4xl: 2.25rem;   /* 36px */
+  --text-5xl: 3rem;      /* 48px */
+  
+  /* Line Heights */
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+  --leading-loose: 2;
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: var(--color-bg-main);
+  color: var(--color-text-primary);
+  line-height: var(--leading-normal);
+}
+
+/* Base Typography Styles */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  line-height: var(--leading-tight);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+h1 { font-size: var(--text-5xl); margin-bottom: var(--space-xl); }
+h2 { font-size: var(--text-4xl); margin-bottom: var(--space-lg); }
+h3 { font-size: var(--text-3xl); margin-bottom: var(--space-lg); }
+h4 { font-size: var(--text-2xl); margin-bottom: var(--space-md); }
+h5 { font-size: var(--text-xl); margin-bottom: var(--space-md); }
+h6 { font-size: var(--text-lg); margin-bottom: var(--space-sm); }
+
+p {
+  margin: 0 0 var(--space-md) 0;
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-secondary);
+}
+
+/* Button Base Styles */
+.btn-primary {
+  background-color: var(--color-btn-primary-bg);
+  color: var(--color-btn-primary-text);
+  border: none;
+  padding: var(--space-sm) var(--space-xl);
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: var(--text-base);
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  letter-spacing: 0.025em;
+}
+
+.btn-primary:hover {
+  background-color: #8F7A5A;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(161, 138, 104, 0.3);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--color-btn-secondary-text);
+  border: 1px solid var(--color-btn-secondary-border);
+  padding: var(--space-sm) var(--space-xl);
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: var(--text-base);
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  letter-spacing: 0.025em;
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-btn-secondary-border);
+  color: var(--color-btn-primary-text);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(161, 138, 104, 0.2);
+}
+
+/* Card Styles */
+.card {
+  background-color: var(--color-bg-card);
+  border-radius: 0.75rem;
+  padding: var(--space-xl);
+  margin-bottom: var(--space-lg);
+  border: 1px solid rgba(199, 193, 184, 0.3);
+  transition: all 0.3s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(78, 74, 71, 0.1);
+  border-color: var(--color-border-subtle);
 }
 
 code {
@@ -34,6 +176,7 @@ code {
 .line-clamp-1 {
   display: -webkit-box;
   -webkit-line-clamp: 1;
+  line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -41,6 +184,7 @@ code {
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -48,8 +192,26 @@ code {
 .line-clamp-3 {
   display: -webkit-box;
   -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  :root {
+    --text-5xl: 2.25rem;  /* 36px on mobile */
+    --text-4xl: 1.875rem; /* 30px on mobile */
+    --text-3xl: 1.5rem;   /* 24px on mobile */
+  }
+  
+  .card {
+    padding: var(--space-lg);
+    margin-bottom: var(--space-md);
+  }
+  
+  h1 { margin-bottom: var(--space-lg); }
+  h2 { margin-bottom: var(--space-md); }
 }
 
 /* Email Verification Animations */
@@ -71,4 +233,9 @@ code {
 
 .animate-pulse-success {
   animation: pulse-success 0.5s ease-in-out;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }

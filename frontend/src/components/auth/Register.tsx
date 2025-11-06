@@ -204,34 +204,79 @@ const Register: React.FC = () => {
 
   return (
     <div 
-      className="min-h-screen bg-cover bg-center bg-no-repeat flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative"
       style={{
+        minHeight: '100vh',
         backgroundImage: `url('/images/Backgroud_Home_Filter.png')`,
-        backgroundAttachment: 'fixed'
+        backgroundAttachment: 'fixed',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '48px 16px',
+        position: 'relative'
       }}
     >
       {/* Dark overlay for better contrast */}
-      <div className="absolute inset-0 bg-black/50"></div>
-      <div className="max-w-md w-full space-y-8 relative z-10">
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+      <div style={{
+        position: 'absolute',
+        inset: '0',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)'
+      }}></div>
+      <div style={{
+        maxWidth: '28rem',
+        width: '100%',
+        position: 'relative',
+        zIndex: 10
+      }}>
+        <div className="card" style={{ padding: 'var(--space-xl)' }}>
+          <div style={{ textAlign: 'center' }}>
+            <h2 style={{
+              fontFamily: 'var(--font-serif)',
+              fontSize: 'var(--text-3xl)',
+              fontWeight: '600',
+              color: 'var(--color-deep-taupe)',
+              marginBottom: 'var(--space-sm)',
+              lineHeight: '1.2'
+            }}>
               Create Account
             </h2>
-            <p className="text-gray-600 mb-8">
+            <p style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: 'var(--text-base)',
+              color: 'var(--color-text-secondary)',
+              marginBottom: 'var(--space-xl)'
+            }}>
               Join Tripook and start planning your adventures
             </p>
           </div>
 
           {error && (
-            <div className="mb-4 p-4 text-red-700 bg-red-100 border border-red-300 rounded-md">
+            <div style={{
+              marginBottom: 'var(--space-md)',
+              padding: 'var(--space-md)',
+              backgroundColor: '#fef2f2',
+              color: '#dc2626',
+              border: '1px solid #fecaca',
+              borderRadius: '8px',
+              fontSize: 'var(--text-sm)',
+              fontFamily: 'var(--font-sans)'
+            }}>
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)' }}>
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="name" style={{
+                display: 'block',
+                fontFamily: 'var(--font-sans)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: '500',
+                color: 'var(--color-deep-taupe)',
+                marginBottom: 'var(--space-sm)'
+              }}>
                 Full Name
               </label>
               <input
@@ -242,13 +287,39 @@ const Register: React.FC = () => {
                 required
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  border: '1px solid var(--color-stone-gray)',
+                  borderRadius: '8px',
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: 'var(--text-base)',
+                  color: 'var(--color-deep-taupe)',
+                  backgroundColor: 'var(--color-linen-white)',
+                  transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+                  outline: 'none'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = 'var(--color-brushed-bronze)';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(161, 138, 104, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = 'var(--color-stone-gray)';
+                  e.target.style.boxShadow = 'none';
+                }}
                 placeholder="Enter your full name"
               />
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="email" style={{
+                display: 'block',
+                fontFamily: 'var(--font-sans)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: '500',
+                color: 'var(--color-deep-taupe)',
+                marginBottom: 'var(--space-sm)'
+              }}>
                 Email Address
               </label>
               <input
@@ -259,13 +330,39 @@ const Register: React.FC = () => {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="Enter your email"
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  border: '1px solid var(--color-stone-gray)',
+                  borderRadius: '8px',
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: 'var(--text-base)',
+                  color: 'var(--color-deep-taupe)',
+                  backgroundColor: 'var(--color-linen-white)',
+                  transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+                  outline: 'none'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = 'var(--color-brushed-bronze)';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(161, 138, 104, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = 'var(--color-stone-gray)';
+                  e.target.style.boxShadow = 'none';
+                }}
+                placeholder="Enter your email address"
               />
             </div>
 
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="username" style={{
+                display: 'block',
+                fontFamily: 'var(--font-sans)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: '500',
+                color: 'var(--color-deep-taupe)',
+                marginBottom: 'var(--space-sm)'
+              }}>
                 Username (Optional)
               </label>
               <input
@@ -275,16 +372,42 @@ const Register: React.FC = () => {
                 autoComplete="username"
                 value={formData.username}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  border: '1px solid var(--color-stone-gray)',
+                  borderRadius: '8px',
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: 'var(--text-base)',
+                  color: 'var(--color-deep-taupe)',
+                  backgroundColor: 'var(--color-linen-white)',
+                  transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+                  outline: 'none'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = 'var(--color-brushed-bronze)';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(161, 138, 104, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = 'var(--color-stone-gray)';
+                  e.target.style.boxShadow = 'none';
+                }}
                 placeholder="Choose a username"
               />
             </div>
 
             <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="phone" style={{
+                display: 'block',
+                fontFamily: 'var(--font-sans)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: '500',
+                color: 'var(--color-deep-taupe)',
+                marginBottom: 'var(--space-sm)'
+              }}>
                 Phone Number
               </label>
-              <div className="relative">
+              <div style={{ position: 'relative' }}>
                 <input
                   id="phone"
                   name="phone"
@@ -293,60 +416,152 @@ const Register: React.FC = () => {
                   required
                   value={formData.phone}
                   onChange={handleChange}
-                  className={`w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
-                    formData.phone 
+                  style={{
+                    width: '100%',
+                    padding: '12px 40px 12px 16px',
+                    border: formData.phone 
                       ? formValidation.phoneValid 
-                        ? 'border-green-300 bg-green-50' 
-                        : 'border-red-300 bg-red-50'
-                      : 'border-gray-300'
-                  }`}
+                        ? '1px solid #22c55e' 
+                        : '1px solid #ef4444'
+                      : '1px solid var(--color-stone-gray)',
+                    borderRadius: '8px',
+                    fontFamily: 'var(--font-sans)',
+                    fontSize: 'var(--text-base)',
+                    color: 'var(--color-deep-taupe)',
+                    backgroundColor: formData.phone 
+                      ? formValidation.phoneValid 
+                        ? '#f0fdf4' 
+                        : '#fef2f2'
+                      : 'var(--color-linen-white)',
+                    transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+                    outline: 'none'
+                  }}
+                  onFocus={(e) => {
+                    if (!formData.phone || formValidation.phoneValid) {
+                      e.target.style.borderColor = 'var(--color-brushed-bronze)';
+                      e.target.style.boxShadow = '0 0 0 3px rgba(161, 138, 104, 0.1)';
+                    }
+                  }}
+                  onBlur={(e) => {
+                    if (!formData.phone) {
+                      e.target.style.borderColor = 'var(--color-stone-gray)';
+                      e.target.style.boxShadow = 'none';
+                    }
+                  }}
                   placeholder="0xxxxxxxxx"
                   maxLength={10}
                 />
                 {formData.phone && formValidation.phoneValid && (
-                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                    <FaCheck className="text-green-500" />
+                  <div style={{
+                    position: 'absolute',
+                    top: '50%',
+                    right: '12px',
+                    transform: 'translateY(-50%)',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}>
+                    <FaCheck style={{ color: '#22c55e' }} />
                   </div>
                 )}
               </div>
               {formData.phone && !formValidation.phoneValid && (
-                <p className="text-red-600 text-xs mt-1">Số điện thoại phải có đúng 10 chữ số và bắt đầu bằng số 0</p>
+                <p style={{
+                  color: '#ef4444',
+                  fontSize: 'var(--text-xs)',
+                  fontFamily: 'var(--font-sans)',
+                  marginTop: 'var(--space-xs)'
+                }}>
+                  Số điện thoại phải có đúng 10 chữ số và bắt đầu bằng số 0
+                </p>
               )}
             </div>
 
             <div>
-              <label htmlFor="date_of_birth" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="date_of_birth" style={{
+                display: 'block',
+                fontFamily: 'var(--font-sans)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: '500',
+                color: 'var(--color-deep-taupe)',
+                marginBottom: 'var(--space-sm)'
+              }}>
                 Date of Birth
               </label>
-              <div className="relative">
+              <div style={{ position: 'relative' }}>
                 <input
                   id="date_of_birth"
                   name="date_of_birth"
                   type="date"
                   value={formData.date_of_birth}
                   onChange={handleChange}
-                  className={`w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
-                    formData.date_of_birth 
+                  style={{
+                    width: '100%',
+                    padding: '12px 40px 12px 16px',
+                    border: formData.date_of_birth 
                       ? formValidation.ageValid 
-                        ? 'border-green-300 bg-green-50' 
-                        : 'border-red-300 bg-red-50'
-                      : 'border-gray-300'
-                  }`}
+                        ? '1px solid #22c55e' 
+                        : '1px solid #ef4444'
+                      : '1px solid var(--color-stone-gray)',
+                    borderRadius: '8px',
+                    fontFamily: 'var(--font-sans)',
+                    fontSize: 'var(--text-base)',
+                    color: 'var(--color-deep-taupe)',
+                    backgroundColor: formData.date_of_birth 
+                      ? formValidation.ageValid 
+                        ? '#f0fdf4' 
+                        : '#fef2f2'
+                      : 'var(--color-linen-white)',
+                    transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+                    outline: 'none'
+                  }}
+                  onFocus={(e) => {
+                    if (!formData.date_of_birth || formValidation.ageValid) {
+                      e.target.style.borderColor = 'var(--color-brushed-bronze)';
+                      e.target.style.boxShadow = '0 0 0 3px rgba(161, 138, 104, 0.1)';
+                    }
+                  }}
+                  onBlur={(e) => {
+                    if (!formData.date_of_birth) {
+                      e.target.style.borderColor = 'var(--color-stone-gray)';
+                      e.target.style.boxShadow = 'none';
+                    }
+                  }}
                   required
                 />
                 {formData.date_of_birth && formValidation.ageValid && (
-                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                    <FaCheck className="text-green-500" />
+                  <div style={{
+                    position: 'absolute',
+                    top: '50%',
+                    right: '12px',
+                    transform: 'translateY(-50%)',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}>
+                    <FaCheck style={{ color: '#22c55e' }} />
                   </div>
                 )}
               </div>
               {formData.date_of_birth && !formValidation.ageValid && (
-                <p className="text-red-600 text-xs mt-1">Bạn phải từ 16 tuổi trở lên</p>
+                <p style={{
+                  color: '#ef4444',
+                  fontSize: 'var(--text-xs)',
+                  fontFamily: 'var(--font-sans)',
+                  marginTop: 'var(--space-xs)'
+                }}>
+                  Bạn phải từ 16 tuổi trở lên
+                </p>
               )}
             </div>
 
             <div>
-              <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="gender" style={{
+                display: 'block',
+                fontFamily: 'var(--font-sans)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: '500',
+                color: 'var(--color-deep-taupe)',
+                marginBottom: 'var(--space-sm)'
+              }}>
                 Gender
               </label>
               <select
@@ -354,7 +569,26 @@ const Register: React.FC = () => {
                 name="gender"
                 value={formData.gender}
                 onChange={(e) => setFormData({...formData, gender: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  border: '1px solid var(--color-stone-gray)',
+                  borderRadius: '8px',
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: 'var(--text-base)',
+                  color: 'var(--color-deep-taupe)',
+                  backgroundColor: 'var(--color-linen-white)',
+                  transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+                  outline: 'none'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = 'var(--color-brushed-bronze)';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(161, 138, 104, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = 'var(--color-stone-gray)';
+                  e.target.style.boxShadow = 'none';
+                }}
               >
                 <option value="">Select gender</option>
                 <option value="male">Male</option>
@@ -364,10 +598,17 @@ const Register: React.FC = () => {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="password" style={{
+                display: 'block',
+                fontFamily: 'var(--font-sans)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: '500',
+                color: 'var(--color-deep-taupe)',
+                marginBottom: 'var(--space-sm)'
+              }}>
                 Password
               </label>
-              <div className="relative">
+              <div style={{ position: 'relative' }}>
                 <input
                   id="password"
                   name="password"
@@ -376,78 +617,157 @@ const Register: React.FC = () => {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  style={{
+                    width: '100%',
+                    padding: '12px 40px 12px 16px',
+                    border: '1px solid var(--color-stone-gray)',
+                    borderRadius: '8px',
+                    fontFamily: 'var(--font-sans)',
+                    fontSize: 'var(--text-base)',
+                    color: 'var(--color-deep-taupe)',
+                    backgroundColor: 'var(--color-linen-white)',
+                    transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+                    outline: 'none'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = 'var(--color-brushed-bronze)';
+                    e.target.style.boxShadow = '0 0 0 3px rgba(161, 138, 104, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = 'var(--color-stone-gray)';
+                    e.target.style.boxShadow = 'none';
+                  }}
                   placeholder="Enter your password"
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  style={{
+                    position: 'absolute',
+                    top: '50%',
+                    right: '12px',
+                    transform: 'translateY(-50%)',
+                    padding: '0',
+                    border: 'none',
+                    backgroundColor: 'transparent',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
-                    <FaEyeSlash className="h-5 w-5 text-gray-400" />
+                    <FaEyeSlash style={{ width: '20px', height: '20px', color: 'var(--color-text-secondary)' }} />
                   ) : (
-                    <FaEye className="h-5 w-5 text-gray-400" />
+                    <FaEye style={{ width: '20px', height: '20px', color: 'var(--color-text-secondary)' }} />
                   )}
                 </button>
               </div>
               
               {/* Password validation indicators */}
               {formData.password && (
-                <div className="mt-3 p-3 bg-gray-50 rounded-md space-y-2">
-                  <p className="text-sm font-medium text-gray-700 mb-2">Yêu cầu mật khẩu:</p>
+                <div style={{
+                  marginTop: 'var(--space-md)',
+                  padding: 'var(--space-md)',
+                  backgroundColor: 'var(--color-warm-beige)',
+                  borderRadius: '8px',
+                  border: '1px solid var(--color-stone-gray)'
+                }}>
+                  <p style={{
+                    fontFamily: 'var(--font-sans)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: '500',
+                    color: 'var(--color-deep-taupe)',
+                    marginBottom: 'var(--space-sm)'
+                  }}>
+                    Yêu cầu mật khẩu:
+                  </p>
                   
-                  <div className={`flex items-center text-sm ${passwordValidation.length ? 'text-green-600' : 'text-red-500'}`}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    fontSize: 'var(--text-sm)',
+                    color: passwordValidation.length ? '#22c55e' : '#ef4444',
+                    marginBottom: 'var(--space-xs)'
+                  }}>
                     {passwordValidation.length ? (
-                      <FaCheck className="h-3 w-3 mr-2" />
+                      <FaCheck style={{ width: '12px', height: '12px', marginRight: '8px' }} />
                     ) : (
-                      <FaTimes className="h-3 w-3 mr-2" />
+                      <FaTimes style={{ width: '12px', height: '12px', marginRight: '8px' }} />
                     )}
                     Ít nhất 6 ký tự
                   </div>
                   
-                  <div className={`flex items-center text-sm ${passwordValidation.uppercase ? 'text-green-600' : 'text-red-500'}`}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    fontSize: 'var(--text-sm)',
+                    color: passwordValidation.uppercase ? '#22c55e' : '#ef4444',
+                    marginBottom: 'var(--space-xs)'
+                  }}>
                     {passwordValidation.uppercase ? (
-                      <FaCheck className="h-3 w-3 mr-2" />
+                      <FaCheck style={{ width: '12px', height: '12px', marginRight: '8px' }} />
                     ) : (
-                      <FaTimes className="h-3 w-3 mr-2" />
+                      <FaTimes style={{ width: '12px', height: '12px', marginRight: '8px' }} />
                     )}
                     Có ít nhất 1 chữ cái viết hoa (A-Z)
                   </div>
                   
-                  <div className={`flex items-center text-sm ${passwordValidation.hasDigit ? 'text-green-600' : 'text-red-500'}`}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    fontSize: 'var(--text-sm)',
+                    color: passwordValidation.hasDigit ? '#22c55e' : '#ef4444',
+                    marginBottom: 'var(--space-xs)'
+                  }}>
                     {passwordValidation.hasDigit ? (
-                      <FaCheck className="h-3 w-3 mr-2" />
+                      <FaCheck style={{ width: '12px', height: '12px', marginRight: '8px' }} />
                     ) : (
-                      <FaTimes className="h-3 w-3 mr-2" />
+                      <FaTimes style={{ width: '12px', height: '12px', marginRight: '8px' }} />
                     )}
                     Có ít nhất 1 chữ số (0-9)
                   </div>
                   
-                  <div className={`flex items-center text-sm ${passwordValidation.hasLetter ? 'text-green-600' : 'text-red-500'}`}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    fontSize: 'var(--text-sm)',
+                    color: passwordValidation.hasLetter ? '#22c55e' : '#ef4444',
+                    marginBottom: 'var(--space-xs)'
+                  }}>
                     {passwordValidation.hasLetter ? (
-                      <FaCheck className="h-3 w-3 mr-2" />
+                      <FaCheck style={{ width: '12px', height: '12px', marginRight: '8px' }} />
                     ) : (
-                      <FaTimes className="h-3 w-3 mr-2" />
+                      <FaTimes style={{ width: '12px', height: '12px', marginRight: '8px' }} />
                     )}
                     Có ít nhất 1 chữ cái (a-z, A-Z)
                   </div>
                   
-                  <div className={`flex items-center text-sm ${passwordValidation.special ? 'text-green-600' : 'text-red-500'}`}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    fontSize: 'var(--text-sm)',
+                    color: passwordValidation.special ? '#22c55e' : '#ef4444',
+                    marginBottom: 'var(--space-xs)'
+                  }}>
                     {passwordValidation.special ? (
-                      <FaCheck className="h-3 w-3 mr-2" />
+                      <FaCheck style={{ width: '12px', height: '12px', marginRight: '8px' }} />
                     ) : (
-                      <FaTimes className="h-3 w-3 mr-2" />
+                      <FaTimes style={{ width: '12px', height: '12px', marginRight: '8px' }} />
                     )}
                     Có ít nhất 1 ký tự đặc biệt (!@#$%^&*)
                   </div>
                   
                   {formData.username && (
-                    <div className={`flex items-center text-sm ${passwordValidation.notUsername ? 'text-green-600' : 'text-red-500'}`}>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      fontSize: 'var(--text-sm)',
+                      color: passwordValidation.notUsername ? '#22c55e' : '#ef4444'
+                    }}>
                       {passwordValidation.notUsername ? (
-                        <FaCheck className="h-3 w-3 mr-2" />
+                        <FaCheck style={{ width: '12px', height: '12px', marginRight: '8px' }} />
                       ) : (
-                        <FaTimes className="h-3 w-3 mr-2" />
+                        <FaTimes style={{ width: '12px', height: '12px', marginRight: '8px' }} />
                       )}
                       Không được chứa tên người dùng
                     </div>
@@ -457,10 +777,17 @@ const Register: React.FC = () => {
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="confirmPassword" style={{
+                display: 'block',
+                fontFamily: 'var(--font-sans)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: '500',
+                color: 'var(--color-deep-taupe)',
+                marginBottom: 'var(--space-sm)'
+              }}>
                 Confirm Password
               </label>
-              <div className="relative">
+              <div style={{ position: 'relative' }}>
                 <input
                   id="confirmPassword"
                   name="confirmPassword"
@@ -469,29 +796,64 @@ const Register: React.FC = () => {
                   required
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  style={{
+                    width: '100%',
+                    padding: '12px 40px 12px 16px',
+                    border: '1px solid var(--color-stone-gray)',
+                    borderRadius: '8px',
+                    fontFamily: 'var(--font-sans)',
+                    fontSize: 'var(--text-base)',
+                    color: 'var(--color-deep-taupe)',
+                    backgroundColor: 'var(--color-linen-white)',
+                    transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+                    outline: 'none'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = 'var(--color-brushed-bronze)';
+                    e.target.style.boxShadow = '0 0 0 3px rgba(161, 138, 104, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = 'var(--color-stone-gray)';
+                    e.target.style.boxShadow = 'none';
+                  }}
                   placeholder="Confirm your password"
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  style={{
+                    position: 'absolute',
+                    top: '50%',
+                    right: '12px',
+                    transform: 'translateY(-50%)',
+                    padding: '0',
+                    border: 'none',
+                    backgroundColor: 'transparent',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
                   {showConfirmPassword ? (
-                    <FaEyeSlash className="h-5 w-5 text-gray-400" />
+                    <FaEyeSlash style={{ width: '20px', height: '20px', color: 'var(--color-text-secondary)' }} />
                   ) : (
-                    <FaEye className="h-5 w-5 text-gray-400" />
+                    <FaEye style={{ width: '20px', height: '20px', color: 'var(--color-text-secondary)' }} />
                   )}
                 </button>
               </div>
               
               {formData.confirmPassword && (
-                <div className="mt-2">
-                  <div className={`flex items-center text-sm ${passwordValidation.match ? 'text-green-600' : 'text-red-500'}`}>
+                <div style={{ marginTop: 'var(--space-sm)' }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    fontSize: 'var(--text-sm)',
+                    color: passwordValidation.match ? '#22c55e' : '#ef4444'
+                  }}>
                     {passwordValidation.match ? (
-                      <FaCheck className="h-3 w-3 mr-2" />
+                      <FaCheck style={{ width: '12px', height: '12px', marginRight: '8px' }} />
                     ) : (
-                      <FaTimes className="h-3 w-3 mr-2" />
+                      <FaTimes style={{ width: '12px', height: '12px', marginRight: '8px' }} />
                     )}
                     {passwordValidation.match ? 'Mật khẩu khớp' : 'Mật khẩu không khớp'}
                   </div>
@@ -501,11 +863,23 @@ const Register: React.FC = () => {
 
             {/* reCAPTCHA */}
             {configLoading ? (
-              <div className="flex justify-center py-4">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
+              <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--space-md)' }}>
+                <div style={{
+                  animation: 'spin 1s linear infinite',
+                  borderRadius: '50%',
+                  height: '24px',
+                  width: '24px',
+                  border: '2px solid transparent',
+                  borderTop: '2px solid var(--color-brushed-bronze)'
+                }}></div>
               </div>
             ) : configError ? (
-              <div className="text-red-500 text-sm text-center">
+              <div style={{
+                color: '#ef4444',
+                fontSize: 'var(--text-sm)',
+                textAlign: 'center',
+                fontFamily: 'var(--font-sans)'
+              }}>
                 {configError}
               </div>
             ) : (
@@ -523,11 +897,23 @@ const Register: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading || !passwordValidation.length || !passwordValidation.match || !recaptchaToken}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-primary w-full"
+              style={{
+                opacity: (isLoading || !passwordValidation.length || !passwordValidation.match || !recaptchaToken) ? '0.5' : '1',
+                cursor: (isLoading || !passwordValidation.length || !passwordValidation.match || !recaptchaToken) ? 'not-allowed' : 'pointer'
+              }}
             >
               {isLoading ? (
-                <div className="flex items-center">
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{
+                    animation: 'spin 1s linear infinite',
+                    borderRadius: '50%',
+                    height: '20px',
+                    width: '20px',
+                    border: '2px solid transparent',
+                    borderTop: '2px solid var(--color-linen-white)',
+                    marginRight: '8px'
+                  }}></div>
                   Creating account...
                 </div>
               ) : (
@@ -535,12 +921,24 @@ const Register: React.FC = () => {
               )}
             </button>
 
-            <div className="text-center">
-              <p className="text-sm text-gray-600">
+            <div style={{ textAlign: 'center' }}>
+              <p style={{ 
+                fontSize: 'var(--text-sm)',
+                color: 'var(--color-deep-taupe)',
+                marginBottom: '8px'
+              }}>
                 Đã có tài khoản?{' '}
                 <Link
                   to="/auth/login"
-                  className="font-medium text-indigo-600 hover:text-indigo-500"
+                  style={{
+                    fontFamily: 'var(--font-inter)',
+                    fontWeight: '500',
+                    color: 'var(--color-brushed-bronze)',
+                    textDecoration: 'none',
+                    transition: 'color 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-deep-taupe)'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--color-brushed-bronze)'}
                 >
                   Đăng nhập tại đây
                 </Link>

@@ -46,16 +46,39 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200">
+    <header style={{ 
+      backgroundColor: 'var(--color-bg-main)',
+      borderBottom: '1px solid var(--color-border-subtle)',
+      padding: 'var(--space-md) 0'
+    }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center" style={{ minHeight: '4rem' }}>
           {/* Logo */}
           <div className="flex items-center">
-            <Link to="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">T</span>
+            <Link to="/" className="flex items-center space-x-3">
+              <div style={{
+                width: '2.5rem',
+                height: '2.5rem',
+                backgroundColor: 'var(--color-brushed-bronze)',
+                borderRadius: '0.75rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <span style={{
+                  color: 'var(--color-text-light)',
+                  fontFamily: 'var(--font-serif)',
+                  fontWeight: '600',
+                  fontSize: 'var(--text-xl)'
+                }}>T</span>
               </div>
-              <span className="text-xl font-bold text-gray-900">Tripook</span>
+              <span style={{
+                fontSize: 'var(--text-2xl)',
+                fontFamily: 'var(--font-serif)',
+                fontWeight: '500',
+                color: 'var(--color-text-primary)',
+                letterSpacing: '-0.025em'
+              }}>Tripook</span>
             </Link>
           </div>
 
@@ -63,13 +86,47 @@ const Header: React.FC = () => {
           <nav className="hidden md:flex space-x-8">
             <Link 
               to="/about" 
-              className="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors"
+              style={{
+                color: 'var(--color-text-secondary)',
+                fontFamily: 'var(--font-sans)',
+                fontSize: 'var(--text-base)',
+                fontWeight: '500',
+                padding: 'var(--space-sm) var(--space-md)',
+                textDecoration: 'none',
+                transition: 'all 0.2s ease-in-out',
+                borderRadius: '0.375rem'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = 'var(--color-brushed-bronze)';
+                e.currentTarget.style.backgroundColor = 'rgba(161, 138, 104, 0.1)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = 'var(--color-text-secondary)';
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
             >
               Về chúng tôi
             </Link>
             <Link 
               to="/services" 
-              className="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors"
+              style={{
+                color: 'var(--color-text-secondary)',
+                fontFamily: 'var(--font-sans)',
+                fontSize: 'var(--text-base)',
+                fontWeight: '500',
+                padding: 'var(--space-sm) var(--space-md)',
+                textDecoration: 'none',
+                transition: 'all 0.2s ease-in-out',
+                borderRadius: '0.375rem'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = 'var(--color-brushed-bronze)';
+                e.currentTarget.style.backgroundColor = 'rgba(161, 138, 104, 0.1)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = 'var(--color-text-secondary)';
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
             >
               Dịch vụ
             </Link>
@@ -78,15 +135,50 @@ const Header: React.FC = () => {
             {isAuthenticated && isActiveProvider() ? (
               <Link 
                 to="/provider/dashboard" 
-                className="text-blue-600 hover:text-blue-700 px-3 py-2 text-sm font-medium transition-colors flex items-center gap-1"
+                style={{
+                  color: 'var(--color-brushed-bronze)',
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: 'var(--text-base)',
+                  fontWeight: '500',
+                  padding: 'var(--space-sm) var(--space-md)',
+                  textDecoration: 'none',
+                  transition: 'all 0.2s ease-in-out',
+                  borderRadius: '0.375rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 'var(--space-xs)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(161, 138, 104, 0.1)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
               >
-                <FaBusinessTime className="w-4 h-4" />
+                <FaBusinessTime style={{ width: '1rem', height: '1rem' }} />
                 Dashboard Provider
               </Link>
             ) : !isAuthenticated || !isProvider() ? (
               <Link 
                 to="/become-provider" 
-                className="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors"
+                style={{
+                  color: 'var(--color-text-secondary)',
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: 'var(--text-base)',
+                  fontWeight: '500',
+                  padding: 'var(--space-sm) var(--space-md)',
+                  textDecoration: 'none',
+                  transition: 'all 0.2s ease-in-out',
+                  borderRadius: '0.375rem'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = 'var(--color-brushed-bronze)';
+                  e.currentTarget.style.backgroundColor = 'rgba(161, 138, 104, 0.1)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = 'var(--color-text-secondary)';
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
               >
                 Trở thành đối tác
               </Link>
@@ -99,58 +191,165 @@ const Header: React.FC = () => {
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="flex items-center space-x-3 text-gray-700 hover:text-indigo-600 focus:outline-none"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 'var(--space-sm)',
+                    color: 'var(--color-text-secondary)',
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: 'var(--space-xs)',
+                    borderRadius: '0.5rem',
+                    transition: 'all 0.2s ease-in-out'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = 'var(--color-brushed-bronze)';
+                    e.currentTarget.style.backgroundColor = 'rgba(161, 138, 104, 0.1)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = 'var(--color-text-secondary)';
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
                 >
                   {/* User Avatar */}
-                  <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center">
+                  <div style={{
+                    width: '2rem',
+                    height: '2rem',
+                    backgroundColor: 'var(--color-brushed-bronze)',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
                     {user.picture ? (
                       <img 
                         src={user.picture} 
                         alt={getUserDisplayName()} 
-                        className="w-8 h-8 rounded-full object-cover"
+                        style={{
+                          width: '2rem',
+                          height: '2rem',
+                          borderRadius: '50%',
+                          objectFit: 'cover'
+                        }}
                       />
                     ) : (
-                      <span className="text-white text-sm font-medium">
+                      <span style={{
+                        color: 'var(--color-text-light)',
+                        fontSize: 'var(--text-sm)',
+                        fontWeight: '500',
+                        fontFamily: 'var(--font-sans)'
+                      }}>
                         {getUserInitials()}
                       </span>
                     )}
                   </div>
                   
                   {/* User Name */}
-                  <span className="hidden sm:block text-sm font-medium">
+                  <span style={{
+                    display: 'none',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: '500',
+                    fontFamily: 'var(--font-sans)'
+                  }} className="sm:block">
                     {getUserDisplayName()}
                   </span>
                   
                   {/* Dropdown Arrow */}
-                  <FaCaretDown className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                  <FaCaretDown style={{
+                    width: '1rem',
+                    height: '1rem',
+                    transition: 'transform 0.2s ease-in-out',
+                    transform: isDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)'
+                  }} />
                 </button>
 
                 {/* Dropdown Menu */}
                 {isDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50">
-                    <div className="py-1">
+                  <div style={{
+                    position: 'absolute',
+                    right: '0',
+                    marginTop: 'var(--space-sm)',
+                    width: '12rem',
+                    backgroundColor: 'var(--color-bg-main)',
+                    borderRadius: '0.75rem',
+                    boxShadow: '0 10px 25px rgba(78, 74, 71, 0.15)',
+                    border: '1px solid var(--color-border-subtle)',
+                    zIndex: '50'
+                  }}>
+                    <div style={{ padding: 'var(--space-xs) 0' }}>
                       {/* User Info */}
-                      <div className="px-4 py-3 border-b border-gray-100">
-                        <p className="text-sm font-medium text-gray-900">{getUserDisplayName()}</p>
-                        <p className="text-sm text-gray-500">{user.email}</p>
+                      <div style={{
+                        padding: 'var(--space-md) var(--space-lg)',
+                        borderBottom: '1px solid var(--color-border-subtle)'
+                      }}>
+                        <p style={{
+                          fontSize: 'var(--text-sm)',
+                          fontWeight: '500',
+                          color: 'var(--color-text-primary)',
+                          margin: '0 0 var(--space-xs) 0',
+                          fontFamily: 'var(--font-sans)'
+                        }}>{getUserDisplayName()}</p>
+                        <p style={{
+                          fontSize: 'var(--text-xs)',
+                          color: 'var(--color-text-secondary)',
+                          margin: '0',
+                          fontFamily: 'var(--font-sans)'
+                        }}>{user.email}</p>
                       </div>
                       
                       {/* Menu Items */}
                       <Link
                         to="/profile"
-                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          padding: 'var(--space-sm) var(--space-lg)',
+                          fontSize: 'var(--text-sm)',
+                          color: 'var(--color-text-secondary)',
+                          textDecoration: 'none',
+                          transition: 'all 0.2s ease-in-out',
+                          fontFamily: 'var(--font-sans)',
+                          fontWeight: '500'
+                        }}
                         onClick={() => setIsDropdownOpen(false)}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = 'var(--color-bg-card)';
+                          e.currentTarget.style.color = 'var(--color-text-primary)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                          e.currentTarget.style.color = 'var(--color-text-secondary)';
+                        }}
                       >
-                        <FaUser className="w-4 h-4 mr-3" />
+                        <FaUser style={{ width: '1rem', height: '1rem', marginRight: 'var(--space-sm)' }} />
                         Profile
                       </Link>
                       
                       <Link
                         to="/settings"
-                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          padding: 'var(--space-sm) var(--space-lg)',
+                          fontSize: 'var(--text-sm)',
+                          color: 'var(--color-text-secondary)',
+                          textDecoration: 'none',
+                          transition: 'all 0.2s ease-in-out',
+                          fontFamily: 'var(--font-sans)',
+                          fontWeight: '500'
+                        }}
                         onClick={() => setIsDropdownOpen(false)}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = 'var(--color-bg-card)';
+                          e.currentTarget.style.color = 'var(--color-text-primary)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                          e.currentTarget.style.color = 'var(--color-text-secondary)';
+                        }}
                       >
-                        <FaCog className="w-4 h-4 mr-3" />
+                        <FaCog style={{ width: '1rem', height: '1rem', marginRight: 'var(--space-sm)' }} />
                         Settings
                       </Link>
                       
@@ -158,10 +357,26 @@ const Header: React.FC = () => {
                       {isActiveProvider() && (
                         <Link
                           to="/provider/dashboard"
-                          className="flex items-center px-4 py-2 text-sm text-blue-600 hover:bg-blue-50"
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            padding: 'var(--space-sm) var(--space-lg)',
+                            fontSize: 'var(--text-sm)',
+                            color: 'var(--color-brushed-bronze)',
+                            textDecoration: 'none',
+                            transition: 'all 0.2s ease-in-out',
+                            fontFamily: 'var(--font-sans)',
+                            fontWeight: '500'
+                          }}
                           onClick={() => setIsDropdownOpen(false)}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = 'rgba(161, 138, 104, 0.1)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                          }}
                         >
-                          <FaChartBar className="w-4 h-4 mr-3" />
+                          <FaChartBar style={{ width: '1rem', height: '1rem', marginRight: 'var(--space-sm)' }} />
                           Provider Dashboard
                         </Link>
                       )}
@@ -170,20 +385,55 @@ const Header: React.FC = () => {
                       {!isProvider() && (
                         <Link
                           to="/become-provider"
-                          className="flex items-center px-4 py-2 text-sm text-green-600 hover:bg-green-50"
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            padding: 'var(--space-sm) var(--space-lg)',
+                            fontSize: 'var(--text-sm)',
+                            color: 'var(--color-brushed-bronze)',
+                            textDecoration: 'none',
+                            transition: 'all 0.2s ease-in-out',
+                            fontFamily: 'var(--font-sans)',
+                            fontWeight: '500'
+                          }}
                           onClick={() => setIsDropdownOpen(false)}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = 'rgba(161, 138, 104, 0.1)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                          }}
                         >
-                          <FaBusinessTime className="w-4 h-4 mr-3" />
+                          <FaBusinessTime style={{ width: '1rem', height: '1rem', marginRight: 'var(--space-sm)' }} />
                           Become Provider
                         </Link>
                       )}
                       
-                      <div className="border-t border-gray-100">
+                      <div style={{ borderTop: '1px solid var(--color-border-subtle)' }}>
                         <button
                           onClick={handleLogout}
-                          className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            width: '100%',
+                            padding: 'var(--space-sm) var(--space-lg)',
+                            fontSize: 'var(--text-sm)',
+                            color: '#DC2626',
+                            backgroundColor: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease-in-out',
+                            fontFamily: 'var(--font-sans)',
+                            fontWeight: '500'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = 'rgba(220, 38, 38, 0.05)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                          }}
                         >
-                          <FaSignOutAlt className="w-4 h-4 mr-3" />
+                          <FaSignOutAlt style={{ width: '1rem', height: '1rem', marginRight: 'var(--space-sm)' }} />
                           Sign Out
                         </button>
                       </div>
@@ -195,13 +445,34 @@ const Header: React.FC = () => {
               <div className="flex items-center space-x-4">
                 <Link
                   to="/auth/login"
-                  className="text-gray-700 hover:text-indigo-600 text-sm font-medium transition-colors"
+                  style={{
+                    color: 'var(--color-text-secondary)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: '500',
+                    textDecoration: 'none',
+                    transition: 'all 0.2s ease-in-out',
+                    fontFamily: 'var(--font-sans)',
+                    padding: 'var(--space-sm) var(--space-md)',
+                    borderRadius: '0.375rem'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = 'var(--color-brushed-bronze)';
+                    e.currentTarget.style.backgroundColor = 'rgba(161, 138, 104, 0.1)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = 'var(--color-text-secondary)';
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
                 >
                   Đăng nhập
                 </Link>
                 <Link
                   to="/auth/register"
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                  className="btn-primary"
+                  style={{
+                    textDecoration: 'none',
+                    display: 'inline-block'
+                  }}
                 >
                   Đăng ký
                 </Link>
