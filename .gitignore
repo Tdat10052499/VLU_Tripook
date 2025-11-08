@@ -183,3 +183,17 @@ venv.bak/
 .mypy_cache/
 .dmypy.json
 dmypy.json
+
+# Docker
+.env
+.env.docker
+docker-compose.override.yml
+
+# MongoDB backups
+backups/
+*.tar.gz
+*.zip
+
+# Docker volumes (if locally mounted)
+mongodb_data/
+backend_logs/

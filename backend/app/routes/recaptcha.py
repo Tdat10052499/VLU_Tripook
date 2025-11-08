@@ -10,11 +10,14 @@ class RecaptchaConfigResource(Resource):
         try:
             site_key = RecaptchaVerifier.get_site_key()
             
+            # If reCAPTCHA is not configured, return success=False with 200 status
+            # This allows frontend to disable reCAPTCHA instead of showing error
             if not site_key or site_key == 'your-recaptcha-site-key-here':
                 return {
                     'success': False,
-                    'message': 'reCAPTCHA not configured. Please set RECAPTCHA_SITE_KEY in .env file'
-                }, 500
+                    'message': 'reCAPTCHA not configured',
+                    'site_key': None
+                }, 200
             
             return {
                 'success': True,
@@ -25,5 +28,6 @@ class RecaptchaConfigResource(Resource):
             print(f"Error in RecaptchaConfigResource: {str(e)}")
             return {
                 'success': False,
-                'message': f'Error getting reCAPTCHA configuration: {str(e)}'
-            }, 500
+                'message': f'Error getting reCAPTCHA configuration: {str(e)}',
+                'site_key': None
+            }, 200

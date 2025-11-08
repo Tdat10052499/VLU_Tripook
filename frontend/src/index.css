@@ -1,39 +1,60 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,400&family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Quiet Luxury Color Palette */
+/* ============================================
+   HỒN VIỆT (The Soul of Vietnam) Theme
+   Inspired by Vietnamese culture and nature
+   ============================================ */
 :root {
-  /* Main Colors */
-  --color-linen-white: #F8F5F2;     /* Main background */
-  --color-deep-taupe: #4E4A47;       /* Text & Footer background */
-  --color-warm-beige: #EAE0D5;       /* Cards & secondary backgrounds */
-  --color-brushed-bronze: #A18A68;   /* Buttons & accents */
-  --color-stone-gray: #C7C1B8;       /* Borders & subtle elements */
+  /* Main Colors - Hồn Việt Palette */
+  --color-indigo-blue: #0A2342;      /* Xanh Chàm Đậm - Header, Footer, Tiêu đề */
+  --color-cream: #FAF3E0;            /* Kem/Be - Nền chính (giấy dó, tường vôi) */
+  --color-bronze-gold: #AE8E5B;      /* Vàng Đồng - CTA, Links, Icons (trống đồng) */
+  --color-dark-charcoal: #2E2E2E;    /* Than Chì - Văn bản chính */
+  --color-light-indigo: #1A3A5C;     /* Xanh Chàm Nhạt - Hover states */
+  --color-soft-cream: #FFFEF8;       /* Kem Nhạt - Light backgrounds */
   
-  /* Typography Colors */
-  --color-text-primary: var(--color-deep-taupe);
-  --color-text-secondary: rgba(78, 74, 71, 0.8);
-  --color-text-light: var(--color-linen-white);
+  /* Gradient Colors */
+  --gradient-indigo: linear-gradient(135deg, #0A2342 0%, #1A3A5C 100%);
+  --gradient-bronze: linear-gradient(135deg, #AE8E5B 0%, #C4A570 100%);
+  
+  /* Typography Colors - Enhanced for better contrast */
+  --color-text-primary: #1A1A1A;              /* Darker for better readability */
+  --color-text-secondary: rgba(26, 26, 26, 0.75); /* Darker secondary text */
+  --color-text-light: #FFFFFF;                 /* Pure white for dark backgrounds */
+  --color-text-accent: #C4A570;                /* Lighter bronze for better visibility */
+  --color-text-heading: #0A2342;               /* Indigo for headings on light bg */
   
   /* Background Colors */
-  --color-bg-main: var(--color-linen-white);
-  --color-bg-card: var(--color-warm-beige);
-  --color-bg-footer: var(--color-deep-taupe);
+  --color-bg-main: var(--color-soft-cream);
+  --color-bg-card: var(--color-cream);
+  --color-bg-footer: var(--color-indigo-blue);
+  --color-bg-hero: rgba(26, 54, 93, 0.85);
   
   /* Button Colors */
-  --color-btn-primary-bg: var(--color-brushed-bronze);
-  --color-btn-primary-text: var(--color-linen-white);
-  --color-btn-secondary-border: var(--color-brushed-bronze);
-  --color-btn-secondary-text: var(--color-brushed-bronze);
+  --color-btn-primary-bg: var(--color-bronze-gold);
+  --color-btn-primary-text: #FFFFFF;
+  --color-btn-primary-hover: #B89850;
+  --color-btn-secondary-bg: transparent;
+  --color-btn-secondary-border: var(--color-bronze-gold);
+  --color-btn-secondary-text: var(--color-bronze-gold);
   
   /* Border Colors */
-  --color-border-subtle: var(--color-stone-gray);
+  --color-border-subtle: rgba(201, 169, 97, 0.2);
+  --color-border-medium: rgba(201, 169, 97, 0.4);
+  --color-border-strong: var(--color-bronze-gold);
   
-  /* Typography */
-  --font-serif: 'Playfair Display', serif;
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  /* Shadow Colors */
+  --shadow-sm: 0 2px 4px rgba(26, 54, 93, 0.08);
+  --shadow-md: 0 4px 12px rgba(26, 54, 93, 0.12);
+  --shadow-lg: 0 8px 24px rgba(26, 54, 93, 0.16);
+  --shadow-bronze: 0 4px 12px rgba(201, 169, 97, 0.3);
+  
+  /* Typography - Hồn Việt Fonts */
+  --font-serif: 'Merriweather', Georgia, serif;        /* Tiêu đề - thanh lịch, hoài cổ */
+  --font-sans: 'Be Vietnam Pro', -apple-system, sans-serif;  /* Nội dung - hiện đại, dễ đọc */
   
   /* Spacing Scale (Based on 8px grid) */
   --space-xs: 0.5rem;    /* 8px */

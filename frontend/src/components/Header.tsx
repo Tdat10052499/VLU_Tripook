@@ -47,7 +47,7 @@ const Header: React.FC = () => {
 
   return (
     <header style={{ 
-      backgroundColor: 'var(--color-bg-main)',
+      backgroundColor: 'var(--color-indigo-blue)',
       borderBottom: '1px solid var(--color-border-subtle)',
       padding: 'var(--space-md) 0'
     }}>
@@ -76,7 +76,7 @@ const Header: React.FC = () => {
                 fontSize: 'var(--text-2xl)',
                 fontFamily: 'var(--font-serif)',
                 fontWeight: '500',
-                color: 'var(--color-text-primary)',
+                color: 'var(--color-cream)',
                 letterSpacing: '-0.025em'
               }}>Tripook</span>
             </Link>
@@ -87,22 +87,25 @@ const Header: React.FC = () => {
             <Link 
               to="/about" 
               style={{
-                color: 'var(--color-text-secondary)',
+                color: 'var(--color-cream)',
                 fontFamily: 'var(--font-sans)',
                 fontSize: 'var(--text-base)',
                 fontWeight: '500',
                 padding: 'var(--space-sm) var(--space-md)',
                 textDecoration: 'none',
                 transition: 'all 0.2s ease-in-out',
-                borderRadius: '0.375rem'
+                borderRadius: '0.375rem',
+                opacity: 0.9
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.color = 'var(--color-brushed-bronze)';
-                e.currentTarget.style.backgroundColor = 'rgba(161, 138, 104, 0.1)';
+                e.currentTarget.style.color = 'var(--color-bronze-gold)';
+                e.currentTarget.style.backgroundColor = 'rgba(174, 142, 91, 0.15)';
+                e.currentTarget.style.opacity = '1';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.color = 'var(--color-text-secondary)';
+                e.currentTarget.style.color = 'var(--color-cream)';
                 e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.opacity = '0.9';
               }}
             >
               Về chúng tôi
@@ -110,22 +113,25 @@ const Header: React.FC = () => {
             <Link 
               to="/services" 
               style={{
-                color: 'var(--color-text-secondary)',
+                color: 'var(--color-cream)',
                 fontFamily: 'var(--font-sans)',
                 fontSize: 'var(--text-base)',
                 fontWeight: '500',
                 padding: 'var(--space-sm) var(--space-md)',
                 textDecoration: 'none',
                 transition: 'all 0.2s ease-in-out',
-                borderRadius: '0.375rem'
+                borderRadius: '0.375rem',
+                opacity: 0.9
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.color = 'var(--color-brushed-bronze)';
-                e.currentTarget.style.backgroundColor = 'rgba(161, 138, 104, 0.1)';
+                e.currentTarget.style.color = 'var(--color-bronze-gold)';
+                e.currentTarget.style.backgroundColor = 'rgba(174, 142, 91, 0.15)';
+                e.currentTarget.style.opacity = '1';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.color = 'var(--color-text-secondary)';
+                e.currentTarget.style.color = 'var(--color-cream)';
                 e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.opacity = '0.9';
               }}
             >
               Dịch vụ
@@ -136,10 +142,10 @@ const Header: React.FC = () => {
               <Link 
                 to="/provider/dashboard" 
                 style={{
-                  color: 'var(--color-brushed-bronze)',
+                  color: 'var(--color-bronze-gold)',
                   fontFamily: 'var(--font-sans)',
                   fontSize: 'var(--text-base)',
-                  fontWeight: '500',
+                  fontWeight: '600',
                   padding: 'var(--space-sm) var(--space-md)',
                   textDecoration: 'none',
                   transition: 'all 0.2s ease-in-out',
@@ -149,7 +155,7 @@ const Header: React.FC = () => {
                   gap: 'var(--space-xs)'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(161, 138, 104, 0.1)';
+                  e.currentTarget.style.backgroundColor = 'rgba(174, 142, 91, 0.2)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.backgroundColor = 'transparent';
@@ -160,24 +166,27 @@ const Header: React.FC = () => {
               </Link>
             ) : !isAuthenticated || !isProvider() ? (
               <Link 
-                to="/become-provider" 
+                to="/auth/register" 
                 style={{
-                  color: 'var(--color-text-secondary)',
+                  color: 'var(--color-cream)',
                   fontFamily: 'var(--font-sans)',
                   fontSize: 'var(--text-base)',
                   fontWeight: '500',
                   padding: 'var(--space-sm) var(--space-md)',
                   textDecoration: 'none',
                   transition: 'all 0.2s ease-in-out',
-                  borderRadius: '0.375rem'
+                  borderRadius: '0.375rem',
+                  opacity: 0.9
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.color = 'var(--color-brushed-bronze)';
-                  e.currentTarget.style.backgroundColor = 'rgba(161, 138, 104, 0.1)';
+                  e.currentTarget.style.color = 'var(--color-bronze-gold)';
+                  e.currentTarget.style.backgroundColor = 'rgba(174, 142, 91, 0.15)';
+                  e.currentTarget.style.opacity = '1';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.color = 'var(--color-text-secondary)';
+                  e.currentTarget.style.color = 'var(--color-cream)';
                   e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.opacity = '0.9';
                 }}
               >
                 Trở thành đối tác
@@ -195,21 +204,24 @@ const Header: React.FC = () => {
                     display: 'flex',
                     alignItems: 'center',
                     gap: 'var(--space-sm)',
-                    color: 'var(--color-text-secondary)',
+                    color: 'var(--color-cream)',
                     backgroundColor: 'transparent',
                     border: 'none',
                     cursor: 'pointer',
                     padding: 'var(--space-xs)',
                     borderRadius: '0.5rem',
-                    transition: 'all 0.2s ease-in-out'
+                    transition: 'all 0.2s ease-in-out',
+                    opacity: 0.9
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.color = 'var(--color-brushed-bronze)';
-                    e.currentTarget.style.backgroundColor = 'rgba(161, 138, 104, 0.1)';
+                    e.currentTarget.style.color = 'var(--color-bronze-gold)';
+                    e.currentTarget.style.backgroundColor = 'rgba(174, 142, 91, 0.15)';
+                    e.currentTarget.style.opacity = '1';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.color = 'var(--color-text-secondary)';
+                    e.currentTarget.style.color = 'var(--color-cream)';
                     e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.opacity = '0.9';
                   }}
                 >
                   {/* User Avatar */}
@@ -384,7 +396,7 @@ const Header: React.FC = () => {
                       {/* Become Provider if not yet a provider */}
                       {!isProvider() && (
                         <Link
-                          to="/become-provider"
+                          to="/auth/register"
                           style={{
                             display: 'flex',
                             alignItems: 'center',
@@ -446,22 +458,25 @@ const Header: React.FC = () => {
                 <Link
                   to="/auth/login"
                   style={{
-                    color: 'var(--color-text-secondary)',
+                    color: 'var(--color-cream)',
                     fontSize: 'var(--text-sm)',
                     fontWeight: '500',
                     textDecoration: 'none',
                     transition: 'all 0.2s ease-in-out',
                     fontFamily: 'var(--font-sans)',
                     padding: 'var(--space-sm) var(--space-md)',
-                    borderRadius: '0.375rem'
+                    borderRadius: '0.375rem',
+                    opacity: 0.9
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.color = 'var(--color-brushed-bronze)';
-                    e.currentTarget.style.backgroundColor = 'rgba(161, 138, 104, 0.1)';
+                    e.currentTarget.style.color = 'var(--color-bronze-gold)';
+                    e.currentTarget.style.backgroundColor = 'rgba(174, 142, 91, 0.15)';
+                    e.currentTarget.style.opacity = '1';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.color = 'var(--color-text-secondary)';
+                    e.currentTarget.style.color = 'var(--color-cream)';
                     e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.opacity = '0.9';
                   }}
                 >
                   Đăng nhập

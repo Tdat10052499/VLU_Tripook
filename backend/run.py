@@ -14,4 +14,8 @@ create_app = app_module.create_app
 
 if __name__ == '__main__':
     app = create_app()
-    app.run(debug=True, port=5000, host='127.0.0.1')
+    # Use 0.0.0.0 to accept connections from outside the container
+    # Port and debug mode can be controlled via environment variables
+    import os
+    debug_mode = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
+    app.run(debug=debug_mode, port=5000, host='0.0.0.0')
