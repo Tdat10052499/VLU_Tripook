@@ -1,5 +1,5 @@
 import React, { useState, useContext, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthContext';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import RecaptchaComponent, { RecaptchaComponentRef } from '../RecaptchaComponent';
@@ -42,7 +42,6 @@ const Login: React.FC = () => {
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
 
   const { login } = useContext(AuthContext);
-  const navigate = useNavigate();
   const recaptchaRef = useRef<RecaptchaComponentRef>(null);
   const { siteKey, isLoading: configLoading, error: configError } = useRecaptchaConfig();
 
@@ -91,9 +90,10 @@ const Login: React.FC = () => {
       // Clear error only on successful login
       setErrorPersistent('');
       
-      // Use setTimeout to ensure state update completes
+      // Redirect will be handled by App.tsx based on user role
+      // Just navigate to home and let it redirect based on role
       setTimeout(() => {
-        navigate('/', { replace: true });
+        window.location.href = '/';
       }, 100);
     } catch (err: any) {
       console.error('Login error:', err);

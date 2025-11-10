@@ -1,10 +1,26 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { FaSearch, FaMapMarkerAlt, FaHeart, FaRegHeart, FaStar } from 'react-icons/fa';
+import BackgroundVideo from '../assets/videos/Background_VIdeo.mp4';
+import { AuthContext } from '../contexts/AuthContext';
 
 const Home: React.FC = () => {
+  const navigate = useNavigate();
+  const { user, isAuthenticated } = useContext(AuthContext);
+
+  // Redirect based on user role after login
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      if (user.role === 'provider') {
+        navigate('/provider/dashboard', { replace: true });
+      } else if (user.role === 'admin') {
+        navigate('/admin/dashboard', { replace: true });
+      }
+      // Regular users stay on home page
+    }
+  }, [isAuthenticated, user, navigate]);
   const [searchData, setSearchData] = useState({
     destination: '',
     checkIn: '',
@@ -66,20 +82,63 @@ const Home: React.FC = () => {
         overflow: 'hidden',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center',
-        backgroundImage: `url('/images/Backgroud_Home_Filter.png')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed'
+        justifyContent: 'center'
       }}>
-        {/* Background Overlay */}
+        {/* Background Video */}
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            minWidth: '100%',
+            minHeight: '100%',
+            width: 'auto',
+            height: 'auto',
+            transform: 'translate(-50%, -50%)',
+            objectFit: 'cover',
+            zIndex: 0
+          }}
+        >
+          <source src={BackgroundVideo} type="video/mp4" />
+          {/* Fallback image if video doesn't load */}
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundImage: `url('/images/Backgroud_Home_Filter.png')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }} />
+        </video>
+
+        {/* Fallback Background Image */}
         <div style={{
           position: 'absolute',
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
-          background: 'linear-gradient(135deg, rgba(10, 35, 66, 0.90) 0%, rgba(26, 58, 92, 0.80) 100%)',
+          backgroundImage: `url('/images/Backgroud_Home_Filter.png')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          zIndex: 0,
+          display: 'none'
+        }} className="video-fallback" />
+
+        {/* Dark Overlay to make video darker */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.55)',
           zIndex: 1
         }} />
         
@@ -92,13 +151,13 @@ const Home: React.FC = () => {
           bottom: 0,
           backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23AE8E5B\' fill-opacity=\'0.08\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
           opacity: 0.3,
-          zIndex: 1
+          zIndex: 2
         }} />
 
         {/* Content */}
         <div style={{
           position: 'relative',
-          zIndex: 2,
+          zIndex: 3,
           textAlign: 'center',
           color: 'var(--color-text-light)',
           maxWidth: '1200px',

@@ -6,14 +6,14 @@ import {
   FaCalendarAlt, 
   FaUser, 
   FaCog, 
-  FaChartBar,
   FaBars,
   FaTimes,
   FaBusinessTime,
-  FaBell,
-  FaSignOutAlt
+  FaSignOutAlt,
+  FaGlobe
 } from 'react-icons/fa';
 import { AuthContext } from '../contexts/AuthContext';
+import NotificationBell from '../components/NotificationBell';
 
 const ProviderDashboard: React.FC = () => {
   const location = useLocation();
@@ -21,10 +21,10 @@ const ProviderDashboard: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const navigationItems = [
-    { path: '/provider/dashboard', icon: FaHome, label: 'Trang chủ', exact: true },
-    { path: '/provider/services', icon: FaServicestack, label: 'Quản lý dịch vụ' },
+    { path: '/', icon: FaGlobe, label: 'Trang chủ Website', exact: true, external: true },
+    { path: '/provider/dashboard', icon: FaHome, label: 'Dashboard', exact: true },
+    { path: '/provider/services', icon: FaServicestack, label: 'Quản lý dịch vụ', exact: false },
     { path: '/provider/bookings', icon: FaCalendarAlt, label: 'Đặt chỗ' },
-    { path: '/provider/statistics', icon: FaChartBar, label: 'Thống kê' },
     { path: '/provider/profile', icon: FaUser, label: 'Hồ sơ' },
     { path: '/provider/settings', icon: FaCog, label: 'Cài đặt' }
   ];
@@ -70,10 +70,17 @@ const ProviderDashboard: React.FC = () => {
             </div>
 
             <div className="flex items-center space-x-4">
+              {/* Home Link */}
+              <Link 
+                to="/" 
+                className="hidden md:flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-100 rounded-md transition-colors"
+              >
+                <FaHome className="mr-2" />
+                Trang chủ
+              </Link>
+              
               {/* Notifications */}
-              <button className="p-2 text-gray-400 hover:text-gray-500">
-                <FaBell className="h-5 w-5" />
-              </button>
+              <NotificationBell />
 
               {/* User menu */}
               <div className="flex items-center space-x-3">
@@ -104,7 +111,8 @@ const ProviderDashboard: React.FC = () => {
           <nav className="flex-1 px-4 py-4 space-y-1">
             {navigationItems.map((item) => {
               const Icon = item.icon;
-              const isActive = isActiveRoute(item.path, item.exact);
+              // Don't highlight external links (like homepage)
+              const isActive = !item.external && isActiveRoute(item.path, item.exact);
               
               return (
                 <Link

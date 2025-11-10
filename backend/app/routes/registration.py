@@ -103,25 +103,35 @@ def register_user():
         # Create user document
         user_doc = {
             'email': email,
-            'password': generate_password_hash(data['password']),
-            'fullName': data['fullName'],
+            'name': data['fullName'],
+            'username': data['fullName'].replace(' ', '').lower(),
+            'password_hash': generate_password_hash(data['password']),
             'phone': data['phone'],
+            'picture': '',
+            'address': '',
             'role': 'provider' if user_type == 'provider' else 'user',
-            'isEmailVerified': True,  # Bỏ qua xác thực email
-            'accountStatus': 'active',  # Active ngay, không cần admin duyệt
-            'createdAt': datetime.utcnow(),
-            'updatedAt': datetime.utcnow()
+            'status': 'active',  # Active ngay, không cần admin duyệt
+            'is_verified': True,  # Bỏ qua xác thực email
+            'preferences': {
+                'currency': 'VND',
+                'language': 'vi',
+                'notifications': {'email': True, 'push': True, 'sms': False}
+            },
+            'created_at': datetime.utcnow(),
+            'updated_at': datetime.utcnow()
         }
 
         # Add provider specific fields
         if user_type == 'provider':
-            user_doc.update({
-                'companyName': data['companyName'],
-                'businessType': data['businessType'],
-                'businessAddress': data['businessAddress'],
-                'businessLicense': data.get('businessLicense', ''),
-                'businessDescription': data.get('businessDescription', ''),
-            })
+            user_doc['provider_info'] = {
+                'company_name': data['companyName'],
+                'business_type': data['businessType'],
+                'address': data['businessAddress'],
+                'business_license': data.get('businessLicense', ''),
+                'description': data.get('businessDescription', ''),
+                'is_active': True,
+                'approved_at': datetime.utcnow()
+            }
 
         # Insert user
         result = db.users.insert_one(user_doc)
@@ -151,6 +161,83 @@ def register_user():
         return jsonify({
             'success': False,
             'message': 'Có lỗi xảy ra trong quá trình đăng ký'
+        }), 500
+
+@registration_bp.route('/login', methods=['POST', 'OPTIONS'])
+@cross_origin(origins=['http://localhost:3000'])
+def simple_login():
+    """Simple login without reCAPTCHA for development"""
+    try:
+        data = request.get_json()
+        
+        if not data or not data.get('login') or not data.get('password'):
+            return jsonify({
+                'success': False,
+                'message': 'Email/username và password là bắt buộc'
+            }), 400
+        
+        login_identifier = data['login'].lower().strip()
+        password = data['password']
+        remember_me = data.get('remember_me', False)
+        
+        # Get database
+        db = get_db()
+        
+        # Find user by email or username
+        user_data = db.users.find_one({
+            '$or': [
+                {'email': login_identifier},
+                {'username': login_identifier}
+            ]
+        })
+        
+        if not user_data:
+            return jsonify({
+                'success': False,
+                'message': 'Email hoặc mật khẩu không đúng'
+            }), 401
+        
+        # Check password
+        password_hash = user_data.get('password_hash')
+        if not password_hash or not check_password_hash(password_hash, password):
+            return jsonify({
+                'success': False,
+                'message': 'Email hoặc mật khẩu không đúng'
+            }), 401
+        
+        # Generate JWT token
+        user_id = str(user_data['_id'])
+        token = generate_token(user_id, remember_me)
+        
+        # Prepare user data to return
+        user_response = {
+            'id': user_id,
+            'email': user_data['email'],
+            'name': user_data.get('name', ''),
+            'username': user_data.get('username', ''),
+            'role': user_data.get('role', 'user'),
+            'status': user_data.get('status', 'active'),
+            'phone': user_data.get('phone', ''),
+            'picture': user_data.get('picture', ''),
+            'is_verified': user_data.get('is_verified', False),
+            'provider_info': user_data.get('provider_info')
+        }
+        
+        return jsonify({
+            'success': True,
+            'message': 'Đăng nhập thành công',
+            'data': {
+                'token': token,
+                'user': user_response,
+                'remember_me': remember_me
+            }
+        }), 200
+        
+    except Exception as e:
+        print(f"Login error: {e}")
+        return jsonify({
+            'success': False,
+            'message': 'Có lỗi xảy ra trong quá trình đăng nhập'
         }), 500
 
 @registration_bp.route('/verify-email', methods=['POST', 'OPTIONS'])

@@ -12,9 +12,11 @@ import Settings from './pages/Settings';
 import Trips from './pages/Trips';
 import ProviderDashboard from './pages/ProviderDashboard';
 import ProviderDashboardHome from './pages/ProviderDashboardHome';
-import ProviderServices from './pages/ProviderServices';
+import ProviderServicesHub from './pages/ProviderServicesHub';
 import ProviderBookings from './pages/ProviderBookings';
 import ProviderProfile from './pages/ProviderProfile';
+import ProviderSettings from './pages/ProviderSettings';
+import ProviderNotifications from './pages/ProviderNotifications';
 import CreateService from './pages/CreateService';
 import Login from './components/auth/Login';
 // import Register from './components/auth/Register'; // Not used - using SimpleRegisterWrapper instead
@@ -85,10 +87,13 @@ function App() {
                 }
               >
                 <Route path="dashboard" element={<ProviderDashboardHome />} />
-                <Route path="services" element={<ProviderServices />} />
+                <Route path="services" element={<ProviderServicesHub />} />
                 <Route path="services/create" element={<CreateService />} />
+                <Route path="services/edit/:serviceId" element={<CreateService />} />
                 <Route path="bookings" element={<ProviderBookings />} />
                 <Route path="profile" element={<ProviderProfile />} />
+                <Route path="settings" element={<ProviderSettings />} />
+                <Route path="notifications" element={<ProviderNotifications />} />
               </Route>
               
               {/* Provider Status & Admin Routes */}

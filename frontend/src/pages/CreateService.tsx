@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   FaSave, 
   FaTimes,
@@ -11,7 +11,14 @@ import {
   FaCar,
   FaSwimmingPool,
   FaUtensils,
-  FaImage
+  FaImage,
+  FaEye,
+  FaBold,
+  FaItalic,
+  FaListUl,
+  FaListOl,
+  FaGripVertical,
+  FaExclamationCircle
 } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import providerApi from '../services/providerApi';
@@ -55,6 +62,8 @@ interface ServiceFormData {
 
 const CreateService: React.FC = () => {
   const navigate = useNavigate();
+  const descriptionRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [formData, setFormData] = useState<ServiceFormData>({
     name: '',
@@ -96,6 +105,9 @@ const CreateService: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
   const [imagePreview, setImagePreview] = useState<string[]>([]);
+  const [showPreview, setShowPreview] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
   const serviceTypes = [
     { value: 'accommodation', label: 'Lưu trú', icon: '🏨' },
@@ -130,8 +142,35 @@ const CreateService: React.FC = () => {
     { value: 'balcony', label: 'Ban công', icon: '🏞️' }
   ];
 
+  // Validation function
+  const validateForm = (): boolean => {
+    const errors: Record<string, string> = {};
+
+    if (!formData.name.trim()) errors.name = 'Tên dịch vụ là bắt buộc';
+    if (!formData.category.trim()) errors.category = 'Danh mục là bắt buộc';
+    if (!formData.description.trim()) errors.description = 'Mô tả là bắt buộc';
+    if (formData.description.length < 50) errors.description = 'Mô tả phải có ít nhất 50 ký tự';
+    if (!formData.location.address.trim()) errors.address = 'Địa chỉ là bắt buộc';
+    if (!formData.location.city.trim()) errors.city = 'Thành phố là bắt buộc';
+    if (formData.pricing.base_price <= 0) errors.price = 'Giá phải lớn hơn 0';
+    if (formData.capacity.max_guests < formData.capacity.min_guests) {
+      errors.capacity = 'Số khách tối đa phải lớn hơn số khách tối thiểu';
+    }
+    if (formData.images.length === 0) errors.images = 'Vui lòng thêm ít nhất 1 hình ảnh';
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
+    
+    // Clear validation error for this field
+    setValidationErrors(prev => {
+      const newErrors = { ...prev };
+      delete newErrors[name];
+      return newErrors;
+    });
     
     if (name.includes('.')) {
       const [parent, child, grandchild] = name.split('.');
@@ -161,15 +200,37 @@ const CreateService: React.FC = () => {
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    if (files.length > 0) {
+    
+    // Validate file size (max 10MB per file)
+    const validFiles = files.filter(file => {
+      if (file.size > 10 * 1024 * 1024) {
+        alert(`${file.name} quá lớn. Kích thước tối đa là 10MB.`);
+        return false;
+      }
+      return true;
+    });
+
+    if (validFiles.length > 0) {
       setFormData(prev => ({
         ...prev,
-        images: [...prev.images, ...files]
+        images: [...prev.images, ...validFiles]
       }));
       
       // Create preview URLs
-      const newPreviews = files.map(file => URL.createObjectURL(file));
+      const newPreviews = validFiles.map(file => URL.createObjectURL(file));
       setImagePreview(prev => [...prev, ...newPreviews]);
+      
+      // Clear validation error
+      setValidationErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors.images;
+        return newErrors;
+      });
+    }
+
+    // Reset input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
@@ -179,6 +240,56 @@ const CreateService: React.FC = () => {
       images: prev.images.filter((_, i) => i !== index)
     }));
     setImagePreview(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Drag and drop handlers for image reordering
+  const handleDragStart = (index: number) => {
+    setDraggedIndex(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === index) return;
+
+    const newImages = [...formData.images];
+    const newPreviews = [...imagePreview];
+    
+    const draggedImage = newImages[draggedIndex];
+    const draggedPreview = newPreviews[draggedIndex];
+
+    newImages.splice(draggedIndex, 1);
+    newImages.splice(index, 0, draggedImage);
+    
+    newPreviews.splice(draggedIndex, 1);
+    newPreviews.splice(index, 0, draggedPreview);
+
+    setFormData(prev => ({ ...prev, images: newImages }));
+    setImagePreview(newPreviews);
+    setDraggedIndex(index);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+  };
+
+  // Rich text editor functions
+  const applyFormat = (command: string, value?: string) => {
+    document.execCommand(command, false, value);
+    descriptionRef.current?.focus();
+  };
+
+  const handleDescriptionChange = () => {
+    if (descriptionRef.current) {
+      const content = descriptionRef.current.innerHTML;
+      setFormData(prev => ({ ...prev, description: content }));
+      
+      // Clear validation error
+      setValidationErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors.description;
+        return newErrors;
+      });
+    }
   };
 
   const handleAmenityToggle = (amenity: string) => {
@@ -192,6 +303,14 @@ const CreateService: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate form
+    if (!validateForm()) {
+      setError('Vui lòng kiểm tra lại các trường thông tin');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
     setLoading(true);
     setError('');
 
@@ -206,7 +325,7 @@ const CreateService: React.FC = () => {
       }));
       
       // Append image files
-      formData.images.forEach((image, index) => {
+      formData.images.forEach((image) => {
         submitData.append(`images`, image);
       });
 
@@ -245,8 +364,25 @@ const CreateService: React.FC = () => {
 
         <form onSubmit={handleSubmit} className="p-6 space-y-8">
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-md p-4">
+            <div className="bg-red-50 border border-red-200 rounded-md p-4 flex items-start">
+              <FaExclamationCircle className="h-5 w-5 text-red-600 mr-2 mt-0.5" />
               <p className="text-sm text-red-600">{error}</p>
+            </div>
+          )}
+
+          {Object.keys(validationErrors).length > 0 && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
+              <div className="flex items-start">
+                <FaExclamationCircle className="h-5 w-5 text-yellow-600 mr-2 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-yellow-800 mb-2">Vui lòng kiểm tra các trường sau:</p>
+                  <ul className="list-disc list-inside text-sm text-yellow-700 space-y-1">
+                    {Object.values(validationErrors).map((err, idx) => (
+                      <li key={idx}>{err}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
             </div>
           )}
 
@@ -301,9 +437,14 @@ const CreateService: React.FC = () => {
                   required
                   value={formData.name}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
+                    validationErrors.name ? 'border-red-300' : 'border-gray-300'
+                  }`}
                   placeholder="VD: Khách sạn Hạ Long View"
                 />
+                {validationErrors.name && (
+                  <p className="mt-1 text-sm text-red-600">{validationErrors.name}</p>
+                )}
               </div>
 
               <div>
@@ -317,26 +458,78 @@ const CreateService: React.FC = () => {
                   required
                   value={formData.category}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
+                    validationErrors.category ? 'border-red-300' : 'border-gray-300'
+                  }`}
                   placeholder="VD: Khách sạn 4 sao, Tour phiêu lưu"
                 />
+                {validationErrors.category && (
+                  <p className="mt-1 text-sm text-red-600">{validationErrors.category}</p>
+                )}
               </div>
             </div>
 
             <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-                Mô tả chi tiết *
+              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
+                Mô tả chi tiết * (tối thiểu 50 ký tự)
               </label>
-              <textarea
-                id="description"
-                name="description"
-                required
-                rows={4}
-                value={formData.description}
-                onChange={handleInputChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="Mô tả chi tiết về dịch vụ, tiện ích, vị trí..."
+              
+              {/* Rich Text Editor Toolbar */}
+              <div className="flex items-center space-x-2 mb-2 p-2 bg-gray-50 border border-gray-300 rounded-t-md">
+                <button
+                  type="button"
+                  onClick={() => applyFormat('bold')}
+                  className="p-2 hover:bg-gray-200 rounded"
+                  title="Bold"
+                >
+                  <FaBold className="h-4 w-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => applyFormat('italic')}
+                  className="p-2 hover:bg-gray-200 rounded"
+                  title="Italic"
+                >
+                  <FaItalic className="h-4 w-4" />
+                </button>
+                <div className="w-px h-6 bg-gray-300"></div>
+                <button
+                  type="button"
+                  onClick={() => applyFormat('insertUnorderedList')}
+                  className="p-2 hover:bg-gray-200 rounded"
+                  title="Bullet List"
+                >
+                  <FaListUl className="h-4 w-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => applyFormat('insertOrderedList')}
+                  className="p-2 hover:bg-gray-200 rounded"
+                  title="Numbered List"
+                >
+                  <FaListOl className="h-4 w-4" />
+                </button>
+              </div>
+
+              {/* Editable Content Area */}
+              <div
+                ref={descriptionRef}
+                contentEditable
+                onInput={handleDescriptionChange}
+                className={`min-h-[150px] px-3 py-2 border border-t-0 rounded-b-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                  validationErrors.description ? 'border-red-300' : 'border-gray-300'
+                }`}
+                style={{ whiteSpace: 'pre-wrap' }}
+                dangerouslySetInnerHTML={{ __html: formData.description || '<p class="text-gray-400">Mô tả chi tiết về dịch vụ, tiện ích, vị trí...</p>' }}
               />
+              
+              <div className="mt-1 flex justify-between items-center">
+                {validationErrors.description ? (
+                  <p className="text-sm text-red-600">{validationErrors.description}</p>
+                ) : (
+                  <p className="text-sm text-gray-500">{formData.description.replace(/<[^>]*>/g, '').length} / 50 ký tự tối thiểu</p>
+                )}
+              </div>
             </div>
           </div>
 
@@ -517,13 +710,19 @@ const CreateService: React.FC = () => {
 
           {/* Images */}
           <div className="space-y-6">
-            <h3 className="text-lg font-medium text-gray-900 flex items-center">
-              <FaImage className="mr-2 h-5 w-5 text-gray-600" />
-              Hình ảnh
-            </h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-medium text-gray-900 flex items-center">
+                <FaImage className="mr-2 h-5 w-5 text-gray-600" />
+                Hình ảnh * ({formData.images.length} ảnh)
+              </h3>
+              {formData.images.length > 0 && (
+                <p className="text-sm text-gray-500">Kéo thả để sắp xếp lại</p>
+              )}
+            </div>
             
             <div>
               <input
+                ref={fileInputRef}
                 type="file"
                 id="images"
                 multiple
@@ -533,32 +732,64 @@ const CreateService: React.FC = () => {
               />
               <label
                 htmlFor="images"
-                className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
+                className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
+                  validationErrors.images 
+                    ? 'border-red-300 bg-red-50 hover:bg-red-100' 
+                    : 'border-gray-300 bg-gray-50 hover:bg-gray-100'
+                }`}
               >
                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                  <FaUpload className="w-8 h-8 mb-4 text-gray-500" />
-                  <p className="mb-2 text-sm text-gray-500">
+                  <FaUpload className={`w-8 h-8 mb-4 ${validationErrors.images ? 'text-red-500' : 'text-gray-500'}`} />
+                  <p className={`mb-2 text-sm ${validationErrors.images ? 'text-red-600' : 'text-gray-500'}`}>
                     <span className="font-semibold">Click để upload</span> hoặc kéo thả
                   </p>
-                  <p className="text-xs text-gray-500">PNG, JPG, GIF (MAX. 10MB)</p>
+                  <p className={`text-xs ${validationErrors.images ? 'text-red-500' : 'text-gray-500'}`}>
+                    PNG, JPG, GIF (MAX. 10MB mỗi ảnh)
+                  </p>
                 </div>
               </label>
+              {validationErrors.images && (
+                <p className="mt-2 text-sm text-red-600">{validationErrors.images}</p>
+              )}
             </div>
 
-            {/* Image Preview */}
+            {/* Image Preview with Drag & Drop */}
             {imagePreview.length > 0 && (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {imagePreview.map((preview, index) => (
-                  <div key={index} className="relative">
+                  <div
+                    key={index}
+                    draggable
+                    onDragStart={() => handleDragStart(index)}
+                    onDragOver={(e) => handleDragOver(e, index)}
+                    onDragEnd={handleDragEnd}
+                    className={`relative group cursor-move ${draggedIndex === index ? 'opacity-50' : ''}`}
+                  >
+                    {/* Drag Handle */}
+                    <div className="absolute top-1 left-1 p-1.5 bg-white bg-opacity-90 rounded shadow-sm z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <FaGripVertical className="w-3 h-3 text-gray-600" />
+                    </div>
+                    
+                    {/* Image Badge */}
+                    {index === 0 && (
+                      <div className="absolute top-1 left-1/2 transform -translate-x-1/2 px-2 py-0.5 bg-indigo-600 text-white text-xs rounded-full z-10">
+                        Ảnh chính
+                      </div>
+                    )}
+                    
+                    {/* Image */}
                     <img
                       src={preview}
                       alt={`Preview ${index + 1}`}
-                      className="w-full h-24 object-cover rounded-lg"
+                      className="w-full h-32 object-cover rounded-lg border-2 border-gray-200 group-hover:border-indigo-400 transition-colors"
                     />
+                    
+                    {/* Delete Button */}
                     <button
                       type="button"
                       onClick={() => removeImage(index)}
-                      className="absolute top-1 right-1 p-1 bg-red-600 text-white rounded-full hover:bg-red-700"
+                      className="absolute bottom-1 right-1 p-1.5 bg-red-600 text-white rounded-full hover:bg-red-700 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                      title="Xóa ảnh"
                     >
                       <FaTrash className="w-3 h-3" />
                     </button>
@@ -619,24 +850,184 @@ const CreateService: React.FC = () => {
           </div>
 
           {/* Submit Buttons */}
-          <div className="flex justify-end space-x-4 pt-6 border-t">
-            <Link
-              to="/provider/services"
-              className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Hủy
-            </Link>
+          <div className="flex justify-between items-center pt-6 border-t">
             <button
-              type="submit"
-              disabled={loading}
-              className="flex items-center px-6 py-2 bg-indigo-600 border border-transparent rounded-md font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              type="button"
+              onClick={() => setShowPreview(true)}
+              className="flex items-center px-6 py-2 border border-indigo-600 rounded-md text-indigo-600 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
-              <FaSave className="mr-2 h-4 w-4" />
-              {loading ? 'Đang tạo...' : 'Tạo dịch vụ'}
+              <FaEye className="mr-2 h-4 w-4" />
+              Xem trước
             </button>
+            
+            <div className="flex space-x-4">
+              <Link
+                to="/provider/services"
+                className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                Hủy
+              </Link>
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex items-center px-6 py-2 bg-indigo-600 border border-transparent rounded-md font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <FaSave className="mr-2 h-4 w-4" />
+                {loading ? 'Đang tạo...' : 'Tạo dịch vụ'}
+              </button>
+            </div>
           </div>
         </form>
       </div>
+
+      {/* Preview Modal */}
+      {showPreview && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            {/* Preview Header */}
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
+              <h2 className="text-2xl font-bold text-gray-900">Xem trước dịch vụ</h2>
+              <button
+                onClick={() => setShowPreview(false)}
+                className="p-2 hover:bg-gray-100 rounded-full"
+              >
+                <FaTimes className="h-5 w-5 text-gray-500" />
+              </button>
+            </div>
+
+            {/* Preview Content */}
+            <div className="p-6 space-y-6">
+              {/* Service Images Gallery */}
+              {imagePreview.length > 0 && (
+                <div className="space-y-4">
+                  <img
+                    src={imagePreview[0]}
+                    alt="Main preview"
+                    className="w-full h-96 object-cover rounded-lg"
+                  />
+                  {imagePreview.length > 1 && (
+                    <div className="grid grid-cols-4 gap-2">
+                      {imagePreview.slice(1, 5).map((img, idx) => (
+                        <img
+                          key={idx}
+                          src={img}
+                          alt={`Preview ${idx + 2}`}
+                          className="w-full h-24 object-cover rounded-lg"
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Service Info */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <h1 className="text-3xl font-bold text-gray-900">{formData.name || 'Tên dịch vụ'}</h1>
+                  {formData.is_active ? (
+                    <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                      Đang hoạt động
+                    </span>
+                  ) : (
+                    <span className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm font-medium">
+                      Chưa kích hoạt
+                    </span>
+                  )}
+                </div>
+                <p className="text-lg text-gray-600">{formData.category}</p>
+              </div>
+
+              {/* Location */}
+              <div className="flex items-start space-x-2">
+                <FaMapMarkerAlt className="h-5 w-5 text-gray-400 mt-0.5" />
+                <div>
+                  <p className="text-gray-900">{formData.location.address}</p>
+                  <p className="text-gray-600">{formData.location.city}, {formData.location.country}</p>
+                </div>
+              </div>
+
+              {/* Pricing */}
+              <div className="bg-indigo-50 rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">Giá từ</p>
+                    <p className="text-3xl font-bold text-indigo-600">
+                      {formData.pricing.base_price.toLocaleString('vi-VN')} {formData.pricing.currency}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      {pricingTypes[formData.service_type].find(pt => pt.value === formData.pricing.pricing_type)?.label}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm text-gray-600">Sức chứa</p>
+                    <p className="text-lg font-semibold text-gray-900">
+                      {formData.capacity.min_guests} - {formData.capacity.max_guests} khách
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Description */}
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">Mô tả</h3>
+                <div 
+                  className="text-gray-700 prose max-w-none"
+                  dangerouslySetInnerHTML={{ __html: formData.description || '<p class="text-gray-400">Chưa có mô tả</p>' }}
+                />
+              </div>
+
+              {/* Amenities */}
+              {formData.amenities.length > 0 && (
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-3">Tiện ích</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {formData.amenities.map((amenityValue) => {
+                      const amenity = commonAmenities.find(a => a.value === amenityValue);
+                      if (!amenity) return null;
+                      const IconComponent = amenity.IconComponent;
+                      return (
+                        <div key={amenityValue} className="flex items-center space-x-2 p-2 bg-gray-50 rounded-lg">
+                          {IconComponent ? (
+                            <IconComponent className="h-5 w-5 text-indigo-600" />
+                          ) : (
+                            <span className="text-lg">{amenity.icon}</span>
+                          )}
+                          <span className="text-sm text-gray-700">{amenity.label}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Contact */}
+              {(formData.contact.phone || formData.contact.email) && (
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-3">Thông tin liên hệ</h3>
+                  <div className="space-y-2">
+                    {formData.contact.phone && (
+                      <p className="text-gray-700">📞 {formData.contact.phone}</p>
+                    )}
+                    {formData.contact.email && (
+                      <p className="text-gray-700">✉️ {formData.contact.email}</p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Preview Footer */}
+            <div className="sticky bottom-0 bg-gray-50 px-6 py-4 border-t border-gray-200 flex justify-end">
+              <button
+                onClick={() => setShowPreview(false)}
+                className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                Đóng xem trước
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

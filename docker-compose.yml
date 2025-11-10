@@ -4,6 +4,7 @@ services:
     image: mongo:7.0
     container_name: tripook-mongodb
     restart: unless-stopped
+    command: ["mongod", "--bind_ip_all", "--auth"]
     ports:
       - "27017:27017"
     environment:

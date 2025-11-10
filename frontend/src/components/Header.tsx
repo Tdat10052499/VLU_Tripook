@@ -85,6 +85,32 @@ const Header: React.FC = () => {
           {/* Navigation */}
           <nav className="hidden md:flex space-x-8">
             <Link 
+              to="/" 
+              style={{
+                color: 'var(--color-cream)',
+                fontFamily: 'var(--font-sans)',
+                fontSize: 'var(--text-base)',
+                fontWeight: '500',
+                padding: 'var(--space-sm) var(--space-md)',
+                textDecoration: 'none',
+                transition: 'all 0.2s ease-in-out',
+                borderRadius: '0.375rem',
+                opacity: 0.9
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = 'var(--color-bronze-gold)';
+                e.currentTarget.style.backgroundColor = 'rgba(174, 142, 91, 0.15)';
+                e.currentTarget.style.opacity = '1';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = 'var(--color-cream)';
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.opacity = '0.9';
+              }}
+            >
+              Trang chủ
+            </Link>
+            <Link 
               to="/about" 
               style={{
                 color: 'var(--color-cream)',

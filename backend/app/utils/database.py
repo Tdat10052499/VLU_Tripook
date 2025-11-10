@@ -14,41 +14,50 @@ def init_db(app):
     # Get database name from environment
     database_name = os.getenv('MONGO_DATABASE', 'tripook')
     
-    # Use local MongoDB (primary for development)
-    local_uri = os.getenv('MONGO_LOCAL_URI', 'mongodb://localhost:27017/tripook')
-    atlas_uri = app.config.get('MONGO_URI')  # Keep as backup if needed
+    # Priority: Use MONGO_URI from environment (Docker/Production) or fall back to local
+    mongo_uri = app.config.get('MONGO_URI') or os.getenv('MONGO_URI')
+    
+    # If no MONGO_URI, use local MongoDB as fallback
+    if not mongo_uri:
+        mongo_uri = os.getenv('MONGO_LOCAL_URI', 'mongodb://localhost:27017/tripook')
     
     connected = False
     
-    # Try local MongoDB first
+    # Try connecting to MongoDB
     try:
-        print("🔗 Connecting to local MongoDB...")
-        # Optimized settings for local development
+        print(f"🔗 Connecting to MongoDB...")
+        # Optimized settings for development
         client = MongoClient(
-            local_uri, 
-            serverSelectionTimeoutMS=2000,  # Quick timeout for local
-            connectTimeoutMS=2000,
+            mongo_uri, 
+            serverSelectionTimeoutMS=5000,
+            connectTimeoutMS=5000,
             maxPoolSize=10,  # Connection pool for better performance
-            retryWrites=False  # Not needed for local development
+            retryWrites=True
         )
         db = client[database_name]
         db.command('ping')
-        print(f"✅ Connected to local MongoDB: {database_name}")
+        
+        # Determine connection type for logging
+        if 'mongodb.net' in mongo_uri or 'atlas' in mongo_uri.lower():
+            print(f"✅ Connected to MongoDB Atlas: {database_name}")
+        else:
+            print(f"✅ Connected to MongoDB: {database_name}")
         connected = True
-    except Exception as local_error:
-        print(f"❌ Local MongoDB connection failed: {local_error}")
+    except Exception as error:
+        print(f"❌ MongoDB connection failed: {error}")
     
-    # Fallback to Atlas only if local fails and Atlas is configured
-    if not connected and atlas_uri:
+    # If still not connected, try one more fallback
+    if not connected:
         try:
-            print("☁️  Falling back to MongoDB Atlas...")
-            client = MongoClient(atlas_uri, serverSelectionTimeoutMS=5000, connectTimeoutMS=5000)
+            print("🔄 Trying fallback connection...")
+            fallback_uri = 'mongodb://localhost:27017/tripook'
+            client = MongoClient(fallback_uri, serverSelectionTimeoutMS=2000)
             db = client[database_name]
             db.command('ping')
-            print(f"✅ Connected to MongoDB Atlas: {database_name}")
+            print(f"✅ Connected to fallback MongoDB: {database_name}")
             connected = True
-        except Exception as atlas_error:
-            print(f"❌ Failed to connect to MongoDB Atlas: {atlas_error}")
+        except Exception as fallback_error:
+            print(f"❌ Fallback connection failed: {fallback_error}")
     
     # If both failed, create a mock db instance but don't crash
     if not connected:

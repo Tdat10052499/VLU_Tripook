@@ -15,7 +15,7 @@
     "@types/react-dom": "^18.3.7",
     "@types/react-google-recaptcha": "^2.1.9",
     "ajv": "^8.17.1",
-    "axios": "^1.13.1",
+    "axios": "^1.13.2",
     "js-cookie": "^3.0.5",
     "leaflet": "^1.9.4",
     "react": "^18.2.0",

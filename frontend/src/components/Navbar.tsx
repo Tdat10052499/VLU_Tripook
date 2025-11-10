@@ -25,6 +25,12 @@ const Navbar: React.FC = () => {
           </div>
           
           <div className="flex items-center space-x-4">
+            <Link 
+              to="/" 
+              className="hover:text-primary-200 transition-colors px-3 py-2 rounded-md text-sm font-medium"
+            >
+              Trang chủ
+            </Link>
             {isAuthenticated ? (
               <>
                 <Link 
