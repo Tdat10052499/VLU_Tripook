@@ -85,16 +85,26 @@ const Login: React.FC = () => {
     }
 
     try {
-      await login(formData.login, formData.password, formData.rememberMe, recaptchaToken);
+      // Login returns user data directly
+      const loggedInUser = await login(formData.login, formData.password, formData.rememberMe, recaptchaToken);
       
       // Clear error only on successful login
       setErrorPersistent('');
       
-      // Redirect will be handled by App.tsx based on user role
-      // Just navigate to home and let it redirect based on role
-      setTimeout(() => {
-        window.location.href = '/';
-      }, 100);
+      // Redirect based on user role immediately
+      if (loggedInUser.role === 'admin') {
+        window.location.href = '/admin/provider-approval';
+      } else if (loggedInUser.role === 'provider') {
+        // Check if provider is approved
+        if (loggedInUser.provider_info?.is_active) {
+          window.location.href = '/provider/dashboard';
+        } else {
+          window.location.href = '/provider/pending';
+        }
+      } else {
+        // Regular user
+        window.location.href = '/dashboard';
+      }
     } catch (err: any) {
       console.error('Login error:', err);
       setErrorPersistent(err.message || 'Login failed. Please try again.');

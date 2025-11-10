@@ -12,9 +12,12 @@ import re
 
 registration_bp = Blueprint('registration', __name__, url_prefix='/api/registration')
 
+# CORS origins configuration
+ALLOWED_ORIGINS = ['http://localhost', 'http://localhost:3000', 'http://localhost:80']
+
 # Test route to verify blueprint is working
 @registration_bp.route('/test', methods=['GET'])
-@cross_origin(origins=['http://localhost:3000'])
+@cross_origin(origins=ALLOWED_ORIGINS)
 def test_route():
     return jsonify({'message': 'Registration blueprint is working!'})
 
@@ -33,7 +36,7 @@ def validate_phone(phone):
     return re.match(pattern, phone.replace(' ', '')) is not None
 
 @registration_bp.route('/register', methods=['POST', 'OPTIONS'])
-@cross_origin(origins=['http://localhost:3000'])
+@cross_origin(origins=ALLOWED_ORIGINS)
 def register_user():
     try:
         data = request.get_json()
@@ -164,7 +167,7 @@ def register_user():
         }), 500
 
 @registration_bp.route('/login', methods=['POST', 'OPTIONS'])
-@cross_origin(origins=['http://localhost:3000'])
+@cross_origin(origins=ALLOWED_ORIGINS)
 def simple_login():
     """Simple login without reCAPTCHA for development"""
     try:
@@ -241,7 +244,7 @@ def simple_login():
         }), 500
 
 @registration_bp.route('/verify-email', methods=['POST', 'OPTIONS'])
-@cross_origin(origins=['http://localhost:3000'])
+@cross_origin(origins=ALLOWED_ORIGINS)
 def verify_email():
     try:
         data = request.get_json()
@@ -341,7 +344,7 @@ def verify_email():
         }), 500
 
 @registration_bp.route('/resend-verification', methods=['POST', 'OPTIONS'])
-@cross_origin(origins=['http://localhost:3000'])
+@cross_origin(origins=ALLOWED_ORIGINS)
 def resend_verification():
     try:
         data = request.get_json()
@@ -417,7 +420,7 @@ def resend_verification():
         }), 500
 
 @registration_bp.route('/check-email', methods=['GET', 'OPTIONS'])
-@cross_origin(origins=['http://localhost:3000'])
+@cross_origin(origins=ALLOWED_ORIGINS)
 def check_email_availability():
     try:
         email = request.args.get('email')

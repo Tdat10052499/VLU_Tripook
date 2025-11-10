@@ -1,5 +1,6 @@
 from flask import request, jsonify
 from flask_restful import Resource
+from flask_cors import cross_origin
 from app.utils.jwt_auth import generate_token, token_required
 from app.models.user import User
 from app.services.email_service import email_service
@@ -8,7 +9,11 @@ from email_validator import validate_email, EmailNotValidError
 import secrets
 from datetime import datetime, timedelta
 
+ALLOWED_ORIGINS = ['http://localhost', 'http://localhost:3000', 'http://localhost:80']
+
 class LoginResource(Resource):
+    decorators = [cross_origin(origins=ALLOWED_ORIGINS)]
+    
     def post(self):
         """User login with email/username and password"""
         try:
@@ -81,6 +86,8 @@ class LoginResource(Resource):
             }, 500
 
 class RegisterResource(Resource):
+    decorators = [cross_origin(origins=ALLOWED_ORIGINS)]
+    
     def post(self):
         """User registration"""
         try:
@@ -243,6 +250,8 @@ class RegisterResource(Resource):
             }, 500
 
 class ForgotPasswordResource(Resource):
+    decorators = [cross_origin(origins=ALLOWED_ORIGINS)]
+    
     def post(self):
         """Request password reset"""
         try:
@@ -284,6 +293,8 @@ class ForgotPasswordResource(Resource):
             }, 500
 
 class ResetPasswordResource(Resource):
+    decorators = [cross_origin(origins=ALLOWED_ORIGINS)]
+    
     def post(self):
         """Reset password with token"""
         try:
@@ -344,6 +355,8 @@ class ResetPasswordResource(Resource):
             }, 500
 
 class AuthResource(Resource):
+    decorators = [cross_origin(origins=ALLOWED_ORIGINS)]
+    
     @token_required
     def get(self):
         """Get current user profile"""
@@ -369,8 +382,14 @@ class AuthResource(Resource):
                 'success': False,
                 'message': f'Failed to get user profile: {str(e)}'
             }, 500
+    
+    def options(self):
+        """Handle preflight OPTIONS request"""
+        return {}, 200
 
 class VerifyEmailResource(Resource):
+    decorators = [cross_origin(origins=ALLOWED_ORIGINS)]
+    
     def post(self):
         """Verify email with token"""
         try:

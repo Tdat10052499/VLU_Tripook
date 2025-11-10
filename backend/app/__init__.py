@@ -1,32 +1,38 @@
 # App package
-from flask import Flask
+from flask import Flask, request, jsonify
 from flask_cors import CORS
-from app.routes.auth import AuthResource, LoginResource, RegisterResource, ForgotPasswordResource, ResetPasswordResource
 
 def create_app():
     app = Flask(__name__)
-    
-    # Enable CORS
-    CORS(app, origins=["http://localhost:3000"], supports_credentials=True)
     
     # Configuration
     app.config['SECRET_KEY'] = 'tripook-secret-key-2024'
     app.config['MONGO_URI'] = 'mongodb+srv://dat:Tdat.100524@tripook-cluster.ht8st5x.mongodb.net/?appName=Tripook-Cluster'
     app.config['JWT_SECRET_KEY'] = 'tripook-jwt-secret-key-2024'  # Add JWT secret
     
-    # Initialize Flask-RESTful
-    from flask_restful import Api
-    api = Api(app)
+    # Enable CORS - Allow both port 80 and 3000 for frontend
+    CORS(app, 
+         origins=["http://localhost", "http://localhost:3000", "http://localhost:80"],
+         supports_credentials=True,
+         allow_headers=["Content-Type", "Authorization"],
+         methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"])
     
-    # Register authentication routes
-    api.add_resource(LoginResource, '/api/auth/login')
-    # api.add_resource(RegisterResource, '/api/auth/register')  # Disabled to avoid conflict with blueprint
-    api.add_resource(ForgotPasswordResource, '/api/auth/forgot-password')
-    api.add_resource(ResetPasswordResource, '/api/auth/reset-password')
-    api.add_resource(AuthResource, '/api/auth/profile')
+    # Add CORS headers to all responses
+    @app.after_request
+    def after_request(response):
+        origin = request.headers.get('Origin')
+        if origin in ["http://localhost", "http://localhost:3000", "http://localhost:80"]:
+            response.headers['Access-Control-Allow-Origin'] = origin
+            response.headers['Access-Control-Allow-Credentials'] = 'true'
+            response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS, PATCH'
+            response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+        return response
+    
+    # Register auth blueprint (replaces Flask-RESTful)
+    from app.routes.auth_blueprint import auth_bp
+    app.register_blueprint(auth_bp, url_prefix='/api/auth')
     
     # Tạm thời thêm registration route trực tiếp
-    from flask import request, jsonify
     from flask_cors import cross_origin
     from werkzeug.security import generate_password_hash
     from app.utils.database import get_db
@@ -43,12 +49,12 @@ def create_app():
         return re.match(pattern, phone.replace(' ', '')) is not None
     
     @app.route('/api/registration/test', methods=['GET'])
-    @cross_origin(origins=['http://localhost:3000'])
+    @cross_origin(origins=['http://localhost', 'http://localhost:3000', 'http://localhost:80'])
     def test_registration():
         return jsonify({'message': 'Registration API is working!'})
     
     @app.route('/api/registration/register', methods=['POST', 'OPTIONS'])
-    @cross_origin(origins=['http://localhost:3000'])
+    @cross_origin(origins=['http://localhost', 'http://localhost:3000', 'http://localhost:80'])
     def register_user():
         try:
             data = request.get_json()
@@ -94,11 +100,9 @@ def create_app():
                     'message': 'Mật khẩu xác nhận không khớp'
                 }), 400
 
-            # Get database
-            db = get_db()
-            
             # Check if email already exists
-            existing_user = db.users.find_one({'email': email})
+            from app.models.user import User
+            existing_user = User.find_by_email(email)
             if existing_user:
                 return jsonify({
                     'success': False,
@@ -115,32 +119,30 @@ def create_app():
                             'message': f'Trường {field} là bắt buộc cho nhà cung cấp'
                         }), 400
 
-            # Create user document
-            user_doc = {
-                'email': email,
-                'password_hash': generate_password_hash(data['password']),
-                'fullName': data['fullName'],
-                'phone': data['phone'],
-                'role': 'provider' if user_type == 'provider' else 'user',
-                'isEmailVerified': True,  # Bỏ qua xác thực email
-                'accountStatus': 'pending' if user_type == 'provider' else 'active',
-                'createdAt': datetime.utcnow(),
-                'updatedAt': datetime.utcnow()
-            }
-
+            # Create user using User model
+            user = User(
+                email=email,
+                name=data['fullName'],
+                phone=data['phone']
+            )
+            user.set_password(data['password'])
+            user.role = 'provider' if user_type == 'provider' else 'user'
+            user.is_verified = True  # Bỏ qua xác thực email
+            user.status = 'pending' if user_type == 'provider' else 'active'
+            
             # Add provider specific fields
             if user_type == 'provider':
-                user_doc.update({
+                user.provider_info = {
                     'companyName': data['companyName'],
                     'businessType': data['businessType'],
                     'businessAddress': data['businessAddress'],
                     'businessLicense': data.get('businessLicense', ''),
                     'businessDescription': data.get('businessDescription', ''),
-                })
+                }
 
-            # Insert user
-            result = db.users.insert_one(user_doc)
-            user_id = str(result.inserted_id)
+            # Save user
+            user.save()
+            user_id = str(user._id)
 
             # Generate JWT token cho user mới
             token = generate_token(user_id)
@@ -150,8 +152,8 @@ def create_app():
                 'id': user_id,
                 'email': email,
                 'fullName': data['fullName'],
-                'role': user_doc['role'],
-                'accountStatus': user_doc['accountStatus']
+                'role': user.role,
+                'accountStatus': user.status
             }
 
             return jsonify({
@@ -178,7 +180,7 @@ def create_app():
     
     # Add simple-login route (proxy to registration/login)
     @app.route('/api/auth/simple-login', methods=['POST', 'OPTIONS'])
-    @cross_origin(origins=['http://localhost:3000'])
+    @cross_origin(origins=['http://localhost', 'http://localhost:3000', 'http://localhost:80'])
     def auth_simple_login():
         from werkzeug.security import check_password_hash
         try:

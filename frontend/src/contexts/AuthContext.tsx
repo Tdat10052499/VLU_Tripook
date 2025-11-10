@@ -40,7 +40,7 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (loginIdentifier: string, password: string, rememberMe?: boolean, recaptchaToken?: string) => Promise<void>;
+  login: (loginIdentifier: string, password: string, rememberMe?: boolean, recaptchaToken?: string) => Promise<User>;
   register: (userData: any, recaptchaToken?: string) => Promise<void>;
   logout: () => void;
   checkAuth: () => Promise<void>;
@@ -54,7 +54,7 @@ export const AuthContext = createContext<AuthContextType>({
   user: null,
   isAuthenticated: false,
   isLoading: true,
-  login: async () => {},
+  login: async () => ({} as User),
   register: async () => {},
   logout: () => {},
   checkAuth: async () => {},
@@ -73,7 +73,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const login = async (loginIdentifier: string, password: string, rememberMe: boolean = false, recaptchaToken?: string): Promise<void> => {
+  const login = async (loginIdentifier: string, password: string, rememberMe: boolean = false, recaptchaToken?: string): Promise<User> => {
     try {
       // Use simple login endpoint without reCAPTCHA
       const response = await authAPI.simpleLogin(loginIdentifier, password, rememberMe);
@@ -87,6 +87,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         
         setUser(user);
         setIsAuthenticated(true);
+        
+        // Return user data for immediate use
+        return user;
       } else {
         throw new Error(response.message || 'Login failed');
       }

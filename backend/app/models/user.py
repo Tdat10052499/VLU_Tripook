@@ -165,9 +165,12 @@ class User:
 
     @staticmethod
     def from_dict(data):
+        # Support both 'name' and 'fullName' fields for backward compatibility
+        user_name = data.get('name') or data.get('fullName') or ''
+        
         user = User(
             email=data['email'],
-            name=data['name'],
+            name=user_name,
             username=data.get('username'),
             picture=data.get('picture'),
             phone=data.get('phone'),

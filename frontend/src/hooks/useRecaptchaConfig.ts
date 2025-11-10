@@ -20,8 +20,8 @@ export const useRecaptchaConfig = (): RecaptchaConfig => {
         
         const response = await api.get('/auth/recaptcha-config');
         
-        if (response.data.success) {
-          setSiteKey(response.data.site_key);
+        if (response.data.success && response.data.data) {
+          setSiteKey(response.data.data.siteKey);
         } else {
           setError('Failed to load reCAPTCHA configuration');
         }
