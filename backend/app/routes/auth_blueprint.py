@@ -56,6 +56,13 @@ def login():
         # Generate token
         token = generate_token(user._id, remember_me)
         
+        # Track login activity for analytics
+        from app.models.login_activity import LoginActivity
+        client_ip = request.environ.get('HTTP_X_REAL_IP', request.environ.get('REMOTE_ADDR'))
+        browser_info = request.headers.get('User-Agent')
+        login_tracker = LoginActivity(user._id, client_ip, browser_info)
+        login_tracker.record_login()
+        
         return jsonify({
             'success': True,
             'data': {
@@ -121,6 +128,13 @@ def simple_login():
         
         # Generate token
         token = generate_token(user._id, remember_me)
+        
+        # Track login activity
+        from app.models.login_activity import LoginActivity
+        ip_address = request.environ.get('HTTP_X_REAL_IP', request.environ.get('REMOTE_ADDR'))
+        user_agent = request.headers.get('User-Agent')
+        activity = LoginActivity(user._id, ip_address, user_agent)
+        activity.record_login()
         
         # Create user data to return
         user_data = {

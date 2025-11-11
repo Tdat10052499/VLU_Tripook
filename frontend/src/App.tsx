@@ -27,6 +27,12 @@ import AdminProviderApproval from './pages/AdminProviderApproval';
 import ForgotPassword from './components/auth/ForgotPassword';
 import ResetPassword from './components/auth/ResetPassword';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import AdminLayout from './components/admin/AdminLayout';
+import AdminDashboard from './pages/AdminDashboard';
+import AdminProviders from './pages/AdminProviders';
+import AdminUsers from './pages/AdminUsers';
+import AdminServices from './pages/AdminServices';
+import AdminTrips from './pages/AdminTrips';
 
 function App() {
   return (
@@ -99,8 +105,25 @@ function App() {
               {/* Provider Status & Admin Routes */}
               <Route path="/provider/pending" element={<ProviderPendingWrapper />} />
               
+              {/* Admin Dashboard Routes */}
               <Route 
-                path="/admin/providers" 
+                path="/admin" 
+                element={
+                  <ProtectedRoute>
+                    <AdminLayout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<AdminDashboard />} />
+                <Route path="providers" element={<AdminProviders />} />
+                <Route path="users" element={<AdminUsers />} />
+                <Route path="services" element={<AdminServices />} />
+                <Route path="trips" element={<AdminTrips />} />
+              </Route>
+              
+              {/* Legacy admin route - redirect to new admin dashboard */}
+              <Route 
+                path="/admin/providers-old" 
                 element={
                   <ProtectedRoute>
                     <AdminProviderApproval />

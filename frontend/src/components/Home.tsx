@@ -1,26 +1,15 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { FaSearch, FaMapMarkerAlt, FaHeart, FaRegHeart, FaStar } from 'react-icons/fa';
 import BackgroundVideo from '../assets/videos/Background_VIdeo.mp4';
-import { AuthContext } from '../contexts/AuthContext';
 
 const Home: React.FC = () => {
-  const navigate = useNavigate();
-  const { user, isAuthenticated } = useContext(AuthContext);
-
-  // Redirect based on user role after login
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      if (user.role === 'provider') {
-        navigate('/provider/dashboard', { replace: true });
-      } else if (user.role === 'admin') {
-        navigate('/admin/dashboard', { replace: true });
-      }
-      // Regular users stay on home page
-    }
-  }, [isAuthenticated, user, navigate]);
+  // Don't auto-redirect on home page
+  // Users should be able to visit home page even when logged in
+  // Redirect logic is handled in Login component after successful login
+  
   const [searchData, setSearchData] = useState({
     destination: '',
     checkIn: '',

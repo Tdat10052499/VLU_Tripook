@@ -93,7 +93,7 @@ const Login: React.FC = () => {
       
       // Redirect based on user role immediately
       if (loggedInUser.role === 'admin') {
-        window.location.href = '/admin/provider-approval';
+        window.location.href = '/admin';
       } else if (loggedInUser.role === 'provider') {
         // Check if provider is approved
         if (loggedInUser.provider_info?.is_active) {
