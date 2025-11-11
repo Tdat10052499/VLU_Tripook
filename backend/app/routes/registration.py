@@ -107,34 +107,40 @@ def register_user():
         user_doc = {
             'email': email,
             'name': data['fullName'],
+            'fullName': data['fullName'],  # Add fullName field for consistency
             'username': data['fullName'].replace(' ', '').lower(),
             'password_hash': generate_password_hash(data['password']),
             'phone': data['phone'],
             'picture': '',
             'address': '',
             'role': 'provider' if user_type == 'provider' else 'user',
-            'status': 'active',  # Active ngay, không cần admin duyệt
+            'status': 'active',  # User account status (active/blocked/deleted)
+            'accountStatus': 'pending' if user_type == 'provider' else 'active',  # Provider approval status
             'is_verified': True,  # Bỏ qua xác thực email
+            'isEmailVerified': True,  # Add snake_case version for consistency
             'preferences': {
                 'currency': 'VND',
                 'language': 'vi',
                 'notifications': {'email': True, 'push': True, 'sms': False}
             },
+            'createdAt': datetime.utcnow(),
             'created_at': datetime.utcnow(),
+            'updatedAt': datetime.utcnow(),
             'updated_at': datetime.utcnow()
         }
 
         # Add provider specific fields
         if user_type == 'provider':
-            user_doc['provider_info'] = {
-                'company_name': data['companyName'],
-                'business_type': data['businessType'],
-                'address': data['businessAddress'],
-                'business_license': data.get('businessLicense', ''),
-                'description': data.get('businessDescription', ''),
-                'is_active': True,
-                'approved_at': datetime.utcnow()
-            }
+            user_doc['companyName'] = data['companyName']
+            user_doc['businessType'] = data['businessType']
+            user_doc['businessAddress'] = data['businessAddress']
+            user_doc['businessLicense'] = data.get('businessLicense', '')
+            user_doc['businessDescription'] = data.get('businessDescription', '')
+            user_doc['taxId'] = data.get('taxId', '')
+            user_doc['website'] = data.get('website', '')
+            # Provider info will be stored in top-level fields for easier querying
+            # accountStatus: 'pending' -> waiting for admin approval
+            # status: 'active' -> account is not blocked
 
         # Insert user
         result = db.users.insert_one(user_doc)

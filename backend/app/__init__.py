@@ -119,30 +119,52 @@ def create_app():
                             'message': f'Trường {field} là bắt buộc cho nhà cung cấp'
                         }), 400
 
-            # Create user using User model
-            user = User(
-                email=email,
-                name=data['fullName'],
-                phone=data['phone']
-            )
-            user.set_password(data['password'])
-            user.role = 'provider' if user_type == 'provider' else 'user'
-            user.is_verified = True  # Bỏ qua xác thực email
-            user.status = 'pending' if user_type == 'provider' else 'active'
+            # Insert user directly into database (không dùng User model vì nó normalize schema)
+            db = get_db()
+            
+            user_doc = {
+                'email': email,
+                'name': data['fullName'],
+                'fullName': data['fullName'],
+                'username': data['fullName'].replace(' ', '').lower(),
+                'password_hash': generate_password_hash(data['password']),
+                'phone': data['phone'],
+                'picture': '',
+                'date_of_birth': None,
+                'gender': None,
+                'address': '',
+                'is_verified': True,
+                'isEmailVerified': True,
+                'role': 'provider' if user_type == 'provider' else 'user',
+                'status': 'active',  # Account status (active/blocked/deleted)
+                'accountStatus': 'pending' if user_type == 'provider' else 'active',  # Provider approval status
+                'preferences': {
+                    'currency': 'VND',
+                    'language': 'vi',
+                    'notifications': {'email': True, 'push': True, 'sms': False}
+                },
+                'created_at': datetime.utcnow(),
+                'createdAt': datetime.utcnow(),
+                'updated_at': datetime.utcnow(),
+                'updatedAt': datetime.utcnow(),
+                'verification_token': None,
+                'reset_token': None,
+                'reset_token_expires': None
+            }
             
             # Add provider specific fields
             if user_type == 'provider':
-                user.provider_info = {
-                    'companyName': data['companyName'],
-                    'businessType': data['businessType'],
-                    'businessAddress': data['businessAddress'],
-                    'businessLicense': data.get('businessLicense', ''),
-                    'businessDescription': data.get('businessDescription', ''),
-                }
+                user_doc['companyName'] = data['companyName']
+                user_doc['businessType'] = data['businessType']
+                user_doc['businessAddress'] = data['businessAddress']
+                user_doc['businessLicense'] = data.get('businessLicense', '')
+                user_doc['businessDescription'] = data.get('businessDescription', '')
+                user_doc['taxId'] = data.get('taxId', '')
+                user_doc['website'] = data.get('website', '')
 
-            # Save user
-            user.save()
-            user_id = str(user._id)
+            # Save user to database
+            result = db.users.insert_one(user_doc)
+            user_id = str(result.inserted_id)
 
             # Generate JWT token cho user mới
             token = generate_token(user_id)
@@ -152,8 +174,8 @@ def create_app():
                 'id': user_id,
                 'email': email,
                 'fullName': data['fullName'],
-                'role': user.role,
-                'accountStatus': user.status
+                'role': user_doc['role'],
+                'accountStatus': user_doc['accountStatus']
             }
 
             return jsonify({
@@ -230,13 +252,18 @@ def create_app():
                 'id': user_id,
                 'email': user_data['email'],
                 'name': user_data.get('name', ''),
+                'fullName': user_data.get('fullName', user_data.get('name', '')),
                 'username': user_data.get('username', ''),
                 'role': user_data.get('role', 'user'),
                 'status': user_data.get('status', 'active'),
+                'accountStatus': user_data.get('accountStatus', 'active'),
                 'phone': user_data.get('phone', ''),
                 'picture': user_data.get('picture', ''),
                 'is_verified': user_data.get('is_verified', False),
-                'provider_info': user_data.get('provider_info')
+                'isEmailVerified': user_data.get('isEmailVerified', user_data.get('is_verified', False)),
+                'provider_info': user_data.get('provider_info'),
+                'companyName': user_data.get('companyName', ''),
+                'businessType': user_data.get('businessType', '')
             }
             
             return jsonify({

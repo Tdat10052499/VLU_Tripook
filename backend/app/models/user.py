@@ -41,15 +41,23 @@ class User:
         self.updated_at = datetime.utcnow()
 
     def set_password(self, password):
-        """Hash and set password"""
-        salt = bcrypt.gensalt()
-        self.password_hash = bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
+        """Hash and set password using Werkzeug (consistent with registration)"""
+        from werkzeug.security import generate_password_hash
+        self.password_hash = generate_password_hash(password)
 
     def check_password(self, password):
         """Check if provided password matches hash"""
         if not self.password_hash:
             return False
-        return bcrypt.checkpw(password.encode('utf-8'), self.password_hash.encode('utf-8'))
+        from werkzeug.security import check_password_hash
+        try:
+            return check_password_hash(self.password_hash, password)
+        except Exception:
+            # Fallback: try bcrypt for old passwords
+            try:
+                return bcrypt.checkpw(password.encode('utf-8'), self.password_hash.encode('utf-8'))
+            except Exception:
+                return False
 
     def generate_verification_token(self):
         """Generate email verification token"""

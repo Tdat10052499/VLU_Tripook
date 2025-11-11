@@ -10,7 +10,7 @@ import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import Trips from './pages/Trips';
-import ProviderDashboard from './pages/ProviderDashboard';
+import ProviderLayout from './components/provider/ProviderLayout';
 import ProviderDashboardHome from './pages/ProviderDashboardHome';
 import ProviderServicesHub from './pages/ProviderServicesHub';
 import ProviderBookings from './pages/ProviderBookings';
@@ -88,11 +88,11 @@ function App() {
                 path="/provider" 
                 element={
                   <ProtectedRoute>
-                    <ProviderDashboard />
+                    <ProviderLayout />
                   </ProtectedRoute>
                 }
               >
-                <Route path="dashboard" element={<ProviderDashboardHome />} />
+                <Route index element={<ProviderDashboardHome />} />
                 <Route path="services" element={<ProviderServicesHub />} />
                 <Route path="services/create" element={<CreateService />} />
                 <Route path="services/edit/:serviceId" element={<CreateService />} />

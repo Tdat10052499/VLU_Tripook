@@ -27,12 +27,17 @@ interface User {
   email: string;
   username: string;
   name: string;
+  fullName?: string;
   phone?: string;
   date_of_birth?: string;
   gender?: string;
   picture?: string;
   is_verified: boolean;
   role: 'user' | 'provider' | 'admin';
+  status?: 'active' | 'blocked';
+  accountStatus?: 'pending' | 'active' | 'rejected';
+  companyName?: string;
+  businessType?: string;
   provider_info?: ProviderInfo;
 }
 

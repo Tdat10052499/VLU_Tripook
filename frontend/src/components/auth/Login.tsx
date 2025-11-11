@@ -95,9 +95,9 @@ const Login: React.FC = () => {
       if (loggedInUser.role === 'admin') {
         window.location.href = '/admin';
       } else if (loggedInUser.role === 'provider') {
-        // Check if provider is approved
-        if (loggedInUser.provider_info?.is_active) {
-          window.location.href = '/provider/dashboard';
+        // Check if provider is approved (accountStatus = 'active')
+        if (loggedInUser.accountStatus === 'active') {
+          window.location.href = '/provider';
         } else {
           window.location.href = '/provider/pending';
         }

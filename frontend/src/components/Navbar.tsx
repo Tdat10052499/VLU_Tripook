@@ -33,12 +33,21 @@ const Navbar: React.FC = () => {
             </Link>
             {isAuthenticated ? (
               <>
-                <Link 
-                  to="/dashboard" 
-                  className="hover:text-primary-200 transition-colors px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  Dashboard
-                </Link>
+                {user?.role === 'provider' ? (
+                  <Link 
+                    to="/provider" 
+                    className="hover:text-primary-200 transition-colors px-3 py-2 rounded-md text-sm font-medium"
+                  >
+                    Quản lý dịch vụ
+                  </Link>
+                ) : (
+                  <Link 
+                    to="/dashboard" 
+                    className="hover:text-primary-200 transition-colors px-3 py-2 rounded-md text-sm font-medium"
+                  >
+                    Dashboard
+                  </Link>
+                )}
                 <div className="flex items-center space-x-2">
                   {user?.picture && (
                     <img 

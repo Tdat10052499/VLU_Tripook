@@ -14,6 +14,10 @@ def admin_required(f):
     """Decorator to require admin role"""
     @functools.wraps(f)
     def decorated_function(*args, **kwargs):
+        # Allow OPTIONS requests without authentication (CORS preflight)
+        if request.method == 'OPTIONS':
+            return '', 200
+        
         # Get token from request
         token = request.headers.get('Authorization')
         if not token or not token.startswith('Bearer '):
@@ -115,21 +119,32 @@ def approve_provider():
     try:
         data = request.get_json()
         
-        if not data.get('providerId') or not data.get('action'):
+        if not data.get('providerId'):
             return jsonify({
                 'success': False,
-                'message': 'Provider ID và action là bắt buộc'
+                'message': 'Provider ID là bắt buộc'
             }), 400
         
         provider_id = data['providerId']
-        action = data['action']  # 'approve' or 'reject'
-        reason = data.get('reason', '')
         
-        if action not in ['approve', 'reject']:
+        # Accept both 'approve' boolean (from frontend) or 'action' string (legacy)
+        if 'approve' in data:
+            approve = data['approve']
+            action = 'approve' if approve else 'reject'
+        elif 'action' in data:
+            action = data['action']
+            if action not in ['approve', 'reject']:
+                return jsonify({
+                    'success': False,
+                    'message': 'Action không hợp lệ'
+                }), 400
+        else:
             return jsonify({
                 'success': False,
-                'message': 'Action không hợp lệ'
+                'message': 'Thiếu thông tin approve hoặc action'
             }), 400
+        
+        reason = data.get('reason', '')
         
         db = get_db()
         
@@ -653,7 +668,7 @@ def update_user(user_id):
             }), 404
         
         # Prevent admin from demoting themselves
-        if str(user['_id']) == request.current_user_id and data.get('role') != 'admin':
+        if str(user['_id']) == str(request.current_user['_id']) and data.get('role') != 'admin':
             return jsonify({
                 'success': False,
                 'message': 'Bạn không thể thay đổi role của chính mình'
@@ -719,7 +734,7 @@ def delete_user(user_id):
             }), 404
         
         # Prevent admin from deleting themselves
-        if str(user['_id']) == request.current_user_id:
+        if str(user['_id']) == str(request.current_user['_id']):
             return jsonify({
                 'success': False,
                 'message': 'Bạn không thể xóa tài khoản của chính mình'
@@ -732,7 +747,7 @@ def delete_user(user_id):
                 '$set': {
                     'status': 'deleted',
                     'deletedAt': datetime.utcnow(),
-                    'deletedBy': request.current_user_id
+                    'deletedBy': str(request.current_user['_id'])
                 }
             }
         )
@@ -776,7 +791,7 @@ def block_user(user_id):
             }), 404
         
         # Prevent admin from blocking themselves
-        if str(user['_id']) == request.current_user_id:
+        if str(user['_id']) == str(request.current_user['_id']):
             return jsonify({
                 'success': False,
                 'message': 'Bạn không thể chặn tài khoản của chính mình'
@@ -793,11 +808,11 @@ def block_user(user_id):
         
         if block:
             update_data['blockedAt'] = datetime.utcnow()
-            update_data['blockedBy'] = request.current_user_id
+            update_data['blockedBy'] = str(request.current_user['_id'])
             update_data['blockReason'] = data.get('reason', '')
         else:
             update_data['unblockedAt'] = datetime.utcnow()
-            update_data['unblockedBy'] = request.current_user_id
+            update_data['unblockedBy'] = str(request.current_user['_id'])
         
         result = db.users.update_one(
             {'_id': ObjectId(user_id)},
