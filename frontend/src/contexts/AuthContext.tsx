@@ -30,8 +30,12 @@ interface User {
   fullName?: string;
   phone?: string;
   date_of_birth?: string;
+  dateOfBirth?: string;
   gender?: string;
   picture?: string;
+  avatar?: string;
+  address?: string;
+  bio?: string;
   is_verified: boolean;
   role: 'user' | 'provider' | 'admin';
   status?: 'active' | 'blocked';

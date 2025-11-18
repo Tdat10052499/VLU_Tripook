@@ -97,13 +97,13 @@ const Login: React.FC = () => {
       } else if (loggedInUser.role === 'provider') {
         // Check if provider is approved (accountStatus = 'active')
         if (loggedInUser.accountStatus === 'active') {
-          window.location.href = '/provider';
+          window.location.href = '/provider/dashboard';
         } else {
           window.location.href = '/provider/pending';
         }
       } else {
-        // Regular user
-        window.location.href = '/dashboard';
+        // Regular user (Traveller) - redirect to home page
+        window.location.href = '/';
       }
     } catch (err: any) {
       console.error('Login error:', err);

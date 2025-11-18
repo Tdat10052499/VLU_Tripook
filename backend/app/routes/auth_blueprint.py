@@ -420,3 +420,175 @@ def get_recaptcha_config():
             'success': False,
             'message': f'Failed to get reCAPTCHA config: {str(e)}'
         }), 500
+
+@auth_bp.route('/send-verification', methods=['POST', 'OPTIONS'])
+@cross_origin(origins=ALLOWED_ORIGINS, supports_credentials=True)
+def send_verification():
+    """Send verification email to user"""
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+    
+    try:
+        # Get user from token
+        token = request.headers.get('Authorization', '').replace('Bearer ', '')
+        if not token:
+            return jsonify({
+                'success': False,
+                'message': 'Authentication required'
+            }), 401
+        
+        # Decode token (returns user_id string directly)
+        user_id = decode_token(token)
+        if not user_id:
+            return jsonify({
+                'success': False,
+                'message': 'Invalid token'
+            }), 401
+        
+        # Find user
+        user = User.find_by_id(user_id)
+        if not user:
+            return jsonify({
+                'success': False,
+                'message': 'User not found'
+            }), 404
+        
+        # Check if already verified
+        if user.is_verified:
+            return jsonify({
+                'success': False,
+                'message': 'Email đã được xác thực'
+            }), 400
+        
+        # Check rate limiting
+        can_send, message = user.can_send_verification_email()
+        if not can_send:
+            return jsonify({
+                'success': False,
+                'message': message
+            }), 429
+        
+        # Generate new verification token
+        verification_token = user.generate_verification_token()
+        user.mark_verification_sent()
+        
+        # Debug logging
+        print(f"🔑 Generated token: {verification_token[:40]}...")
+        print(f"⏰ Token expires (timestamp): {user.verification_token_expires}")
+        print(f"📊 Sent count: {user.verification_sent_count}")
+        print(f"🆔 User ID: {user._id if hasattr(user, '_id') else 'NO _id!'}")
+        print(f"📧 User email: {user.email}")
+        
+        user.save()
+        print(f"💾 User saved to DB")
+        
+        # Verify save worked
+        from app.utils.database import get_db
+        db = get_db()
+        saved_user = db.users.find_one({'_id': user._id})
+        if saved_user:
+            print(f"✅ Verified: Token in DB = {saved_user.get('verification_token')[:20] if saved_user.get('verification_token') else 'NONE'}...")
+        else:
+            print(f"❌ ERROR: User not found in DB after save!")
+        
+        # Send verification email
+        email_sent = email_service.send_verification_email(
+            user.email, 
+            verification_token, 
+            user.name
+        )
+        
+        if not email_sent:
+            return jsonify({
+                'success': False,
+                'message': 'Không thể gửi email xác thực. Vui lòng thử lại sau.'
+            }), 500
+        
+        return jsonify({
+            'success': True,
+            'message': f'Email xác thực đã được gửi đến {user.email}',
+            'data': {
+                'email': user.email,
+                'sent_count': user.verification_sent_count,
+                'can_resend_in': 60
+            }
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi gửi email xác thực: {str(e)}'
+        }), 500
+
+
+@auth_bp.route('/verify-email', methods=['GET', 'OPTIONS'])
+@cross_origin(origins=ALLOWED_ORIGINS, supports_credentials=True)
+def verify_email():
+    """Verify email using token from email link"""
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+    
+    try:
+        # Get token from query params
+        token = request.args.get('token')
+        if not token:
+            return jsonify({
+                'success': False,
+                'message': 'Token không hợp lệ'
+            }), 400
+        
+        # Find user with this verification token
+        from app.utils.database import get_db
+        db = get_db()
+        
+        # Note: verification_token_expires is stored as timestamp (float)
+        current_timestamp = datetime.utcnow().timestamp()
+        user_data = db.users.find_one({
+            'verification_token': token,
+            'verification_token_expires': {'$gt': current_timestamp}
+        })
+        
+        if not user_data:
+            # Check if token expired
+            expired_user = db.users.find_one({
+                'verification_token': token
+            })
+            
+            if expired_user:
+                return jsonify({
+                    'success': False,
+                    'message': 'Token đã hết hạn. Vui lòng yêu cầu gửi lại email xác thực.'
+                }), 400
+            else:
+                return jsonify({
+                    'success': False,
+                    'message': 'Token không hợp lệ'
+                }), 400
+        
+        # Update user as verified
+        db.users.update_one(
+            {'_id': user_data['_id']},
+            {
+                '$set': {
+                    'is_verified': True,
+                    'verification_token': None,
+                    'verification_token_expiry': None,
+                    'updated_at': datetime.utcnow()
+                }
+            }
+        )
+        
+        return jsonify({
+            'success': True,
+            'message': 'Email đã được xác thực thành công!',
+            'data': {
+                'email': user_data['email'],
+                'is_verified': True
+            }
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi xác thực email: {str(e)}'
+        }), 500

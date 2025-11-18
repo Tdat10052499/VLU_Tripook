@@ -367,135 +367,330 @@ const Services: React.FC = () => {
   }, [activeService]);
 
   return (
-    <div className="bg-gray-50">
+    <div style={{ backgroundColor: 'var(--color-bg-main)' }}>
       <Header />
       
-      {/* BHeader - Service Navigation */}
-      <section 
-        className="relative py-12 bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: `url('/images/Backgroud_Home_Filter.png')`,
-          backgroundAttachment: 'fixed'
-        }}
-      >
-        {/* Dark overlay for better contrast */}
-        <div className="absolute inset-0 bg-black/50"></div>
+      {/* Hero Section with Service Tabs */}
+      <section style={{
+        position: 'relative',
+        padding: 'var(--spacing-20) var(--spacing-8)',
+        backgroundColor: 'var(--color-primary)',
+        borderBottom: '3px solid var(--color-accent)'
+      }}>
+        {/* Pattern overlay */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23B8860B\' fill-opacity=\'0.08\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
+          opacity: 0.1,
+          pointerEvents: 'none',
+          zIndex: 0
+        }} />
         
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div style={{
+          position: 'relative',
+          zIndex: 1,
+          maxWidth: '1200px',
+          margin: '0 auto'
+        }}>
+          {/* Page Title */}
+          <div style={{
+            textAlign: 'center',
+            marginBottom: 'var(--spacing-12)'
+          }}>
+            <h1 style={{
+              fontFamily: 'var(--font-heading)',
+              fontSize: 'var(--font-size-h1)',
+              color: '#FFFFFF',
+              fontWeight: 'var(--font-weight-bold)',
+              marginBottom: 'var(--spacing-4)'
+            }}>
+              Khám Phá Dịch Vụ Du Lịch
+            </h1>
+            <p style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: 'var(--font-size-lg)',
+              color: 'rgba(255, 255, 255, 0.9)'
+            }}>
+              Tìm kiếm và đặt dịch vụ du lịch tốt nhất tại Việt Nam
+            </p>
+          </div>
+
           {/* Service Navigation Tabs */}
-          <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 mb-8 border border-white/30">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <button
-                onClick={() => setActiveService('accommodation')}
-                className={`group relative p-6 rounded-2xl font-semibold transition-all duration-300 text-center ${
-                  activeService === 'accommodation'
-                    ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-2xl transform scale-105'
-                    : 'bg-white/80 text-gray-700 hover:bg-gradient-to-br hover:from-blue-50 hover:to-blue-100 hover:text-blue-700 shadow-md hover:shadow-xl border border-gray-200'
-                }`}
-              >
-                <div className="flex flex-col items-center gap-3">
-                  <div className={`text-4xl ${activeService === 'accommodation' ? 'animate-bounce' : 'group-hover:scale-110 transition-transform'}`}>
-                    🏨
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold mb-1">Chỗ ở</h3>
-                    <p className={`text-sm ${activeService === 'accommodation' ? 'text-blue-100' : 'text-gray-500'}`}>
-                      Khách sạn • Resort • Homestay
-                    </p>
-                  </div>
-                  {activeService === 'accommodation' && (
-                    <div className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full font-medium">
-                      NEW
-                    </div>
-                  )}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: 'var(--spacing-6)'
+          }}>
+            {/* Chỗ ở Tab */}
+            <button
+              onClick={() => setActiveService('accommodation')}
+              style={{
+                padding: 'var(--spacing-8)',
+                borderRadius: 'var(--radius-lg)',
+                backgroundColor: activeService === 'accommodation' ? '#FFFFFF' : 'rgba(255,255,255,0.1)',
+                border: `2px solid ${activeService === 'accommodation' ? 'var(--color-accent)' : 'transparent'}`,
+                color: activeService === 'accommodation' ? 'var(--color-primary)' : '#FFFFFF',
+                cursor: 'pointer',
+                transition: 'var(--transition-default)',
+                boxShadow: activeService === 'accommodation' ? 'var(--shadow-accent-lg)' : 'none',
+                transform: activeService === 'accommodation' ? 'scale(1.05)' : 'scale(1)'
+              }}
+              onMouseEnter={(e) => {
+                if (activeService !== 'accommodation') {
+                  e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.2)';
+                  e.currentTarget.style.transform = 'scale(1.02)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (activeService !== 'accommodation') {
+                  e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)';
+                  e.currentTarget.style.transform = 'scale(1)';
+                }
+              }}
+            >
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 'var(--spacing-3)'
+              }}>
+                <div style={{ fontSize: '3rem' }}>🏨</div>
+                <div>
+                  <h3 style={{
+                    fontFamily: 'var(--font-heading)',
+                    fontSize: 'var(--font-size-xl)',
+                    fontWeight: 'var(--font-weight-bold)',
+                    marginBottom: 'var(--spacing-1)'
+                  }}>Chỗ Ở</h3>
+                  <p style={{
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 'var(--font-size-sm)',
+                    opacity: 0.8
+                  }}>
+                    Khách sạn • Resort • Homestay
+                  </p>
                 </div>
-              </button>
+              </div>
+            </button>
 
-              <button
-                onClick={() => setActiveService('tour')}
-                className={`group relative p-6 rounded-2xl font-semibold transition-all duration-300 text-center ${
-                  activeService === 'tour'
-                    ? 'bg-gradient-to-br from-orange-400 to-pink-500 text-white shadow-2xl transform scale-105'
-                    : 'bg-white/80 text-gray-700 hover:bg-gradient-to-br hover:from-orange-50 hover:to-pink-50 hover:text-orange-700 shadow-md hover:shadow-xl border border-gray-200'
-                }`}
-              >
-                <div className="flex flex-col items-center gap-3">
-                  <div className={`text-4xl ${activeService === 'tour' ? 'animate-bounce' : 'group-hover:scale-110 transition-transform'}`}>
-                    🎈
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold mb-1">Tour du lịch</h3>
-                    <p className={`text-sm ${activeService === 'tour' ? 'text-orange-100' : 'text-gray-500'}`}>
-                      Tour • Hoạt động • Trải nghiệm
-                    </p>
-                  </div>
-                  {activeService === 'tour' && (
-                    <div className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs px-2 py-1 rounded-full font-medium">
-                      NEW
-                    </div>
-                  )}
+            {/* Tour du lịch Tab */}
+            <button
+              onClick={() => setActiveService('tour')}
+              style={{
+                padding: 'var(--spacing-8)',
+                borderRadius: 'var(--radius-lg)',
+                backgroundColor: activeService === 'tour' ? '#FFFFFF' : 'rgba(255,255,255,0.1)',
+                border: `2px solid ${activeService === 'tour' ? 'var(--color-accent)' : 'transparent'}`,
+                color: activeService === 'tour' ? 'var(--color-primary)' : '#FFFFFF',
+                cursor: 'pointer',
+                transition: 'var(--transition-default)',
+                boxShadow: activeService === 'tour' ? 'var(--shadow-accent-lg)' : 'none',
+                transform: activeService === 'tour' ? 'scale(1.05)' : 'scale(1)'
+              }}
+              onMouseEnter={(e) => {
+                if (activeService !== 'tour') {
+                  e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.2)';
+                  e.currentTarget.style.transform = 'scale(1.02)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (activeService !== 'tour') {
+                  e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)';
+                  e.currentTarget.style.transform = 'scale(1)';
+                }
+              }}
+            >
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 'var(--spacing-3)'
+              }}>
+                <div style={{ fontSize: '3rem' }}>🎈</div>
+                <div>
+                  <h3 style={{
+                    fontFamily: 'var(--font-heading)',
+                    fontSize: 'var(--font-size-xl)',
+                    fontWeight: 'var(--font-weight-bold)',
+                    marginBottom: 'var(--spacing-1)'
+                  }}>Tour Du Lịch</h3>
+                  <p style={{
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 'var(--font-size-sm)',
+                    opacity: 0.8
+                  }}>
+                    Tour • Hoạt động • Trải nghiệm
+                  </p>
                 </div>
-              </button>
+              </div>
+            </button>
 
-              <button
-                onClick={() => setActiveService('transport')}
-                className={`group relative p-6 rounded-2xl font-semibold transition-all duration-300 text-center ${
-                  activeService === 'transport'
-                    ? 'bg-gradient-to-br from-gray-600 to-gray-700 text-white shadow-2xl transform scale-105'
-                    : 'bg-white/80 text-gray-700 hover:bg-gradient-to-br hover:from-gray-50 hover:to-gray-100 hover:text-gray-800 shadow-md hover:shadow-xl border border-gray-200'
-                }`}
-              >
-                <div className="flex flex-col items-center gap-3">
-                  <div className={`text-4xl ${activeService === 'transport' ? 'animate-bounce' : 'group-hover:scale-110 transition-transform'}`}>
-                    🛎️
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold mb-1">Vận chuyển</h3>
-                    <p className={`text-sm ${activeService === 'transport' ? 'text-gray-100' : 'text-gray-500'}`}>
-                      Vận chuyển • Bảo hiểm • Visa
-                    </p>
-                  </div>
-                  {activeService === 'transport' && (
-                    <div className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs px-2 py-1 rounded-full font-medium">
-                      NEW
-                    </div>
-                  )}
+            {/* Vận chuyển Tab */}
+            <button
+              onClick={() => setActiveService('transport')}
+              style={{
+                padding: 'var(--spacing-8)',
+                borderRadius: 'var(--radius-lg)',
+                backgroundColor: activeService === 'transport' ? '#FFFFFF' : 'rgba(255,255,255,0.1)',
+                border: `2px solid ${activeService === 'transport' ? 'var(--color-accent)' : 'transparent'}`,
+                color: activeService === 'transport' ? 'var(--color-primary)' : '#FFFFFF',
+                cursor: 'pointer',
+                transition: 'var(--transition-default)',
+                boxShadow: activeService === 'transport' ? 'var(--shadow-accent-lg)' : 'none',
+                transform: activeService === 'transport' ? 'scale(1.05)' : 'scale(1)'
+              }}
+              onMouseEnter={(e) => {
+                if (activeService !== 'transport') {
+                  e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.2)';
+                  e.currentTarget.style.transform = 'scale(1.02)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (activeService !== 'transport') {
+                  e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)';
+                  e.currentTarget.style.transform = 'scale(1)';
+                }
+              }}
+            >
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 'var(--spacing-3)'
+              }}>
+                <div style={{ fontSize: '3rem' }}>✈️</div>
+                <div>
+                  <h3 style={{
+                    fontFamily: 'var(--font-heading)',
+                    fontSize: 'var(--font-size-xl)',
+                    fontWeight: 'var(--font-weight-bold)',
+                    marginBottom: 'var(--spacing-1)'
+                  }}>Vận Chuyển</h3>
+                  <p style={{
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 'var(--font-size-sm)',
+                    opacity: 0.8
+                  }}>
+                    Máy bay • Xe • Tàu hỏa
+                  </p>
                 </div>
-              </button>
-            </div>
+              </div>
+            </button>
           </div>
         </div>
       </section>
 
-      {/* BBody - Search and Content */}
-      <main className="bg-gray-50 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Search and Content Section */}
+      <main style={{
+        backgroundColor: 'var(--color-bg-main)',
+        padding: 'var(--spacing-16) var(--spacing-8)'
+      }}>
+        <div style={{
+          maxWidth: '1200px',
+          margin: '0 auto'
+        }}>
           {/* Search Bar */}
-          <div className="bg-white rounded-2xl shadow-xl p-6 mb-8 border border-gray-200">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">
-              {activeService === 'accommodation' && '🔍 Tìm kiếm chỗ ở phù hợp'}
-              {activeService === 'tour' && '🔍 Tìm kiếm tour du lịch'}
-              {activeService === 'transport' && '🔍 Tìm kiếm phương tiện vận chuyển'}
+          <div style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: 'var(--radius-lg)',
+            padding: 'var(--spacing-8)',
+            marginBottom: 'var(--spacing-12)',
+            boxShadow: 'var(--shadow-lg)',
+            border: '1px solid rgba(184,134,11,0.1)'
+          }}>
+            <h3 style={{
+              fontFamily: 'var(--font-heading)',
+              fontSize: 'var(--font-size-xl)',
+              color: 'var(--color-primary)',
+              fontWeight: 'var(--font-weight-semibold)',
+              marginBottom: 'var(--spacing-6)'
+            }}>
+              {activeService === 'accommodation' && '🔍 Tìm Kiếm Chỗ Ở'}
+              {activeService === 'tour' && '🔍 Tìm Kiếm Tour Du Lịch'}
+              {activeService === 'transport' && '🔍 Tìm Kiếm Vận Chuyển'}
             </h3>
             
-            <div className="flex flex-col md:flex-row gap-4 items-end">
+            <div style={{
+              display: 'flex',
+              gap: 'var(--spacing-4)',
+              alignItems: 'flex-end'
+            }}>
               {/* Destination Search */}
-              <div className="relative flex-1">
-                <FaMapMarkerAlt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 z-10" />
+              <div style={{
+                flex: 1,
+                position: 'relative'
+              }}>
+                <FaMapMarkerAlt style={{
+                  position: 'absolute',
+                  left: '16px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: 'var(--color-accent)',
+                  fontSize: '18px',
+                  zIndex: 10
+                }} />
                 <input
                   type="text"
-                  placeholder="Điểm đến hoặc tên dịch vụ..."
+                  placeholder="Nhập điểm đến hoặc tên dịch vụ..."
                   value={searchData.destination}
                   onChange={(e) => handleSearchChange('destination', e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  style={{
+                    width: '100%',
+                    paddingLeft: '48px',
+                    paddingRight: 'var(--spacing-4)',
+                    paddingTop: 'var(--spacing-4)',
+                    paddingBottom: 'var(--spacing-4)',
+                    border: '2px solid #E5E7EB',
+                    borderRadius: 'var(--radius-md)',
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 'var(--font-size-base)',
+                    outline: 'none',
+                    transition: 'var(--transition-default)'
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--color-accent)';
+                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(184,134,11,0.1)';
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = '#E5E7EB';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
                 />
               </div>
 
               {/* Search Button */}
               <button 
                 onClick={handleSearch}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 flex items-center justify-center gap-2 shadow-lg whitespace-nowrap"
+                style={{
+                  backgroundColor: 'var(--color-cta)',
+                  color: '#FFFFFF',
+                  padding: 'var(--spacing-4) var(--spacing-10)',
+                  borderRadius: 'var(--radius-md)',
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 'var(--font-size-base)',
+                  fontWeight: 'var(--font-weight-semibold)',
+                  border: 'none',
+                  cursor: 'pointer',
+                  transition: 'var(--transition-default)',
+                  boxShadow: 'var(--shadow-cta)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 'var(--spacing-2)',
+                  whiteSpace: 'nowrap'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'scale(1.05)';
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(217,65,30,0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)';
+                  e.currentTarget.style.boxShadow = 'var(--shadow-cta)';
+                }}
               >
                 <FaSearch />
                 Tìm kiếm
@@ -503,111 +698,595 @@ const Services: React.FC = () => {
             </div>
           </div>
 
-          {/* Banner Quảng Cáo */}
-          <div className="mb-8">
-            <div className="relative bg-gradient-to-r overflow-hidden rounded-2xl shadow-xl h-32 md:h-40">
-              {bannerSlides.map((slide, index) => (
-                <div
-                  key={slide.id}
-                  className={`absolute inset-0 bg-gradient-to-r ${slide.gradient} transition-opacity duration-1000 ${
-                    index === currentBannerSlide ? 'opacity-100' : 'opacity-0'
-                  }`}
-                >
-                  <div className="flex items-center h-full px-8">
-                    <div className="text-white">
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="text-3xl">{slide.icon}</span>
-                        <h3 className="text-xl md:text-2xl font-bold">{slide.title}</h3>
+          {/* 3D Card Carousel - Portrait Style */}
+          <div style={{ 
+            marginBottom: 'var(--spacing-12)',
+            position: 'relative',
+            height: '480px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            perspective: '2000px',
+            overflow: 'visible'
+          }}>
+            <div style={{
+              position: 'relative',
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              {bannerSlides.map((slide, index) => {
+                const isActive = index === currentBannerSlide;
+                const isPrev = index === (currentBannerSlide - 1 + bannerSlides.length) % bannerSlides.length;
+                const isNext = index === (currentBannerSlide + 1) % bannerSlides.length;
+                const isVisible = isActive || isPrev || isNext;
+
+                // Calculate position and scale for 3D effect - Portrait cards
+                let translateX = 0;
+                let translateZ = 0;
+                let rotateY = 0;
+                let scale = 0.75;
+                let opacity = 0.5;
+                let zIndex = 1;
+
+                if (isActive) {
+                  translateX = 0;
+                  translateZ = 50;
+                  rotateY = 0;
+                  scale = 1;
+                  opacity = 1;
+                  zIndex = 3;
+                } else if (isPrev) {
+                  translateX = -320;
+                  translateZ = -100;
+                  rotateY = 15;
+                  scale = 0.85;
+                  opacity = 0.6;
+                  zIndex = 2;
+                } else if (isNext) {
+                  translateX = 320;
+                  translateZ = -100;
+                  rotateY = -15;
+                  scale = 0.85;
+                  opacity = 0.6;
+                  zIndex = 2;
+                }
+
+                return (
+                  <div
+                    key={slide.id}
+                    style={{
+                      position: 'absolute',
+                      width: '340px',
+                      height: '440px',
+                      transform: `translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`,
+                      opacity: isVisible ? opacity : 0,
+                      transition: 'all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                      zIndex: zIndex,
+                      pointerEvents: isVisible ? 'auto' : 'none',
+                      transformStyle: 'preserve-3d',
+                      filter: isActive ? 'none' : 'blur(1.5px)'
+                    }}
+                  >
+                    <div style={{
+                      position: 'relative',
+                      width: '100%',
+                      height: '100%',
+                      borderRadius: 'var(--radius-xl)',
+                      overflow: 'hidden',
+                      boxShadow: isActive ? 'var(--shadow-2xl)' : 'var(--shadow-lg)',
+                      background: slide.id === 1 ? 'linear-gradient(135deg, #FF6B35 0%, #F7931E 50%, #FF6B35 100%)' :
+                                 slide.id === 2 ? 'linear-gradient(135deg, #2C3E50 0%, #3498DB 50%, #2C3E50 100%)' :
+                                 slide.id === 3 ? 'linear-gradient(135deg, #10B981 0%, #059669 50%, #10B981 100%)' :
+                                 'linear-gradient(135deg, #8B5CF6 0%, #6366F1 50%, #8B5CF6 100%)',
+                      cursor: isActive ? 'default' : 'pointer',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onClick={() => !isActive && setCurrentBannerSlide(index)}
+                    onMouseEnter={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.transform = 'scale(1.05)';
+                        // Add hover overlay
+                        const overlay = document.createElement('div');
+                        overlay.className = 'hover-overlay-temp';
+                        overlay.style.cssText = `
+                          position: absolute;
+                          inset: 0;
+                          background: rgba(255, 255, 255, 0.1);
+                          pointer-events: none;
+                          transition: opacity 0.3s ease;
+                        `;
+                        e.currentTarget.appendChild(overlay);
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.transform = 'scale(1)';
+                        // Remove hover overlay
+                        const overlay = e.currentTarget.querySelector('.hover-overlay-temp');
+                        if (overlay) overlay.remove();
+                      }
+                    }}
+                  >
+                  {/* Animated Background Pattern */}
+                  <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    opacity: 0.08,
+                    backgroundImage: 'radial-gradient(circle at 20% 30%, white 2px, transparent 2px), radial-gradient(circle at 80% 70%, white 2px, transparent 2px)',
+                    backgroundSize: '40px 40px',
+                    animation: 'slidePattern 25s linear infinite'
+                  }} />
+
+                  {/* Decorative Circle - Top Right */}
+                  <div style={{
+                    position: 'absolute',
+                    top: '-30px',
+                    right: '-30px',
+                    width: '160px',
+                    height: '160px',
+                    borderRadius: '50%',
+                    background: 'rgba(255, 255, 255, 0.15)',
+                    filter: 'blur(40px)',
+                    animation: isActive ? 'pulse 4s ease-in-out infinite' : 'none'
+                  }} />
+
+                  {/* Content Container - Vertical Layout */}
+                  <div style={{
+                    position: 'relative',
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    padding: 'var(--spacing-8)',
+                    color: '#FFFFFF',
+                    zIndex: 2
+                  }}>
+                    {/* Top Section - Icon & Badge */}
+                    <div style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      textAlign: 'center'
+                    }}>
+                      {/* Icon Badge - Larger for portrait */}
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '96px',
+                        height: '96px',
+                        backgroundColor: 'rgba(255, 255, 255, 0.25)',
+                        backdropFilter: 'blur(10px)',
+                        borderRadius: '50%',
+                        fontSize: '52px',
+                        marginBottom: 'var(--spacing-6)',
+                        border: '3px solid rgba(255, 255, 255, 0.4)',
+                        boxShadow: '0 12px 40px rgba(0, 0, 0, 0.15)',
+                        animation: isActive ? 'bounceIn 0.8s ease-out' : 'none'
+                      }}>
+                        {slide.icon}
                       </div>
-                      <p className="text-sm md:text-base text-white/90">{slide.description}</p>
+
+                      {/* Discount Badge - NEW */}
+                      <div style={{
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                        color: slide.id === 1 ? '#FF6B35' :
+                               slide.id === 2 ? '#2C3E50' :
+                               slide.id === 3 ? '#10B981' : '#8B5CF6',
+                        padding: 'var(--spacing-2) var(--spacing-4)',
+                        borderRadius: 'var(--radius-lg)',
+                        fontSize: 'var(--font-size-sm)',
+                        fontWeight: 'var(--font-weight-bold)',
+                        fontFamily: 'var(--font-body)',
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                        transform: isActive ? 'scale(1)' : 'scale(0.9)',
+                        opacity: isActive ? 1 : 0,
+                        transition: 'all 0.5s ease-out 0.2s'
+                      }}>
+                        {slide.id === 1 ? 'GIẢM ĐẾN 40%' :
+                         slide.id === 2 ? 'ƯU ĐÃI ĐẶC BIỆT' :
+                         slide.id === 3 ? 'COMBO TIẾT KIỆM' : 'BOOK SỚM'}
+                      </div>
+                    </div>
+
+                    {/* Middle Section - Title & Description */}
+                    <div style={{
+                      flex: 1,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'center',
+                      textAlign: 'center',
+                      padding: '0 var(--spacing-4)'
+                    }}>
+                      {/* Title - Center aligned */}
+                      <h3 style={{
+                        fontFamily: 'var(--font-heading)',
+                        fontSize: 'clamp(1.5rem, 2vw, 1.75rem)',
+                        fontWeight: 'var(--font-weight-bold)',
+                        marginBottom: 'var(--spacing-4)',
+                        lineHeight: 1.3,
+                        textShadow: '2px 2px 8px rgba(0, 0, 0, 0.3)',
+                        transform: isActive ? 'translateY(0)' : 'translateY(20px)',
+                        opacity: isActive ? 1 : 0,
+                        transition: 'transform 0.6s ease-out 0.3s, opacity 0.6s ease-out 0.3s'
+                      }}>
+                        {slide.title}
+                      </h3>
+
+                      {/* Description - Center aligned */}
+                      <p style={{
+                        fontFamily: 'var(--font-body)',
+                        fontSize: 'var(--font-size-base)',
+                        lineHeight: 1.6,
+                        color: 'rgba(255, 255, 255, 0.95)',
+                        textShadow: '1px 1px 4px rgba(0, 0, 0, 0.3)',
+                        transform: isActive ? 'translateY(0)' : 'translateY(20px)',
+                        opacity: isActive ? 1 : 0,
+                        transition: 'transform 0.6s ease-out 0.4s, opacity 0.6s ease-out 0.4s'
+                      }}>
+                        {slide.description}
+                      </p>
+                    </div>
+
+                    {/* Bottom Section - CTA Button */}
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'center'
+                    }}>
+                      <button style={{
+                        width: '100%',
+                        padding: 'var(--spacing-4) var(--spacing-6)',
+                        backgroundColor: '#FFFFFF',
+                        color: slide.id === 1 ? '#FF6B35' :
+                               slide.id === 2 ? '#2C3E50' :
+                               slide.id === 3 ? '#10B981' : '#8B5CF6',
+                        border: 'none',
+                        borderRadius: 'var(--radius-lg)',
+                        fontFamily: 'var(--font-body)',
+                        fontSize: 'var(--font-size-lg)',
+                        fontWeight: 'var(--font-weight-bold)',
+                        cursor: 'pointer',
+                        boxShadow: '0 6px 20px rgba(0, 0, 0, 0.2)',
+                        transform: isActive ? 'translateY(0)' : 'translateY(20px)',
+                        opacity: isActive ? 1 : 0,
+                        transition: 'all 0.3s ease, transform 0.6s ease-out 0.5s, opacity 0.6s ease-out 0.5s',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 'var(--spacing-2)'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-4px) scale(1.02)';
+                        e.currentTarget.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.3)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                        e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.2)';
+                      }}>
+                        <span>Khám Phá Ngay</span>
+                        <span style={{ fontSize: '20px' }}>→</span>
+                      </button>
                     </div>
                   </div>
                 </div>
-              ))}
+              </div>
+                );
+              })}
               
-              {/* Banner Navigation Dots */}
-              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+              {/* Navigation Controls */}
+              <div style={{
+                position: 'absolute',
+                bottom: 'var(--spacing-6)',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                display: 'flex',
+                gap: 'var(--spacing-3)',
+                zIndex: 10,
+                padding: 'var(--spacing-2) var(--spacing-4)',
+                backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                backdropFilter: 'blur(10px)',
+                borderRadius: 'var(--radius-lg)'
+              }}>
                 {bannerSlides.map((_, index) => (
                   <button
                     key={index}
                     onClick={() => setCurrentBannerSlide(index)}
-                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                      index === currentBannerSlide ? 'bg-white scale-125' : 'bg-white/50'
-                    }`}
+                    style={{
+                      width: index === currentBannerSlide ? '32px' : '8px',
+                      height: '8px',
+                      borderRadius: 'var(--radius-sm)',
+                      backgroundColor: index === currentBannerSlide ? '#FFFFFF' : 'rgba(255, 255, 255, 0.4)',
+                      border: 'none',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease',
+                      boxShadow: index === currentBannerSlide ? '0 2px 8px rgba(255, 255, 255, 0.5)' : 'none'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (index !== currentBannerSlide) {
+                        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.7)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (index !== currentBannerSlide) {
+                        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.4)';
+                      }
+                    }}
                   />
                 ))}
               </div>
+
+              {/* Arrow Navigation */}
+              <button
+                onClick={() => setCurrentBannerSlide(prev => prev === 0 ? bannerSlides.length - 1 : prev - 1)}
+                style={{
+                  position: 'absolute',
+                  left: 'var(--spacing-4)',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '50%',
+                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '20px',
+                  color: 'var(--color-primary)',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+                  transition: 'all 0.3s ease',
+                  zIndex: 10
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
+                  e.currentTarget.style.backgroundColor = '#FFFFFF';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+                }}>
+                ←
+              </button>
+
+              <button
+                onClick={() => setCurrentBannerSlide(prev => (prev + 1) % bannerSlides.length)}
+                style={{
+                  position: 'absolute',
+                  right: 'var(--spacing-4)',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '50%',
+                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '20px',
+                  color: 'var(--color-primary)',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+                  transition: 'all 0.3s ease',
+                  zIndex: 10
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
+                  e.currentTarget.style.backgroundColor = '#FFFFFF';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+                }}>
+                →
+              </button>
             </div>
           </div>
 
-          {/* Service Suggestions */}
-          <div className="bg-white rounded-2xl shadow-xl p-6">
-            <div className="mb-6">
-              <h3 className="text-2xl font-bold text-gray-900">
+          {/* Service Cards Section */}
+          <div style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: 'var(--radius-xl)',
+            boxShadow: 'var(--shadow-xl)',
+            padding: 'var(--spacing-8)'
+          }}>
+            {/* Section Title */}
+            <div style={{ marginBottom: 'var(--spacing-10)' }}>
+              <h3 style={{
+                fontFamily: 'var(--font-heading)',
+                fontSize: 'var(--font-size-h3)',
+                color: 'var(--color-primary)',
+                fontWeight: 'var(--font-weight-bold)'
+              }}>
                 {getContainerTitle()}
               </h3>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+            {/* Service Cards Grid */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(4, 1fr)',
+              gap: 'var(--spacing-8)'
+            }}>
               {getCurrentData().map((item) => (
                 <div
                   key={item.id}
-                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-200 h-full flex flex-col"
+                  style={{
+                    backgroundColor: 'var(--color-bg-main)',
+                    borderRadius: 'var(--radius-lg)',
+                    overflow: 'hidden',
+                    cursor: 'pointer',
+                    transition: 'var(--transition-default)',
+                    boxShadow: 'var(--shadow-sm)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: '100%'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-8px)';
+                    e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+                  }}
                 >
                   {/* Image */}
-                  <div className="relative h-48 overflow-hidden flex-shrink-0">
+                  <div style={{ position: 'relative', flexShrink: 0 }}>
                     <img
                       src={item.image}
                       alt={item.name}
-                      className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                      style={{
+                        width: '100%',
+                        height: '200px',
+                        objectFit: 'cover'
+                      }}
                     />
-                    <button className="absolute top-3 right-3 p-2 bg-white/80 rounded-full hover:bg-white transition-colors">
+                    {/* Favorite Button */}
+                    <button style={{
+                      position: 'absolute',
+                      top: 'var(--spacing-3)',
+                      right: 'var(--spacing-3)',
+                      padding: 'var(--spacing-2)',
+                      borderRadius: '50%',
+                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                      border: 'none',
+                      cursor: 'pointer',
+                      transition: 'var(--transition-default)',
+                      boxShadow: 'var(--shadow-sm)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'scale(1.1)';
+                      e.currentTarget.style.backgroundColor = '#FFFFFF';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'scale(1)';
+                      e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+                    }}>
                       {item.isFavorite ? (
-                        <FaHeart className="text-red-500" />
+                        <FaHeart style={{ color: 'var(--color-cta)', fontSize: '16px' }} />
                       ) : (
-                        <FaRegHeart className="text-gray-600" />
+                        <FaRegHeart style={{ color: 'var(--color-text-secondary)', fontSize: '16px' }} />
                       )}
                     </button>
                   </div>
 
                   {/* Content */}
-                  <div className="p-4 flex flex-col flex-grow">
-                    {/* Title với chiều cao cố định */}
-                    <div className="h-12 mb-2">
-                      <h4 className="font-semibold text-gray-900 line-clamp-2 text-sm leading-tight">
-                        {item.name}
-                      </h4>
-                    </div>
+                  <div style={{
+                    padding: 'var(--spacing-6)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    flexGrow: 1
+                  }}>
+                    {/* Title */}
+                    <h4 style={{
+                      fontFamily: 'var(--font-heading)',
+                      fontSize: 'var(--font-size-lg)',
+                      color: 'var(--color-primary)',
+                      fontWeight: 'var(--font-weight-semibold)',
+                      marginBottom: 'var(--spacing-3)',
+                      lineHeight: '1.4',
+                      minHeight: '2.8rem',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical'
+                    }}>{item.name}</h4>
                     
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="flex items-center gap-1">
-                        <FaStar className="text-yellow-400 text-sm" />
-                        <span className="text-sm font-medium text-gray-700">
-                          {item.rating}
-                        </span>
-                      </div>
+                    {/* Rating */}
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 'var(--spacing-2)',
+                      marginBottom: 'var(--spacing-4)'
+                    }}>
+                      <FaStar style={{
+                        color: 'var(--color-accent)',
+                        fontSize: '14px'
+                      }} />
+                      <span style={{
+                        fontFamily: 'var(--font-body)',
+                        fontSize: 'var(--font-size-sm)',
+                        fontWeight: 'var(--font-weight-semibold)',
+                        color: 'var(--color-text)'
+                      }}>{item.rating}</span>
                     </div>
 
-                    {/* Flexible space */}
-                    <div className="flex-grow"></div>
-
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="text-lg font-bold text-blue-600">
-                        {item.price}
-                      </span>
+                    {/* Price */}
+                    <div style={{
+                      marginBottom: 'var(--spacing-6)',
+                      flexGrow: 1
+                    }}>
+                      <span style={{
+                        fontFamily: 'var(--font-body)',
+                        fontSize: 'var(--font-size-xl)',
+                        fontWeight: 'var(--font-weight-bold)',
+                        color: 'var(--color-accent)'
+                      }}>{item.price}</span>
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex gap-2 mt-auto">
+                    <div style={{
+                      display: 'flex',
+                      gap: 'var(--spacing-3)',
+                      marginTop: 'auto'
+                    }}>
                       <button 
                         onClick={() => handleViewDetail(item)}
-                        className="flex-1 bg-blue-50 text-blue-600 py-2 px-4 rounded-lg font-medium hover:bg-blue-100 transition-colors text-sm"
+                        style={{
+                          flex: 1,
+                          padding: 'var(--spacing-3) var(--spacing-4)',
+                          backgroundColor: 'transparent',
+                          color: 'var(--color-primary)',
+                          border: '2px solid var(--color-primary)',
+                          borderRadius: 'var(--radius-md)',
+                          fontFamily: 'var(--font-body)',
+                          fontSize: 'var(--font-size-sm)',
+                          fontWeight: 'var(--font-weight-semibold)',
+                          textAlign: 'center',
+                          cursor: 'pointer',
+                          transition: 'var(--transition-default)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = 'var(--color-primary)';
+                          e.currentTarget.style.color = '#FFFFFF';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                          e.currentTarget.style.color = 'var(--color-primary)';
+                        }}
                       >
-                        Xem chi tiết
+                        Chi tiết
                       </button>
                       <button 
                         onClick={() => handleViewDetail(item)}
-                        className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors text-sm"
+                        style={{
+                          flex: 1,
+                          padding: 'var(--spacing-3) var(--spacing-4)',
+                          backgroundColor: 'var(--color-cta)',
+                          color: '#FFFFFF',
+                          border: 'none',
+                          borderRadius: 'var(--radius-md)',
+                          fontFamily: 'var(--font-body)',
+                          fontSize: 'var(--font-size-sm)',
+                          fontWeight: 'var(--font-weight-semibold)',
+                          cursor: 'pointer',
+                          transition: 'var(--transition-default)',
+                          boxShadow: 'var(--shadow-cta)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = 'scale(1.05)';
+                          e.currentTarget.style.boxShadow = '0 6px 20px rgba(217,65,30,0.4)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = 'scale(1)';
+                          e.currentTarget.style.boxShadow = 'var(--shadow-cta)';
+                        }}
                       >
                         Đặt ngay
                       </button>
@@ -617,136 +1296,364 @@ const Services: React.FC = () => {
               ))}
             </div>
 
-            {/* Load More Button - Always visible */}
-            <div className="text-center mt-8">
+            {/* Load More Button */}
+            <div style={{
+              textAlign: 'center',
+              marginTop: 'var(--spacing-12)'
+            }}>
               <button 
                 onClick={handleLoadMore}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
+                style={{
+                  backgroundColor: 'var(--color-accent)',
+                  color: '#FFFFFF',
+                  padding: 'var(--spacing-5) var(--spacing-12)',
+                  borderRadius: 'var(--radius-lg)',
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 'var(--font-size-lg)',
+                  fontWeight: 'var(--font-weight-semibold)',
+                  border: 'none',
+                  cursor: 'pointer',
+                  transition: 'var(--transition-default)',
+                  boxShadow: '0 4px 20px rgba(184,134,11,0.3)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-4px) scale(1.05)';
+                  e.currentTarget.style.boxShadow = '0 8px 30px rgba(184,134,11,0.4)';
+                  e.currentTarget.style.backgroundColor = '#C79A2B';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                  e.currentTarget.style.boxShadow = '0 4px 20px rgba(184,134,11,0.3)';
+                  e.currentTarget.style.backgroundColor = 'var(--color-accent)';
+                }}
               >
-                Xem thêm dịch vụ
+                Xem Thêm Dịch Vụ
               </button>
             </div>
           </div>
         </div>
       </main>
 
-      {/* BFooter - Illustration Section */}
-      <section className="relative bg-gradient-to-br from-blue-500 via-blue-600 to-purple-700 py-16 overflow-hidden">
-        {/* Background decorative elements */}
-        <div className="absolute inset-0">
-          <div className="absolute top-10 left-10 w-20 h-20 bg-yellow-400 rounded-full opacity-20 animate-pulse"></div>
-          <div className="absolute top-32 right-20 w-16 h-16 bg-orange-400 rounded-full opacity-30"></div>
-          <div className="absolute bottom-20 left-1/4 w-12 h-12 bg-pink-400 rounded-full opacity-25"></div>
-          <div className="absolute bottom-40 right-10 w-24 h-24 bg-cyan-400 rounded-full opacity-20 animate-bounce"></div>
-          <div className="absolute top-1/2 left-1/3 w-8 h-8 bg-white rounded-full opacity-30"></div>
+      {/* Call to Action Section with Illustration */}
+      <section style={{
+        position: 'relative',
+        backgroundColor: 'var(--color-primary)',
+        padding: 'var(--spacing-20) var(--spacing-8)',
+        overflow: 'hidden'
+      }}>
+        {/* Bronze Pattern Overlay */}
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          opacity: 0.08,
+          pointerEvents: 'none'
+        }}>
+          <svg width="100%" height="100%">
+            <defs>
+              <pattern id="servicesBrocade" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+                <circle cx="50" cy="50" r="20" fill="var(--color-accent)" opacity="0.3"/>
+                <circle cx="25" cy="25" r="15" fill="var(--color-accent)" opacity="0.2"/>
+                <circle cx="75" cy="75" r="15" fill="var(--color-accent)" opacity="0.2"/>
+              </pattern>
+            </defs>
+            <rect x="0" y="0" width="100%" height="100%" fill="url(#servicesBrocade)"/>
+          </svg>
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        {/* Decorative Floating Elements */}
+        <div style={{ position: 'absolute', inset: 0 }}>
+          <div style={{
+            position: 'absolute',
+            top: '40px',
+            left: '40px',
+            width: '80px',
+            height: '80px',
+            backgroundColor: 'var(--color-accent)',
+            borderRadius: '50%',
+            opacity: 0.15,
+            animation: 'pulse 3s ease-in-out infinite'
+          }} />
+          <div style={{
+            position: 'absolute',
+            top: '128px',
+            right: '80px',
+            width: '64px',
+            height: '64px',
+            backgroundColor: 'var(--color-cta)',
+            borderRadius: '50%',
+            opacity: 0.2
+          }} />
+          <div style={{
+            position: 'absolute',
+            bottom: '80px',
+            left: '25%',
+            width: '48px',
+            height: '48px',
+            backgroundColor: 'var(--color-accent)',
+            borderRadius: '50%',
+            opacity: 0.12
+          }} />
+        </div>
+
+        <div style={{
+          position: 'relative',
+          maxWidth: '1280px',
+          margin: '0 auto',
+          padding: '0 var(--spacing-6)',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(2, 1fr)',
+          gap: 'var(--spacing-16)',
+          alignItems: 'center'
+        }}>
+          {/* Left Content */}
+          <div style={{ color: '#FFFFFF' }}>
+            <h2 style={{
+              fontFamily: 'var(--font-heading)',
+              fontSize: 'clamp(2rem, 5vw, 3rem)',
+              fontWeight: 'var(--font-weight-bold)',
+              lineHeight: 1.2,
+              marginBottom: 'var(--spacing-6)'
+            }}>
+              Khám Phá<br />
+              <span style={{ color: 'var(--color-accent)' }}>Dịch Vụ Du Lịch</span><br />
+              Tuyệt Vời Nhất!
+            </h2>
             
-            {/* Left side - Text content */}
-            <div className="text-white space-y-6">
-              <div className="space-y-4">
-                <h2 className="text-4xl lg:text-5xl font-bold leading-tight">
-                  Khám phá
-                  <span className="block text-yellow-300">dịch vụ du lịch</span>
-                  <span className="block">tuyệt vời nhất!</span>
-                </h2>
-                
-                <p className="text-xl text-blue-100 leading-relaxed">
-                  Từ chỗ ở sang trọng đến những chuyến tour khám phá, 
-                  chúng tôi mang đến trải nghiệm hoàn hảo cho mọi chuyến đi của bạn.
-                </p>
+            <p style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: 'var(--font-size-xl)',
+              lineHeight: 1.6,
+              color: 'rgba(255, 255, 255, 0.9)',
+              marginBottom: 'var(--spacing-8)'
+            }}>
+              Từ chỗ ở sang trọng đến những chuyến tour khám phá, 
+              chúng tôi mang đến trải nghiệm hoàn hảo cho mọi chuyến đi của bạn.
+            </p>
 
-                <div className="flex flex-wrap gap-4 pt-4">
-                  <div className="flex items-center gap-3 text-blue-100">
-                    <div className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
-                      <span className="text-blue-900 font-bold text-sm">✓</span>
-                    </div>
-                    <span>Đặt chỗ dễ dàng</span>
+            {/* Feature List */}
+            <div style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 'var(--spacing-4)',
+              marginBottom: 'var(--spacing-10)'
+            }}>
+              {['Đặt chỗ dễ dàng', 'Giá cả hợp lý', 'Hỗ trợ 24/7'].map((feature) => (
+                <div key={feature} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 'var(--spacing-3)'
+                }}>
+                  <div style={{
+                    width: '24px',
+                    height: '24px',
+                    backgroundColor: 'var(--color-accent)',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0
+                  }}>
+                    <span style={{
+                      color: 'var(--color-primary)',
+                      fontWeight: 'var(--font-weight-bold)',
+                      fontSize: '12px'
+                    }}>✓</span>
                   </div>
-                  
-                  <div className="flex items-center gap-3 text-blue-100">
-                    <div className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
-                      <span className="text-blue-900 font-bold text-sm">✓</span>
-                    </div>
-                    <span>Giá cả hợp lý</span>
-                  </div>
-                  
-                  <div className="flex items-center gap-3 text-blue-100">
-                    <div className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
-                      <span className="text-blue-900 font-bold text-sm">✓</span>
-                    </div>
-                    <span>Hỗ trợ 24/7</span>
-                  </div>
+                  <span style={{
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 'var(--font-size-base)',
+                    color: 'rgba(255, 255, 255, 0.9)'
+                  }}>{feature}</span>
                 </div>
-              </div>
-
-              <div className="pt-6">
-                <button className="bg-yellow-400 text-blue-900 px-8 py-4 rounded-2xl font-bold text-lg hover:bg-yellow-300 transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-yellow-400/30">
-                  Khám phá ngay
-                  <span className="ml-2">→</span>
-                </button>
-              </div>
+              ))}
             </div>
 
-            {/* Right side - Illustration */}
-            <div className="relative">
-              <div className="relative bg-white/10 backdrop-blur-sm rounded-3xl p-8 border border-white/20">
-                {/* Room illustration */}
-                <div className="aspect-square bg-gradient-to-br from-yellow-100 to-orange-100 rounded-2xl p-6 relative overflow-hidden">
-                  
-                  {/* Window */}
-                  <div className="absolute top-4 right-4 w-16 h-12 bg-sky-200 rounded-lg border-2 border-white">
-                    <div className="w-full h-full bg-gradient-to-b from-sky-100 to-sky-300 rounded opacity-80"></div>
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-0.5 h-8 bg-white"></div>
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-0.5 bg-white"></div>
-                  </div>
+            {/* CTA Button */}
+            <button style={{
+              backgroundColor: 'var(--color-accent)',
+              color: '#FFFFFF',
+              padding: 'var(--spacing-5) var(--spacing-12)',
+              borderRadius: 'var(--radius-xl)',
+              fontFamily: 'var(--font-body)',
+              fontSize: 'var(--font-size-xl)',
+              fontWeight: 'var(--font-weight-bold)',
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'var(--transition-default)',
+              boxShadow: '0 8px 32px rgba(184,134,11,0.4)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 'var(--spacing-3)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-4px) scale(1.05)';
+              e.currentTarget.style.boxShadow = '0 12px 40px rgba(184,134,11,0.5)';
+              e.currentTarget.style.backgroundColor = '#C79A2B';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0) scale(1)';
+              e.currentTarget.style.boxShadow = '0 8px 32px rgba(184,134,11,0.4)';
+              e.currentTarget.style.backgroundColor = 'var(--color-accent)';
+            }}>
+              Khám Phá Ngay
+              <span>→</span>
+            </button>
+          </div>
 
-                  {/* Bed */}
-                  <div className="absolute bottom-4 left-4 right-4">
-                    {/* Bed frame */}
-                    <div className="h-8 bg-amber-600 rounded-lg mb-1"></div>
-                    {/* Mattress */}
-                    <div className="h-6 bg-white rounded-t-lg border-2 border-gray-200"></div>
-                    {/* Pillows */}
-                    <div className="flex gap-2 -mt-2">
-                      <div className="w-12 h-4 bg-blue-200 rounded-full"></div>
-                      <div className="w-12 h-4 bg-pink-200 rounded-full"></div>
-                    </div>
-                  </div>
-
-                  {/* Lamp */}
-                  <div className="absolute top-1/3 left-6">
-                    <div className="w-1 h-8 bg-gray-600"></div>
-                    <div className="w-6 h-4 bg-yellow-200 rounded-full -mt-1 -ml-2.5 border border-gray-400"></div>
-                  </div>
-
-                  {/* Decorative plants */}
-                  <div className="absolute top-6 left-12">
-                    <div className="w-3 h-6 bg-green-400 rounded-full"></div>
-                    <div className="w-2 h-2 bg-amber-700 rounded-full mx-auto"></div>
-                  </div>
-
-                  {/* Heart floating elements */}
-                  <div className="absolute top-8 right-8 text-red-400 animate-pulse">�</div>
-                  <div className="absolute bottom-16 right-6 text-yellow-400 animate-bounce">✨</div>
-                  <div className="absolute top-1/2 left-1/3 text-pink-400">🌸</div>
+          {/* Right Illustration */}
+          <div style={{ position: 'relative' }}>
+            <div style={{
+              position: 'relative',
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: 'var(--radius-2xl)',
+              padding: 'var(--spacing-10)',
+              border: '2px solid rgba(255, 255, 255, 0.2)'
+            }}>
+              {/* Room Illustration */}
+              <div style={{
+                aspectRatio: '1/1',
+                background: 'linear-gradient(135deg, #FEF3C7 0%, #FED7AA 100%)',
+                borderRadius: 'var(--radius-xl)',
+                padding: 'var(--spacing-8)',
+                position: 'relative',
+                overflow: 'hidden'
+              }}>
+                {/* Window */}
+                <div style={{
+                  position: 'absolute',
+                  top: 'var(--spacing-4)',
+                  right: 'var(--spacing-4)',
+                  width: '64px',
+                  height: '48px',
+                  backgroundColor: '#BAE6FD',
+                  borderRadius: 'var(--radius-md)',
+                  border: '2px solid #FFFFFF'
+                }}>
+                  <div style={{
+                    width: '1px',
+                    height: '100%',
+                    backgroundColor: '#FFFFFF',
+                    position: 'absolute',
+                    left: '50%',
+                    transform: 'translateX(-50%)'
+                  }} />
+                  <div style={{
+                    width: '100%',
+                    height: '1px',
+                    backgroundColor: '#FFFFFF',
+                    position: 'absolute',
+                    top: '50%',
+                    transform: 'translateY(-50%)'
+                  }} />
                 </div>
 
-                {/* Floating service icons */}
-                <div className="absolute -top-4 -left-4 bg-white rounded-full p-3 shadow-lg animate-float">
-                  <span className="text-2xl">🏨</span>
+                {/* Bed */}
+                <div style={{
+                  position: 'absolute',
+                  bottom: 'var(--spacing-4)',
+                  left: 'var(--spacing-4)',
+                  right: 'var(--spacing-4)'
+                }}>
+                  <div style={{
+                    height: '32px',
+                    backgroundColor: '#D97706',
+                    borderRadius: 'var(--radius-md)',
+                    marginBottom: 'var(--spacing-1)'
+                  }} />
+                  <div style={{
+                    height: '24px',
+                    backgroundColor: '#FFFFFF',
+                    borderTopLeftRadius: 'var(--radius-md)',
+                    borderTopRightRadius: 'var(--radius-md)',
+                    border: '2px solid #E5E7EB'
+                  }} />
+                  <div style={{
+                    display: 'flex',
+                    gap: 'var(--spacing-2)',
+                    marginTop: '-8px'
+                  }}>
+                    <div style={{
+                      width: '48px',
+                      height: '16px',
+                      backgroundColor: '#BFDBFE',
+                      borderRadius: '50%'
+                    }} />
+                    <div style={{
+                      width: '48px',
+                      height: '16px',
+                      backgroundColor: '#FBCFE8',
+                      borderRadius: '50%'
+                    }} />
+                  </div>
                 </div>
-                
-                <div className="absolute -top-2 -right-2 bg-white rounded-full p-3 shadow-lg animate-float" style={{animationDelay: '1s'}}>
-                  <span className="text-2xl">✈️</span>
+
+                {/* Lamp */}
+                <div style={{
+                  position: 'absolute',
+                  top: '33.333%',
+                  left: 'var(--spacing-6)'
+                }}>
+                  <div style={{
+                    width: '4px',
+                    height: '32px',
+                    backgroundColor: '#4B5563'
+                  }} />
+                  <div style={{
+                    width: '24px',
+                    height: '16px',
+                    backgroundColor: '#FEF08A',
+                    borderRadius: '50%',
+                    marginTop: '-4px',
+                    marginLeft: '-10px',
+                    border: '1px solid #9CA3AF'
+                  }} />
                 </div>
-                
-                <div className="absolute -bottom-4 -right-4 bg-white rounded-full p-3 shadow-lg animate-float" style={{animationDelay: '2s'}}>
-                  <span className="text-2xl">🗺️</span>
-                </div>
+
+                {/* Decorative Elements */}
+                <div style={{
+                  position: 'absolute',
+                  top: '32px',
+                  right: '32px',
+                  fontSize: '24px',
+                  animation: 'pulse 2s ease-in-out infinite'
+                }}>❤️</div>
+                <div style={{
+                  position: 'absolute',
+                  bottom: '64px',
+                  right: '24px',
+                  fontSize: '20px'
+                }}>✨</div>
+                <div style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '33.333%',
+                  fontSize: '18px'
+                }}>🌸</div>
               </div>
+
+              {/* Floating Service Icons */}
+              {[
+                { icon: '🏨', top: '-16px', left: '-16px', delay: '0s' },
+                { icon: '✈️', top: '-8px', right: '-8px', delay: '1s' },
+                { icon: '🗺️', bottom: '-16px', right: '-16px', delay: '2s' }
+              ].map((item, index) => (
+                <div key={index} style={{
+                  position: 'absolute',
+                  ...(item.top && { top: item.top }),
+                  ...(item.bottom && { bottom: item.bottom }),
+                  ...(item.left && { left: item.left }),
+                  ...(item.right && { right: item.right }),
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '50%',
+                  padding: 'var(--spacing-3)',
+                  boxShadow: 'var(--shadow-lg)',
+                  fontSize: '28px',
+                  animation: `float 3s ease-in-out ${item.delay} infinite`
+                }}>
+                  {item.icon}
+                </div>
+              ))}
             </div>
           </div>
         </div>

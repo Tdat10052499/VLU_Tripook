@@ -3,12 +3,14 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 def create_app():
+    import os
     app = Flask(__name__)
     
     # Configuration
-    app.config['SECRET_KEY'] = 'tripook-secret-key-2024'
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'tripook-secret-key-2024')
+    # Use MongoDB Atlas for production
     app.config['MONGO_URI'] = 'mongodb+srv://dat:Tdat.100524@tripook-cluster.ht8st5x.mongodb.net/?appName=Tripook-Cluster'
-    app.config['JWT_SECRET_KEY'] = 'tripook-jwt-secret-key-2024'  # Add JWT secret
+    app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'tripook-jwt-secret-key-2024')
     
     # Enable CORS - Allow both port 80 and 3000 for frontend
     CORS(app, 
@@ -32,6 +34,14 @@ def create_app():
     from app.routes.auth_blueprint import auth_bp
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     
+    # Register bookings blueprint
+    from app.routes.bookings import bookings_bp
+    app.register_blueprint(bookings_bp, url_prefix='/api')
+    
+    # Register profile blueprint
+    from app.routes.profile import profile_bp
+    app.register_blueprint(profile_bp, url_prefix='/api')
+    
     # Tạm thời thêm registration route trực tiếp
     from flask_cors import cross_origin
     from werkzeug.security import generate_password_hash
@@ -53,9 +63,12 @@ def create_app():
     def test_registration():
         return jsonify({'message': 'Registration API is working!'})
     
+    # NOTE: Registration endpoint is now in registration_bp blueprint
+    # Keeping this commented out to avoid conflicts
+    """
     @app.route('/api/registration/register', methods=['POST', 'OPTIONS'])
     @cross_origin(origins=['http://localhost', 'http://localhost:3000', 'http://localhost:80'])
-    def register_user():
+    def register_user_OLD():
         try:
             data = request.get_json()
             print(f"Registration data received: {data}")
@@ -133,8 +146,7 @@ def create_app():
                 'date_of_birth': None,
                 'gender': None,
                 'address': '',
-                'is_verified': True,
-                'isEmailVerified': True,
+                'is_verified': False,
                 'role': 'provider' if user_type == 'provider' else 'user',
                 'status': 'active',  # Account status (active/blocked/deleted)
                 'accountStatus': 'pending' if user_type == 'provider' else 'active',  # Provider approval status
@@ -191,6 +203,7 @@ def create_app():
                 'success': False,
                 'message': 'Có lỗi xảy ra trong quá trình đăng ký'
             }), 500
+    """
 
     # Register admin blueprint
     from app.routes.admin import admin_bp

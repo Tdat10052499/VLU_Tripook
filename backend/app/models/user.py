@@ -18,8 +18,11 @@ class User:
         self.password_hash = None
         if password:
             self.set_password(password)
-        self.is_verified = True  # Auto-verify for development
+        self.is_verified = False  # Require email verification
         self.verification_token = None
+        self.verification_token_expires = None
+        self.verification_sent_count = 0  # Track rate limiting
+        self.last_verification_sent = None  # Timestamp of last email sent
         self.reset_token = None
         self.reset_token_expires = None
         self.role = "user"  # 'user', 'provider', 'admin'
@@ -59,10 +62,56 @@ class User:
             except Exception:
                 return False
 
-    def generate_verification_token(self):
-        """Generate email verification token"""
+    def generate_verification_token(self, expires_in=86400):
+        """Generate email verification token (expires in 24 hours by default)"""
         self.verification_token = secrets.token_urlsafe(32)
+        self.verification_token_expires = datetime.utcnow().timestamp() + expires_in
         return self.verification_token
+
+    def verify_email_token(self, token):
+        """Verify email token"""
+        if not self.verification_token or self.verification_token != token:
+            return False
+        if datetime.utcnow().timestamp() > self.verification_token_expires:
+            return False
+        return True
+    
+    def can_send_verification_email(self):
+        """Check if user can send verification email (rate limiting: 3 emails per hour)"""
+        # Already verified
+        if self.is_verified:
+            return False, "Email đã được xác thực"
+        
+        # Check rate limiting
+        if self.last_verification_sent:
+            time_since_last = datetime.utcnow().timestamp() - self.last_verification_sent
+            
+            # Reset count after 1 hour
+            if time_since_last >= 3600:
+                self.verification_sent_count = 0
+            
+            # Check if exceeded limit (3 emails per hour)
+            if self.verification_sent_count >= 3 and time_since_last < 3600:
+                remaining_time = int((3600 - time_since_last) / 60)
+                return False, f"Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau {remaining_time} phút"
+            
+            # Check cooldown (60 seconds between emails)
+            if time_since_last < 60:
+                remaining_time = int(60 - time_since_last)
+                return False, f"Vui lòng đợi {remaining_time} giây trước khi gửi lại"
+        
+        return True, "OK"
+    
+    def mark_verification_sent(self):
+        """Mark that verification email was sent (for rate limiting)"""
+        now = datetime.utcnow().timestamp()
+        
+        # Reset count if more than 1 hour has passed
+        if self.last_verification_sent and (now - self.last_verification_sent) >= 3600:
+            self.verification_sent_count = 0
+        
+        self.verification_sent_count += 1
+        self.last_verification_sent = now
 
     def generate_reset_token(self, expires_in=3600):
         """Generate password reset token (expires in 1 hour by default)"""
@@ -165,6 +214,9 @@ class User:
             user_dict.update({
                 'password_hash': self.password_hash,
                 'verification_token': self.verification_token,
+                'verification_token_expires': self.verification_token_expires,
+                'verification_sent_count': self.verification_sent_count,
+                'last_verification_sent': self.last_verification_sent,
                 'reset_token': self.reset_token,
                 'reset_token_expires': self.reset_token_expires
             })
@@ -190,6 +242,9 @@ class User:
         user.password_hash = data.get('password_hash')
         user.is_verified = data.get('is_verified', False)
         user.verification_token = data.get('verification_token')
+        user.verification_token_expires = data.get('verification_token_expires')
+        user.verification_sent_count = data.get('verification_sent_count', 0)
+        user.last_verification_sent = data.get('last_verification_sent')
         user.reset_token = data.get('reset_token')
         user.reset_token_expires = data.get('reset_token_expires')
         user.role = data.get('role', 'user')

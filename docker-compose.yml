@@ -48,16 +48,15 @@ services:
       # CORS Configuration
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000,http://localhost:80}
       
+      # Brevo Email Service Configuration
+      BREVO_API_KEY: ${BREVO_API_KEY}
+      FROM_EMAIL: ${FROM_EMAIL:-noreply@tripook.com}
+      FROM_NAME: ${FROM_NAME:-Tripook}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost}
+      
       # reCAPTCHA Configuration
       RECAPTCHA_SITE_KEY: ${RECAPTCHA_SITE_KEY}
       RECAPTCHA_SECRET_KEY: ${RECAPTCHA_SECRET_KEY}
-      
-      # Email Configuration
-      SMTP_SERVER: ${SMTP_SERVER:-smtp.gmail.com}
-      SMTP_PORT: ${SMTP_PORT:-587}
-      SMTP_USERNAME: ${SMTP_USERNAME}
-      SMTP_PASSWORD: ${SMTP_PASSWORD}
-      FROM_EMAIL: ${FROM_EMAIL:-noreply@tripook.com}
     depends_on:
       mongodb:
         condition: service_healthy

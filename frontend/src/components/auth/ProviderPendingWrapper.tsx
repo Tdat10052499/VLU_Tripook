@@ -25,8 +25,18 @@ const ProviderPendingWrapper: React.FC = () => {
     return <Navigate to="/dashboard" replace />;
   }
 
-  if (user.provider_info?.approved_at || user.role === 'provider') {
-    // If provider is already approved, redirect to provider dashboard
+  // If provider is already approved (accountStatus = 'active'), redirect to success page
+  // Check if user has seen the approved page before (using localStorage)
+  if (user.accountStatus === 'active') {
+    const hasSeenApprovedPage = localStorage.getItem(`provider_approved_${user.id}`);
+    
+    if (!hasSeenApprovedPage) {
+      // First time seeing approval - show success page
+      localStorage.setItem(`provider_approved_${user.id}`, 'true');
+      return <Navigate to="/provider/approved" replace />;
+    }
+    
+    // Already seen success page - go to dashboard
     return <Navigate to="/provider/dashboard" replace />;
   }
 

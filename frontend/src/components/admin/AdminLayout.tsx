@@ -20,6 +20,11 @@ const AdminLayout: React.FC = () => {
       exact: true
     },
     {
+      path: '/admin/transactions',
+      icon: '💰',
+      label: 'Transactions'
+    },
+    {
       path: '/admin/providers',
       icon: '👥',
       label: 'Provider Approval'

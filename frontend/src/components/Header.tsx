@@ -2,6 +2,7 @@ import React, { useState, useContext, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 import { FaUser, FaSignOutAlt, FaCog, FaCaretDown, FaBusinessTime, FaChartBar } from 'react-icons/fa';
+import EmailVerificationBanner from './EmailVerificationBanner';
 
 const Header: React.FC = () => {
   const { user, isAuthenticated, logout, isProvider, isActiveProvider } = useContext(AuthContext);
@@ -46,36 +47,49 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header style={{ 
-      backgroundColor: 'var(--color-indigo-blue)',
-      borderBottom: '1px solid var(--color-border-subtle)',
-      padding: 'var(--space-md) 0'
-    }}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <>
+      <EmailVerificationBanner />
+      <header style={{ 
+        backgroundColor: 'var(--color-deep-indigo)',
+        borderBottom: '2px solid var(--color-bronze-light)',
+        padding: 'var(--spacing-4) 0',
+        boxShadow: '0 2px 8px rgba(16, 24, 40, 0.08)'
+      }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center" style={{ minHeight: '4rem' }}>
           {/* Logo */}
           <div className="flex items-center">
-            <Link to="/" className="flex items-center space-x-3">
+            <Link to="/" className="flex items-center space-x-3" style={{ textDecoration: 'none' }}>
               <div style={{
-                width: '2.5rem',
-                height: '2.5rem',
-                backgroundColor: 'var(--color-brushed-bronze)',
-                borderRadius: '0.75rem',
+                width: '48px',
+                height: '48px',
+                backgroundColor: 'var(--color-bronze)',
+                borderRadius: 'var(--radius-lg)',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                boxShadow: 'var(--shadow-md)',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.05)';
+                e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+                e.currentTarget.style.boxShadow = 'var(--shadow-md)';
               }}>
                 <span style={{
-                  color: 'var(--color-text-light)',
-                  fontFamily: 'var(--font-serif)',
-                  fontWeight: '600',
-                  fontSize: 'var(--text-xl)'
+                  color: '#FFFFFF',
+                  fontFamily: 'var(--font-heading)',
+                  fontWeight: 'var(--font-weight-bold)',
+                  fontSize: 'var(--font-size-2xl)'
                 }}>T</span>
               </div>
               <span style={{
-                fontSize: 'var(--text-2xl)',
-                fontFamily: 'var(--font-serif)',
-                fontWeight: '500',
+                fontSize: 'var(--font-size-2xl)',
+                fontFamily: 'var(--font-heading)',
+                fontWeight: 'var(--font-weight-bold)',
                 color: 'var(--color-cream)',
                 letterSpacing: '-0.025em'
               }}>Tripook</span>
@@ -83,29 +97,27 @@ const Header: React.FC = () => {
           </div>
 
           {/* Navigation */}
-          <nav className="hidden md:flex space-x-8">
+          <nav className="hidden md:flex space-x-2">
             <Link 
               to="/" 
               style={{
                 color: 'var(--color-cream)',
-                fontFamily: 'var(--font-sans)',
-                fontSize: 'var(--text-base)',
-                fontWeight: '500',
-                padding: 'var(--space-sm) var(--space-md)',
+                fontFamily: 'var(--font-body)',
+                fontSize: 'var(--font-size-base)',
+                fontWeight: 'var(--font-weight-medium)',
+                padding: 'var(--spacing-2) var(--spacing-4)',
                 textDecoration: 'none',
-                transition: 'all 0.2s ease-in-out',
-                borderRadius: '0.375rem',
-                opacity: 0.9
+                transition: 'all 0.3s ease',
+                borderRadius: 'var(--radius-lg)',
+                position: 'relative'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.color = 'var(--color-bronze-gold)';
-                e.currentTarget.style.backgroundColor = 'rgba(174, 142, 91, 0.15)';
-                e.currentTarget.style.opacity = '1';
+                e.currentTarget.style.color = 'var(--color-bronze)';
+                e.currentTarget.style.backgroundColor = 'rgba(205, 127, 50, 0.1)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.color = 'var(--color-cream)';
                 e.currentTarget.style.backgroundColor = 'transparent';
-                e.currentTarget.style.opacity = '0.9';
               }}
             >
               Trang chủ
@@ -114,24 +126,22 @@ const Header: React.FC = () => {
               to="/about" 
               style={{
                 color: 'var(--color-cream)',
-                fontFamily: 'var(--font-sans)',
-                fontSize: 'var(--text-base)',
-                fontWeight: '500',
-                padding: 'var(--space-sm) var(--space-md)',
+                fontFamily: 'var(--font-body)',
+                fontSize: 'var(--font-size-base)',
+                fontWeight: 'var(--font-weight-medium)',
+                padding: 'var(--spacing-2) var(--spacing-4)',
                 textDecoration: 'none',
-                transition: 'all 0.2s ease-in-out',
-                borderRadius: '0.375rem',
-                opacity: 0.9
+                transition: 'all 0.3s ease',
+                borderRadius: 'var(--radius-lg)',
+                position: 'relative'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.color = 'var(--color-bronze-gold)';
-                e.currentTarget.style.backgroundColor = 'rgba(174, 142, 91, 0.15)';
-                e.currentTarget.style.opacity = '1';
+                e.currentTarget.style.color = 'var(--color-bronze)';
+                e.currentTarget.style.backgroundColor = 'rgba(205, 127, 50, 0.1)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.color = 'var(--color-cream)';
                 e.currentTarget.style.backgroundColor = 'transparent';
-                e.currentTarget.style.opacity = '0.9';
               }}
             >
               Về chúng tôi
@@ -140,24 +150,22 @@ const Header: React.FC = () => {
               to="/services" 
               style={{
                 color: 'var(--color-cream)',
-                fontFamily: 'var(--font-sans)',
-                fontSize: 'var(--text-base)',
-                fontWeight: '500',
-                padding: 'var(--space-sm) var(--space-md)',
+                fontFamily: 'var(--font-body)',
+                fontSize: 'var(--font-size-base)',
+                fontWeight: 'var(--font-weight-medium)',
+                padding: 'var(--spacing-2) var(--spacing-4)',
                 textDecoration: 'none',
-                transition: 'all 0.2s ease-in-out',
-                borderRadius: '0.375rem',
-                opacity: 0.9
+                transition: 'all 0.3s ease',
+                borderRadius: 'var(--radius-lg)',
+                position: 'relative'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.color = 'var(--color-bronze-gold)';
-                e.currentTarget.style.backgroundColor = 'rgba(174, 142, 91, 0.15)';
-                e.currentTarget.style.opacity = '1';
+                e.currentTarget.style.color = 'var(--color-bronze)';
+                e.currentTarget.style.backgroundColor = 'rgba(205, 127, 50, 0.1)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.color = 'var(--color-cream)';
                 e.currentTarget.style.backgroundColor = 'transparent';
-                e.currentTarget.style.opacity = '0.9';
               }}
             >
               Dịch vụ
@@ -168,26 +176,30 @@ const Header: React.FC = () => {
               <Link 
                 to="/provider/dashboard" 
                 style={{
-                  color: 'var(--color-bronze-gold)',
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: 'var(--text-base)',
-                  fontWeight: '600',
-                  padding: 'var(--space-sm) var(--space-md)',
+                  color: 'var(--color-bronze)',
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 'var(--font-size-base)',
+                  fontWeight: 'var(--font-weight-semibold)',
+                  padding: 'var(--spacing-2) var(--spacing-4)',
                   textDecoration: 'none',
-                  transition: 'all 0.2s ease-in-out',
-                  borderRadius: '0.375rem',
+                  transition: 'all 0.3s ease',
+                  borderRadius: 'var(--radius-lg)',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 'var(--space-xs)'
+                  gap: 'var(--spacing-2)',
+                  backgroundColor: 'rgba(205, 127, 50, 0.15)',
+                  border: '1px solid var(--color-bronze-light)'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(174, 142, 91, 0.2)';
+                  e.currentTarget.style.backgroundColor = 'rgba(205, 127, 50, 0.25)';
+                  e.currentTarget.style.borderColor = 'var(--color-bronze)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.backgroundColor = 'rgba(205, 127, 50, 0.15)';
+                  e.currentTarget.style.borderColor = 'var(--color-bronze-light)';
                 }}
               >
-                <FaBusinessTime style={{ width: '1rem', height: '1rem' }} />
+                <FaBusinessTime style={{ width: '16px', height: '16px' }} />
                 Dashboard Provider
               </Link>
             ) : !isAuthenticated || !isProvider() ? (
@@ -195,24 +207,22 @@ const Header: React.FC = () => {
                 to="/auth/register" 
                 style={{
                   color: 'var(--color-cream)',
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: 'var(--text-base)',
-                  fontWeight: '500',
-                  padding: 'var(--space-sm) var(--space-md)',
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 'var(--font-size-base)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  padding: 'var(--spacing-2) var(--spacing-4)',
                   textDecoration: 'none',
-                  transition: 'all 0.2s ease-in-out',
-                  borderRadius: '0.375rem',
-                  opacity: 0.9
+                  transition: 'all 0.3s ease',
+                  borderRadius: 'var(--radius-lg)',
+                  position: 'relative'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.color = 'var(--color-bronze-gold)';
-                  e.currentTarget.style.backgroundColor = 'rgba(174, 142, 91, 0.15)';
-                  e.currentTarget.style.opacity = '1';
+                  e.currentTarget.style.color = 'var(--color-bronze)';
+                  e.currentTarget.style.backgroundColor = 'rgba(205, 127, 50, 0.1)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.color = 'var(--color-cream)';
                   e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.opacity = '0.9';
                 }}
               >
                 Trở thành đối tác
@@ -229,54 +239,52 @@ const Header: React.FC = () => {
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 'var(--space-sm)',
+                    gap: 'var(--spacing-2)',
                     color: 'var(--color-cream)',
                     backgroundColor: 'transparent',
-                    border: 'none',
+                    border: '2px solid var(--color-bronze-light)',
                     cursor: 'pointer',
-                    padding: 'var(--space-xs)',
-                    borderRadius: '0.5rem',
-                    transition: 'all 0.2s ease-in-out',
-                    opacity: 0.9
+                    padding: 'var(--spacing-2) var(--spacing-3)',
+                    borderRadius: 'var(--radius-full)',
+                    transition: 'all 0.3s ease'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.color = 'var(--color-bronze-gold)';
-                    e.currentTarget.style.backgroundColor = 'rgba(174, 142, 91, 0.15)';
-                    e.currentTarget.style.opacity = '1';
+                    e.currentTarget.style.borderColor = 'var(--color-bronze)';
+                    e.currentTarget.style.backgroundColor = 'rgba(205, 127, 50, 0.1)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.color = 'var(--color-cream)';
+                    e.currentTarget.style.borderColor = 'var(--color-bronze-light)';
                     e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.opacity = '0.9';
                   }}
                 >
                   {/* User Avatar */}
                   <div style={{
-                    width: '2rem',
-                    height: '2rem',
-                    backgroundColor: 'var(--color-brushed-bronze)',
+                    width: '36px',
+                    height: '36px',
+                    backgroundColor: 'var(--color-bronze)',
                     borderRadius: '50%',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center'
+                    justifyContent: 'center',
+                    border: '2px solid var(--color-bronze-light)',
+                    overflow: 'hidden'
                   }}>
-                    {user.picture ? (
+                    {(user.avatar || user.picture) ? (
                       <img 
-                        src={user.picture} 
+                        src={user.avatar || user.picture} 
                         alt={getUserDisplayName()} 
                         style={{
-                          width: '2rem',
-                          height: '2rem',
-                          borderRadius: '50%',
+                          width: '100%',
+                          height: '100%',
                           objectFit: 'cover'
                         }}
                       />
                     ) : (
                       <span style={{
-                        color: 'var(--color-text-light)',
-                        fontSize: 'var(--text-sm)',
-                        fontWeight: '500',
-                        fontFamily: 'var(--font-sans)'
+                        color: '#FFFFFF',
+                        fontSize: 'var(--font-size-sm)',
+                        fontWeight: 'var(--font-weight-semibold)',
+                        fontFamily: 'var(--font-body)'
                       }}>
                         {getUserInitials()}
                       </span>
@@ -286,18 +294,18 @@ const Header: React.FC = () => {
                   {/* User Name */}
                   <span style={{
                     display: 'none',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: '500',
-                    fontFamily: 'var(--font-sans)'
+                    fontSize: 'var(--font-size-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    fontFamily: 'var(--font-body)'
                   }} className="sm:block">
                     {getUserDisplayName()}
                   </span>
                   
                   {/* Dropdown Arrow */}
                   <FaCaretDown style={{
-                    width: '1rem',
-                    height: '1rem',
-                    transition: 'transform 0.2s ease-in-out',
+                    width: '14px',
+                    height: '14px',
+                    transition: 'transform 0.3s ease',
                     transform: isDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)'
                   }} />
                 </button>
@@ -307,172 +315,278 @@ const Header: React.FC = () => {
                   <div style={{
                     position: 'absolute',
                     right: '0',
-                    marginTop: 'var(--space-sm)',
-                    width: '12rem',
-                    backgroundColor: 'var(--color-bg-main)',
-                    borderRadius: '0.75rem',
-                    boxShadow: '0 10px 25px rgba(78, 74, 71, 0.15)',
-                    border: '1px solid var(--color-border-subtle)',
-                    zIndex: '50'
+                    marginTop: 'var(--spacing-3)',
+                    width: '280px',
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: 'var(--radius-2xl)',
+                    boxShadow: 'var(--shadow-2xl)',
+                    border: '2px solid var(--color-bronze-light)',
+                    zIndex: 9999,
+                    overflow: 'hidden'
                   }}>
-                    <div style={{ padding: 'var(--space-xs) 0' }}>
+                    <div>
                       {/* User Info */}
                       <div style={{
-                        padding: 'var(--space-md) var(--space-lg)',
-                        borderBottom: '1px solid var(--color-border-subtle)'
+                        padding: 'var(--spacing-6)',
+                        borderBottom: '2px solid var(--color-cream)',
+                        backgroundColor: 'var(--color-cream)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 'var(--spacing-3)'
                       }}>
-                        <p style={{
-                          fontSize: 'var(--text-sm)',
-                          fontWeight: '500',
-                          color: 'var(--color-text-primary)',
-                          margin: '0 0 var(--space-xs) 0',
-                          fontFamily: 'var(--font-sans)'
-                        }}>{getUserDisplayName()}</p>
-                        <p style={{
-                          fontSize: 'var(--text-xs)',
-                          color: 'var(--color-text-secondary)',
-                          margin: '0',
-                          fontFamily: 'var(--font-sans)'
-                        }}>{user.email}</p>
+                        {/* Avatar in Dropdown */}
+                        <div style={{
+                          width: '48px',
+                          height: '48px',
+                          backgroundColor: 'var(--color-bronze)',
+                          borderRadius: '50%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          border: '2px solid var(--color-bronze-light)',
+                          overflow: 'hidden',
+                          flexShrink: 0
+                        }}>
+                          {(user.avatar || user.picture) ? (
+                            <img 
+                              src={user.avatar || user.picture} 
+                              alt={getUserDisplayName()} 
+                              style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover'
+                              }}
+                            />
+                          ) : (
+                            <span style={{
+                              color: '#FFFFFF',
+                              fontSize: 'var(--font-size-base)',
+                              fontWeight: 'var(--font-weight-bold)',
+                              fontFamily: 'var(--font-body)'
+                            }}>
+                              {getUserInitials()}
+                            </span>
+                          )}
+                        </div>
+                        
+                        {/* User Name and Email */}
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <p style={{
+                            fontSize: 'var(--font-size-base)',
+                            fontWeight: 'var(--font-weight-semibold)',
+                            color: 'var(--color-deep-indigo)',
+                            margin: '0 0 var(--spacing-1) 0',
+                            fontFamily: 'var(--font-body)',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap'
+                          }}>{getUserDisplayName()}</p>
+                          <p style={{
+                            fontSize: 'var(--font-size-sm)',
+                            color: '#666666',
+                            margin: '0',
+                            fontFamily: 'var(--font-body)',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap'
+                          }}>{user.email}</p>
+                        </div>
                       </div>
                       
                       {/* Menu Items */}
-                      <Link
-                        to="/profile"
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          padding: 'var(--space-sm) var(--space-lg)',
-                          fontSize: 'var(--text-sm)',
-                          color: 'var(--color-text-secondary)',
-                          textDecoration: 'none',
-                          transition: 'all 0.2s ease-in-out',
-                          fontFamily: 'var(--font-sans)',
-                          fontWeight: '500'
-                        }}
-                        onClick={() => setIsDropdownOpen(false)}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = 'var(--color-bg-card)';
-                          e.currentTarget.style.color = 'var(--color-text-primary)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = 'transparent';
-                          e.currentTarget.style.color = 'var(--color-text-secondary)';
-                        }}
-                      >
-                        <FaUser style={{ width: '1rem', height: '1rem', marginRight: 'var(--space-sm)' }} />
-                        Profile
-                      </Link>
-                      
-                      <Link
-                        to="/settings"
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          padding: 'var(--space-sm) var(--space-lg)',
-                          fontSize: 'var(--text-sm)',
-                          color: 'var(--color-text-secondary)',
-                          textDecoration: 'none',
-                          transition: 'all 0.2s ease-in-out',
-                          fontFamily: 'var(--font-sans)',
-                          fontWeight: '500'
-                        }}
-                        onClick={() => setIsDropdownOpen(false)}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = 'var(--color-bg-card)';
-                          e.currentTarget.style.color = 'var(--color-text-primary)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = 'transparent';
-                          e.currentTarget.style.color = 'var(--color-text-secondary)';
-                        }}
-                      >
-                        <FaCog style={{ width: '1rem', height: '1rem', marginRight: 'var(--space-sm)' }} />
-                        Settings
-                      </Link>
-                      
-                      {/* Provider Dashboard */}
-                      {isActiveProvider() && (
+                      <div style={{ padding: 'var(--spacing-2) 0' }}>
                         <Link
-                          to="/provider/dashboard"
+                          to="/profile"
                           style={{
                             display: 'flex',
                             alignItems: 'center',
-                            padding: 'var(--space-sm) var(--space-lg)',
-                            fontSize: 'var(--text-sm)',
-                            color: 'var(--color-brushed-bronze)',
+                            padding: 'var(--spacing-3) var(--spacing-6)',
+                            fontSize: 'var(--font-size-base)',
+                            color: 'var(--color-text)',
                             textDecoration: 'none',
-                            transition: 'all 0.2s ease-in-out',
-                            fontFamily: 'var(--font-sans)',
-                            fontWeight: '500'
+                            transition: 'all 0.3s ease',
+                            fontFamily: 'var(--font-body)',
+                            fontWeight: 'var(--font-weight-medium)',
+                            gap: 'var(--spacing-3)'
                           }}
                           onClick={() => setIsDropdownOpen(false)}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = 'rgba(161, 138, 104, 0.1)';
+                            e.currentTarget.style.backgroundColor = 'var(--color-cream)';
+                            e.currentTarget.style.color = 'var(--color-deep-indigo)';
                           }}
                           onMouseLeave={(e) => {
                             e.currentTarget.style.backgroundColor = 'transparent';
+                            e.currentTarget.style.color = 'var(--color-text)';
                           }}
                         >
-                          <FaChartBar style={{ width: '1rem', height: '1rem', marginRight: 'var(--space-sm)' }} />
-                          Provider Dashboard
+                          <FaUser style={{ width: '18px', height: '18px', color: 'var(--color-bronze)' }} />
+                          <span>Hồ sơ</span>
                         </Link>
-                      )}
-                      
-                      {/* Become Provider if not yet a provider */}
-                      {!isProvider() && (
+                        
                         <Link
-                          to="/auth/register"
+                          to="/settings"
                           style={{
                             display: 'flex',
                             alignItems: 'center',
-                            padding: 'var(--space-sm) var(--space-lg)',
-                            fontSize: 'var(--text-sm)',
-                            color: 'var(--color-brushed-bronze)',
+                            padding: 'var(--spacing-3) var(--spacing-6)',
+                            fontSize: 'var(--font-size-base)',
+                            color: 'var(--color-text)',
                             textDecoration: 'none',
-                            transition: 'all 0.2s ease-in-out',
-                            fontFamily: 'var(--font-sans)',
-                            fontWeight: '500'
+                            transition: 'all 0.3s ease',
+                            fontFamily: 'var(--font-body)',
+                            fontWeight: 'var(--font-weight-medium)',
+                            gap: 'var(--spacing-3)'
                           }}
                           onClick={() => setIsDropdownOpen(false)}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = 'rgba(161, 138, 104, 0.1)';
+                            e.currentTarget.style.backgroundColor = 'var(--color-cream)';
+                            e.currentTarget.style.color = 'var(--color-deep-indigo)';
                           }}
                           onMouseLeave={(e) => {
                             e.currentTarget.style.backgroundColor = 'transparent';
+                            e.currentTarget.style.color = 'var(--color-text)';
                           }}
                         >
-                          <FaBusinessTime style={{ width: '1rem', height: '1rem', marginRight: 'var(--space-sm)' }} />
-                          Become Provider
+                          <FaCog style={{ width: '18px', height: '18px', color: 'var(--color-bronze)' }} />
+                          <span>Cài đặt</span>
                         </Link>
-                      )}
+                        
+                        {/* Provider Dashboard */}
+                        {isActiveProvider() && (
+                          <Link
+                            to="/provider/dashboard"
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              padding: 'var(--spacing-3) var(--spacing-6)',
+                              fontSize: 'var(--font-size-base)',
+                              color: 'var(--color-bronze)',
+                              textDecoration: 'none',
+                              transition: 'all 0.3s ease',
+                              fontFamily: 'var(--font-body)',
+                              fontWeight: 'var(--font-weight-semibold)',
+                              gap: 'var(--spacing-3)',
+                              borderTop: '1px solid var(--color-cream)',
+                              marginTop: 'var(--spacing-2)'
+                            }}
+                            onClick={() => setIsDropdownOpen(false)}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = 'rgba(205, 127, 50, 0.1)';
+                              e.currentTarget.style.color = 'var(--color-deep-indigo)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = 'transparent';
+                              e.currentTarget.style.color = 'var(--color-bronze)';
+                            }}
+                          >
+                            <FaChartBar style={{ width: '18px', height: '18px' }} />
+                            <span>Dashboard Provider</span>
+                          </Link>
+                        )}
+                        
+                        {/* Provider Status - For pending providers */}
+                        {isProvider() && !isActiveProvider() && (
+                          <Link
+                            to="/provider/pending"
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              padding: 'var(--spacing-3) var(--spacing-6)',
+                              fontSize: 'var(--font-size-base)',
+                              color: '#F59E0B',
+                              textDecoration: 'none',
+                              transition: 'all 0.3s ease',
+                              fontFamily: 'var(--font-body)',
+                              fontWeight: 'var(--font-weight-semibold)',
+                              gap: 'var(--spacing-3)',
+                              borderTop: '1px solid var(--color-cream)',
+                              marginTop: 'var(--spacing-2)',
+                              backgroundColor: 'rgba(245, 158, 11, 0.1)'
+                            }}
+                            onClick={() => setIsDropdownOpen(false)}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = 'rgba(245, 158, 11, 0.2)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = 'rgba(245, 158, 11, 0.1)';
+                            }}
+                          >
+                            <FaBusinessTime style={{ width: '18px', height: '18px' }} />
+                            <span>⏳ Trạng thái Provider</span>
+                          </Link>
+                        )}
+                        
+                        {/* Become Provider if not yet a provider */}
+                        {!isProvider() && (
+                          <Link
+                            to="/auth/register"
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              padding: 'var(--spacing-3) var(--spacing-6)',
+                              fontSize: 'var(--font-size-base)',
+                              color: 'var(--color-bronze)',
+                              textDecoration: 'none',
+                              transition: 'all 0.3s ease',
+                              fontFamily: 'var(--font-body)',
+                              fontWeight: 'var(--font-weight-semibold)',
+                              gap: 'var(--spacing-3)',
+                              borderTop: '1px solid var(--color-cream)',
+                              marginTop: 'var(--spacing-2)'
+                            }}
+                            onClick={() => setIsDropdownOpen(false)}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = 'rgba(205, 127, 50, 0.1)';
+                              e.currentTarget.style.color = 'var(--color-deep-indigo)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = 'transparent';
+                              e.currentTarget.style.color = 'var(--color-bronze)';
+                            }}
+                          >
+                            <FaBusinessTime style={{ width: '18px', height: '18px' }} />
+                            <span>Trở thành đối tác</span>
+                          </Link>
+                        )}
+                      </div>
                       
-                      <div style={{ borderTop: '1px solid var(--color-border-subtle)' }}>
+                      <div style={{ 
+                        borderTop: '2px solid var(--color-cream)',
+                        padding: 'var(--spacing-4) var(--spacing-6) var(--spacing-6)'
+                      }}>
                         <button
                           onClick={handleLogout}
                           style={{
                             display: 'flex',
                             alignItems: 'center',
+                            justifyContent: 'center',
                             width: '100%',
-                            padding: 'var(--space-sm) var(--space-lg)',
-                            fontSize: 'var(--text-sm)',
-                            color: '#DC2626',
-                            backgroundColor: 'transparent',
+                            padding: 'var(--spacing-3)',
+                            fontSize: 'var(--font-size-base)',
+                            color: '#FFFFFF',
+                            backgroundColor: 'var(--color-vermilion)',
                             border: 'none',
+                            borderRadius: 'var(--radius-lg)',
                             cursor: 'pointer',
-                            transition: 'all 0.2s ease-in-out',
-                            fontFamily: 'var(--font-sans)',
-                            fontWeight: '500'
+                            transition: 'all 0.3s ease',
+                            fontFamily: 'var(--font-body)',
+                            fontWeight: 'var(--font-weight-semibold)',
+                            gap: 'var(--spacing-2)',
+                            boxShadow: 'var(--shadow-sm)'
                           }}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = 'rgba(220, 38, 38, 0.05)';
+                            e.currentTarget.style.backgroundColor = 'var(--color-deep-indigo)';
+                            e.currentTarget.style.transform = 'translateY(-1px)';
+                            e.currentTarget.style.boxShadow = 'var(--shadow-md)';
                           }}
                           onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = 'transparent';
+                            e.currentTarget.style.backgroundColor = 'var(--color-vermilion)';
+                            e.currentTarget.style.transform = 'translateY(0)';
+                            e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
                           }}
                         >
-                          <FaSignOutAlt style={{ width: '1rem', height: '1rem', marginRight: 'var(--space-sm)' }} />
-                          Sign Out
+                          <FaSignOutAlt style={{ width: '16px', height: '16px' }} />
+                          <span>Đăng xuất</span>
                         </button>
                       </div>
                     </div>
@@ -480,39 +594,60 @@ const Header: React.FC = () => {
                 )}
               </div>
             ) : (
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center" style={{ gap: 'var(--spacing-3)' }}>
                 <Link
                   to="/auth/login"
                   style={{
                     color: 'var(--color-cream)',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: '500',
+                    fontSize: 'var(--font-size-base)',
+                    fontWeight: 'var(--font-weight-medium)',
                     textDecoration: 'none',
-                    transition: 'all 0.2s ease-in-out',
-                    fontFamily: 'var(--font-sans)',
-                    padding: 'var(--space-sm) var(--space-md)',
-                    borderRadius: '0.375rem',
-                    opacity: 0.9
+                    transition: 'all 0.3s ease',
+                    fontFamily: 'var(--font-body)',
+                    padding: 'var(--spacing-2) var(--spacing-5)',
+                    borderRadius: 'var(--radius-lg)',
+                    border: '2px solid transparent'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.color = 'var(--color-bronze-gold)';
-                    e.currentTarget.style.backgroundColor = 'rgba(174, 142, 91, 0.15)';
-                    e.currentTarget.style.opacity = '1';
+                    e.currentTarget.style.color = 'var(--color-bronze)';
+                    e.currentTarget.style.borderColor = 'var(--color-bronze-light)';
+                    e.currentTarget.style.backgroundColor = 'rgba(205, 127, 50, 0.1)';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.color = 'var(--color-cream)';
+                    e.currentTarget.style.borderColor = 'transparent';
                     e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.opacity = '0.9';
                   }}
                 >
                   Đăng nhập
                 </Link>
                 <Link
                   to="/auth/register"
-                  className="btn-primary"
                   style={{
                     textDecoration: 'none',
-                    display: 'inline-block'
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: 'var(--spacing-2) var(--spacing-6)',
+                    backgroundColor: 'var(--color-vermilion)',
+                    color: '#FFFFFF',
+                    fontSize: 'var(--font-size-base)',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    fontFamily: 'var(--font-body)',
+                    borderRadius: 'var(--radius-lg)',
+                    transition: 'all 0.3s ease',
+                    border: 'none',
+                    boxShadow: 'var(--shadow-md)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-deep-indigo)';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-vermilion)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'var(--shadow-md)';
                   }}
                 >
                   Đăng ký
@@ -523,6 +658,7 @@ const Header: React.FC = () => {
         </div>
       </div>
     </header>
+    </>
   );
 };
 

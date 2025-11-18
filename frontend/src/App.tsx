@@ -23,9 +23,11 @@ import Login from './components/auth/Login';
 import SimpleRegisterWrapper from './components/auth/SimpleRegisterWrapper';
 import RegistrationWizard from './components/auth/RegistrationWizard';
 import ProviderPendingWrapper from './components/auth/ProviderPendingWrapper';
+import ProviderApprovedSuccess from './components/auth/ProviderApprovedSuccess';
 import AdminProviderApproval from './pages/AdminProviderApproval';
 import ForgotPassword from './components/auth/ForgotPassword';
 import ResetPassword from './components/auth/ResetPassword';
+import VerifyEmail from './pages/VerifyEmail';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import AdminLayout from './components/admin/AdminLayout';
 import AdminDashboard from './pages/AdminDashboard';
@@ -33,6 +35,8 @@ import AdminProviders from './pages/AdminProviders';
 import AdminUsers from './pages/AdminUsers';
 import AdminServices from './pages/AdminServices';
 import AdminTrips from './pages/AdminTrips';
+import AdminTransactions from './pages/AdminTransactions';
+import DesignSystemShowcase from './components/DesignSystemShowcase';
 
 function App() {
   return (
@@ -42,6 +46,7 @@ function App() {
           <main className="min-h-screen bg-gray-50">
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/design-system" element={<DesignSystemShowcase />} />
               <Route path="/services" element={<Services />} />
               <Route path="/services/detail/:serviceId" element={<ServiceDetail />} />
               <Route path="/about" element={<About />} />
@@ -50,6 +55,7 @@ function App() {
               <Route path="/auth/register-wizard" element={<RegistrationWizard />} />
               <Route path="/auth/forgot-password" element={<ForgotPassword />} />
               <Route path="/auth/reset-password" element={<ResetPassword />} />
+              <Route path="/verify-email" element={<VerifyEmail />} />
               <Route 
                 path="/dashboard" 
                 element={
@@ -104,6 +110,7 @@ function App() {
               
               {/* Provider Status & Admin Routes */}
               <Route path="/provider/pending" element={<ProviderPendingWrapper />} />
+              <Route path="/provider/approved" element={<ProviderApprovedSuccess />} />
               
               {/* Admin Dashboard Routes */}
               <Route 
@@ -119,6 +126,7 @@ function App() {
                 <Route path="users" element={<AdminUsers />} />
                 <Route path="services" element={<AdminServices />} />
                 <Route path="trips" element={<AdminTrips />} />
+                <Route path="transactions" element={<AdminTransactions />} />
               </Route>
               
               {/* Legacy admin route - redirect to new admin dashboard */}

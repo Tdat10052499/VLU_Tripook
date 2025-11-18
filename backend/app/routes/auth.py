@@ -218,13 +218,10 @@ class RegisterResource(Resource):
                 user.name
             )
             
-            if not email_sent:
+            if email_sent:
+                print(f"✅ Verification email sent to {user.email}")
+            else:
                 print(f"⚠️ Failed to send verification email to {user.email}")
-            
-            # For development, auto-verify users for immediate login
-            user.is_verified = True
-            user.verification_token = None
-            user.save()
             
             return {
                 'success': True,
@@ -437,46 +434,67 @@ class VerifyEmailResource(Resource):
     def get(self):
         """Verify email with token from URL"""
         try:
-            verification_token = request.args.get('token')
+            token = request.args.get('token')
             
-            if not verification_token:
+            if not token:
                 return {
                     'success': False,
-                    'message': 'Verification token is required'
+                    'message': 'Token xác thực là bắt buộc'
                 }, 400
             
             # Find user with this verification token
-            user = User.find_by_verification_token(verification_token)
+            user = User.find_by_verification_token(token)
             if not user:
                 return {
                     'success': False,
-                    'message': 'Invalid or expired verification token'
+                    'message': 'Link xác thực không hợp lệ hoặc đã hết hạn',
+                    'expired': True
                 }, 400
             
             # Check if already verified
             if user.is_verified:
                 return {
                     'success': True,
-                    'message': 'Email is already verified'
+                    'message': 'Email đã được xác thực trước đó',
+                    'data': {
+                        'email': user.email,
+                        'is_verified': True
+                    }
                 }, 200
+            
+            # Verify token expiry
+            is_valid = user.verify_email_token(token)
+            if not is_valid:
+                return {
+                    'success': False,
+                    'message': 'Link xác thực đã hết hạn (24 giờ). Vui lòng yêu cầu link mới.',
+                    'expired': True
+                }, 400
             
             # Verify user
             user.is_verified = True
             user.verification_token = None
+            user.verification_token_expires = None
             user.save()
             
             return {
                 'success': True,
-                'message': 'Email verified successfully! You can now login.'
+                'message': 'Email đã được xác thực thành công!',
+                'data': {
+                    'email': user.email,
+                    'is_verified': True
+                }
             }, 200
             
         except Exception as e:
             return {
                 'success': False,
-                'message': f'Email verification failed: {str(e)}'
+                'message': f'Lỗi xác thực email: {str(e)}'
             }, 500
 
 class ResendVerificationResource(Resource):
+    decorators = [cross_origin(origins=ALLOWED_ORIGINS)]
+    
     def post(self):
         """Resend verification email"""
         try:
@@ -488,26 +506,41 @@ class ResendVerificationResource(Resource):
                     'message': 'Email is required'
                 }, 400
             
-            email = data['email'].lower().strip()
+            # Get user from token
+            from app.utils.jwt_auth import decode_token
+            token = request.headers.get('Authorization', '').replace('Bearer ', '')
+            if not token:
+                return {
+                    'success': False,
+                    'message': 'Authentication required'
+                }, 401
             
-            # Find user by email
-            user = User.find_by_login(email)
+            user_id = decode_token(token)
+            if not user_id:
+                return {
+                    'success': False,
+                    'message': 'Invalid token'
+                }, 401
+            
+            # Find user
+            user = User.find_by_id(user_id)
             if not user:
                 return {
                     'success': False,
                     'message': 'User not found'
                 }, 404
             
-            # Check if already verified
-            if user.is_verified:
+            # Check rate limiting
+            can_send, message = user.can_send_verification_email()
+            if not can_send:
                 return {
                     'success': False,
-                    'message': 'Email is already verified'
-                }, 400
+                    'message': message
+                }, 429
             
             # Generate new verification token
-            verification_token = secrets.token_urlsafe(32)
-            user.verification_token = verification_token
+            verification_token = user.generate_verification_token()
+            user.mark_verification_sent()
             user.save()
             
             # Send verification email
@@ -520,16 +553,21 @@ class ResendVerificationResource(Resource):
             if not email_sent:
                 return {
                     'success': False,
-                    'message': 'Failed to send verification email'
+                    'message': 'Không thể gửi email xác thực. Vui lòng thử lại sau.'
                 }, 500
             
             return {
                 'success': True,
-                'message': 'Verification email sent successfully'
+                'message': f'Email xác thực đã được gửi đến {user.email}',
+                'data': {
+                    'email': user.email,
+                    'sent_count': user.verification_sent_count,
+                    'can_resend_in': 60  # seconds
+                }
             }, 200
             
         except Exception as e:
             return {
                 'success': False,
-                'message': f'Failed to resend verification email: {str(e)}'
+                'message': f'Lỗi khi gửi email xác thực: {str(e)}'
             }, 500

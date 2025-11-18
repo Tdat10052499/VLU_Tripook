@@ -151,10 +151,14 @@ const EnhancedRegister: React.FC<EnhancedRegisterProps> = ({ userType, onBack, o
         
         toast.success(result.message || 'Đăng ký thành công!');
         
-        // Redirect theo role
+        // Redirect theo role và accountStatus
         if (result.user.role === 'provider') {
-          // Provider redirect to dashboard để tạo dịch vụ
-          window.location.href = '/dashboard';
+          // Provider mới đăng ký luôn có accountStatus = 'pending'
+          // Redirect đến trang pending để chờ admin approve
+          window.location.href = '/provider/pending';
+        } else if (result.user.role === 'admin') {
+          // Admin redirect to admin dashboard
+          window.location.href = '/admin';
         } else {
           // Tourist redirect to home để khám phá dịch vụ
           window.location.href = '/';

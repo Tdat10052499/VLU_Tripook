@@ -116,8 +116,7 @@ def register_user():
             'role': 'provider' if user_type == 'provider' else 'user',
             'status': 'active',  # User account status (active/blocked/deleted)
             'accountStatus': 'pending' if user_type == 'provider' else 'active',  # Provider approval status
-            'is_verified': True,  # Bỏ qua xác thực email
-            'isEmailVerified': True,  # Add snake_case version for consistency
+            'is_verified': False,  # Email chưa được xác thực
             'preferences': {
                 'currency': 'VND',
                 'language': 'vi',
@@ -146,6 +145,23 @@ def register_user():
         result = db.users.insert_one(user_doc)
         user_id = str(result.inserted_id)
 
+        # Send verification email for provider
+        if user_type == 'provider':
+            from app.models.user import User
+            user_obj = User.find_by_id(user_id)
+            if user_obj:
+                verification_token = user_obj.generate_verification_token()
+                user_obj.save()
+                
+                # Send verification email
+                from app.services.email_service import email_service
+                email_service.send_verification_email(
+                    email,
+                    verification_token,
+                    data['fullName']
+                )
+                print(f"✅ Verification email sent to provider: {email}")
+
         # Generate JWT token cho user mới
         token = generate_token(user_id)
         
@@ -160,7 +176,7 @@ def register_user():
 
         return jsonify({
             'success': True,
-            'message': 'Đăng ký thành công!',
+            'message': 'Đăng ký thành công!' + (' Email xác thực đã được gửi.' if user_type == 'provider' else ''),
             'token': token,
             'user': user_data
         }), 201
@@ -312,7 +328,7 @@ def verify_email():
             {'_id': user['_id']},
             {
                 '$set': {
-                    'isEmailVerified': True,
+                    'is_verified': True,
                     'updatedAt': datetime.utcnow()
                 }
             }
@@ -373,7 +389,7 @@ def resend_verification():
             }), 404
 
         # Check if already verified
-        if user.get('isEmailVerified'):
+        if user.get('is_verified'):
             return jsonify({
                 'success': False,
                 'message': 'Email đã được xác thực'

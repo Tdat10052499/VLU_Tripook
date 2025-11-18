@@ -1,24 +1,13 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { getLoginStats, getRegistrationStats, getProviderStats } from '../services/adminApi';
-
-interface StatCardProps {
-  title: string;
-  value: number | string;
-  icon: string;
-  color: string;
-}
-
-const StatCard: React.FC<StatCardProps> = ({ title, value, icon, color }) => (
-  <div className={`bg-white rounded-lg shadow-md p-6 border-l-4 ${color}`}>
-    <div className="flex items-center justify-between">
-      <div>
-        <p className="text-gray-600 text-sm font-medium">{title}</p>
-        <p className="text-3xl font-bold mt-2">{value}</p>
-      </div>
-      <div className="text-4xl">{icon}</div>
-    </div>
-  </div>
-);
+import StatCard from '../components/admin/StatCards';
+import DonutChart from '../components/admin/DonutChart';
+import {
+  LoginTrendChart,
+  RegistrationTrendChart,
+  UserProviderComparison,
+  CombinedAnalyticsChart,
+} from '../components/admin/DashboardCharts';
 
 const AdminDashboard: React.FC = () => {
   const [loginStats, setLoginStats] = useState<any>(null);
@@ -62,6 +51,24 @@ const AdminDashboard: React.FC = () => {
   const totalLogins = loginStats?.stats?.reduce((sum: number, item: any) => sum + item.count, 0) || 0;
   const totalRegistrations = registrationStats?.totals?.total || 0;
 
+  // Prepare data for DonutChart
+  const providerStatusData = [
+    { name: 'Active', value: providerStats?.stats?.active || 0, color: '#10B981' },
+    { name: 'Pending', value: providerStats?.stats?.pending || 0, color: '#F59E0B' },
+    { name: 'Rejected', value: providerStats?.stats?.rejected || 0, color: '#EF4444' },
+  ];
+
+  // Prepare data for CombinedAnalyticsChart
+  const combinedData = (loginStats?.stats || []).map((loginItem: any, index: number) => {
+    const regItem = registrationStats?.stats?.[index] || {};
+    return {
+      date: loginItem.date,
+      logins: loginItem.count || 0,
+      registrations: regItem.count || 0,
+      uniqueUsers: loginItem.unique_users || 0,
+    };
+  });
+
   return (
     <div>
       <div className="mb-8">
@@ -98,7 +105,7 @@ const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Stats Cards */}
+      {/* Stats Cards Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <StatCard
           title="Total Logins"
@@ -126,84 +133,48 @@ const AdminDashboard: React.FC = () => {
         />
       </div>
 
-      {/* Registration Breakdown */}
-      {role === 'all' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <StatCard
-            title="User Registrations"
-            value={registrationStats?.totals?.users || 0}
-            icon="👤"
-            color="border-indigo-500"
-          />
-          <StatCard
-            title="Provider Registrations"
-            value={registrationStats?.totals?.providers || 0}
-            icon="🏪"
-            color="border-pink-500"
-          />
-        </div>
-      )}
-
-      {/* Login Statistics Chart */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">Login Activity</h2>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b">
-                <th className="text-left py-3 px-4 text-gray-700 font-semibold">Date</th>
-                <th className="text-right py-3 px-4 text-gray-700 font-semibold">Logins</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loginStats?.stats?.slice(-10).reverse().map((item: any, index: number) => (
-                <tr key={index} className="border-b hover:bg-gray-50">
-                  <td className="py-3 px-4">{item.date}</td>
-                  <td className="text-right py-3 px-4 font-semibold text-blue-600">
-                    {item.count}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+      {/* Second Row: User/Provider Stats + Donut Chart */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <StatCard
+          title="User Registrations"
+          value={registrationStats?.totals?.users || 0}
+          icon="👤"
+          color="border-indigo-500"
+        />
+        <StatCard
+          title="Provider Registrations"
+          value={registrationStats?.totals?.providers || 0}
+          icon="🏪"
+          color="border-pink-500"
+        />
+        <DonutChart
+          data={providerStatusData}
+          title="Provider Status"
+          centerLabel="Providers"
+        />
       </div>
 
-      {/* Registration Statistics Chart */}
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">Registration Trends</h2>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b">
-                <th className="text-left py-3 px-4 text-gray-700 font-semibold">Date</th>
-                <th className="text-right py-3 px-4 text-gray-700 font-semibold">Total</th>
-                {role === 'all' && (
-                  <>
-                    <th className="text-right py-3 px-4 text-gray-700 font-semibold">Users</th>
-                    <th className="text-right py-3 px-4 text-gray-700 font-semibold">Providers</th>
-                  </>
-                )}
-              </tr>
-            </thead>
-            <tbody>
-              {registrationStats?.stats?.slice(-10).reverse().map((item: any, index: number) => (
-                <tr key={index} className="border-b hover:bg-gray-50">
-                  <td className="py-3 px-4">{item._id}</td>
-                  <td className="text-right py-3 px-4 font-semibold text-green-600">
-                    {item.count}
-                  </td>
-                  {role === 'all' && (
-                    <>
-                      <td className="text-right py-3 px-4 text-indigo-600">{item.users}</td>
-                      <td className="text-right py-3 px-4 text-pink-600">{item.providers}</td>
-                    </>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+      {/* Login Trend Chart */}
+      <div className="mb-8">
+        <LoginTrendChart data={loginStats?.stats || []} />
+      </div>
+
+      {/* Registration Trend Chart */}
+      <div className="mb-8">
+        <RegistrationTrendChart data={registrationStats?.stats || []} />
+      </div>
+
+      {/* User vs Provider Comparison */}
+      <div className="mb-8">
+        <UserProviderComparison
+          users={registrationStats?.totals?.users || 0}
+          providers={registrationStats?.totals?.providers || 0}
+        />
+      </div>
+
+      {/* Combined Analytics Chart */}
+      <div className="mb-8">
+        <CombinedAnalyticsChart data={combinedData} />
       </div>
     </div>
   );

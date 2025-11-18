@@ -29,27 +29,46 @@ const BookingModal: React.FC<BookingModalProps> = ({ isOpen, onClose, item, serv
   const { user } = useContext(AuthContext);
   
   const [bookingData, setBookingData] = useState({
-    fullName: user?.name || user?.username || '',
-    phone: user?.phone || '',
-    email: user?.email || '',
+    fullName: '',
+    phone: '',
+    email: '',
     checkIn: preFilledData?.checkIn || '',
     checkOut: preFilledData?.checkOut || '',
     guests: preFilledData?.guests || 2,
     specialRequests: ''
   });
 
+  const [errors, setErrors] = useState({
+    fullName: '',
+    email: '',
+    phone: ''
+  });
+
   // Update user info and prefilled data when modal opens or user data changes
   useEffect(() => {
     if (isOpen) {
-      setBookingData(prev => ({
-        ...prev,
-        fullName: user?.name || user?.username || '',
-        phone: user?.phone || '',
-        email: user?.email || '',
-        checkIn: preFilledData?.checkIn || '',
-        checkOut: preFilledData?.checkOut || '',
-        guests: preFilledData?.guests || 2,
-      }));
+      if (user) {
+        // For logged-in users, auto-fill with user data
+        setBookingData(prev => ({
+          ...prev,
+          fullName: user?.name || user?.username || '',
+          phone: user?.phone || '',
+          email: user?.email || '',
+          checkIn: preFilledData?.checkIn || '',
+          checkOut: preFilledData?.checkOut || '',
+          guests: preFilledData?.guests || 2,
+        }));
+      } else {
+        // For guests, only set prefilled dates
+        setBookingData(prev => ({
+          ...prev,
+          checkIn: preFilledData?.checkIn || '',
+          checkOut: preFilledData?.checkOut || '',
+          guests: preFilledData?.guests || 2,
+        }));
+      }
+      // Reset errors
+      setErrors({ fullName: '', email: '', phone: '' });
     }
   }, [user, isOpen, preFilledData]);
 
@@ -60,6 +79,56 @@ const BookingModal: React.FC<BookingModalProps> = ({ isOpen, onClose, item, serv
 
   const handleInputChange = (field: string, value: string | number) => {
     setBookingData(prev => ({ ...prev, [field]: value }));
+    
+    // Clear error when user starts typing
+    if (field === 'fullName' || field === 'email' || field === 'phone') {
+      setErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  };
+
+  const validateEmail = (email: string): boolean => {
+    const pattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return pattern.test(email);
+  };
+
+  const validatePhone = (phone: string): boolean => {
+    const pattern = /^0[0-9]{9}$/;
+    return pattern.test(phone);
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors = { fullName: '', email: '', phone: '' };
+    let isValid = true;
+
+    // Validate fullName
+    if (!bookingData.fullName.trim()) {
+      newErrors.fullName = 'Vui lòng nhập họ và tên';
+      isValid = false;
+    } else if (bookingData.fullName.trim().length < 3) {
+      newErrors.fullName = 'Họ và tên phải có ít nhất 3 ký tự';
+      isValid = false;
+    }
+
+    // Validate email
+    if (!bookingData.email.trim()) {
+      newErrors.email = 'Vui lòng nhập email';
+      isValid = false;
+    } else if (!validateEmail(bookingData.email)) {
+      newErrors.email = 'Email không hợp lệ';
+      isValid = false;
+    }
+
+    // Validate phone
+    if (!bookingData.phone.trim()) {
+      newErrors.phone = 'Vui lòng nhập số điện thoại';
+      isValid = false;
+    } else if (!validatePhone(bookingData.phone)) {
+      newErrors.phone = 'Số điện thoại phải gồm 10 số và bắt đầu bằng 0';
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
   };
 
   const calculateTotal = () => {
@@ -82,56 +151,81 @@ const BookingModal: React.FC<BookingModalProps> = ({ isOpen, onClose, item, serv
   };
 
   const handleBookingSubmit = () => {
-    if (!user) {
-      alert('Vui lòng đăng nhập để tiếp tục đặt dịch vụ!');
-      return;
-    }
-
-    if (!bookingData.phone) {
-      alert('Vui lòng cập nhật số điện thoại trong hồ sơ cá nhân để tiếp tục!');
-      return;
-    }
-
+    // Validate dates first
     if (!bookingData.checkIn || !bookingData.checkOut) {
-      alert('Vui lòng chọn ngày nhận phòng và trả phòng!');
+      alert('Vui lòng chọn ngày nhận phòng và trả phòng ở trang chi tiết dịch vụ!');
+      return;
+    }
+
+    // Validate form (both guest and logged-in user)
+    if (!validateForm()) {
+      return;
+    }
+
+    // Additional check for logged-in users without phone
+    if (user && !bookingData.phone) {
+      alert('Vui lòng cập nhật số điện thoại trong hồ sơ cá nhân để tiếp tục!');
       return;
     }
 
     setCurrentStep(2);
   };
 
-  const handlePayment = () => {
-    // Create booking data to send to backend
-    const bookingPayload = {
-      serviceId: item?.id,
-      serviceName: item?.name,
-      customerInfo: {
-        fullName: bookingData.fullName,
-        phone: bookingData.phone,
-        email: bookingData.email
-      },
-      bookingDetails: {
-        checkIn: bookingData.checkIn,
-        checkOut: bookingData.checkOut,
-        guests: bookingData.guests,
-        specialRequests: bookingData.specialRequests
-      },
-      paymentMethod: paymentMethod,
-      totalAmount: calculateTotal(),
-      currency: 'VND'
-    };
-
-    console.log('Booking Payload:', bookingPayload);
-
-    // Simulate payment processing with more realistic flow
+  const handlePayment = async () => {
     const paymentMethodName = paymentMethod === 'vnpay' ? 'VNPay' : 'Internet Banking';
     
-    if (window.confirm(`Bạn xác nhận thanh toán ${formatCurrency(calculateTotal())} qua ${paymentMethodName}?`)) {
-      // Here you would integrate with actual payment gateway
+    if (!window.confirm(`Bạn xác nhận thanh toán ${formatCurrency(calculateTotal())} qua ${paymentMethodName}?`)) {
+      return;
+    }
+
+    try {
+      // Create booking payload
+      const bookingPayload = {
+        service_id: item?.id.toString(),
+        service_type: serviceType,
+        check_in: bookingData.checkIn,
+        check_out: bookingData.checkOut,
+        guests: bookingData.guests,
+        special_requests: bookingData.specialRequests,
+        guest_info: {
+          fullName: bookingData.fullName,
+          email: bookingData.email,
+          phone: bookingData.phone
+        }
+      };
+
+      console.log('Creating booking:', bookingPayload);
+
+      // Get token if user is logged in
+      const token = localStorage.getItem('token');
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json'
+      };
+      
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      // Call booking API
+      const response = await fetch('http://localhost:5000/api/bookings', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(bookingPayload)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create booking');
+      }
+
+      console.log('Booking created:', data);
+
+      // Simulate payment gateway redirect
       alert(`Đang chuyển hướng đến cổng thanh toán ${paymentMethodName}...`);
       
       setTimeout(() => {
-        alert('Thanh toán thành công! Thông tin đặt chỗ đã được gửi đến email của bạn.');
+        alert(`Thanh toán thành công! Mã đặt chỗ: ${data.booking.booking_reference}\nThông tin đã được gửi đến email: ${bookingData.email}`);
         onClose();
         setCurrentStep(1);
         // Reset form
@@ -145,6 +239,10 @@ const BookingModal: React.FC<BookingModalProps> = ({ isOpen, onClose, item, serv
           specialRequests: ''
         });
       }, 2000);
+
+    } catch (error: any) {
+      console.error('Payment error:', error);
+      alert(`Lỗi: ${error.message || 'Không thể tạo đặt chỗ. Vui lòng thử lại!'}`);
     }
   };
 
@@ -158,70 +256,209 @@ const BookingModal: React.FC<BookingModalProps> = ({ isOpen, onClose, item, serv
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+    <div style={{
+      position: 'fixed',
+      inset: 0,
+      zIndex: 9999,
+      backgroundColor: 'rgba(16, 24, 40, 0.75)',
+      backdropFilter: 'blur(8px)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 'var(--spacing-4)'
+    }}
+    onClick={onClose}>
+      <div style={{
+        backgroundColor: '#FFFFFF',
+        borderRadius: 'var(--radius-2xl)',
+        maxWidth: '1200px',
+        width: '100%',
+        maxHeight: '90vh',
+        overflowY: 'auto',
+        boxShadow: 'var(--shadow-2xl)',
+        border: '3px solid var(--color-bronze-light)'
+      }}
+      onClick={(e) => e.stopPropagation()}>
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-900">
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: 'var(--spacing-8)',
+          borderBottom: '2px solid var(--color-cream)',
+          backgroundColor: 'var(--color-cream)'
+        }}>
+          <h2 style={{
+            fontFamily: 'var(--font-heading)',
+            fontSize: 'var(--font-size-3xl)',
+            fontWeight: 'var(--font-weight-bold)',
+            color: 'var(--color-deep-indigo)',
+            margin: 0
+          }}>
             {currentStep === 1 ? 'Xác nhận đặt chỗ' : 'Thanh toán'}
           </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: 'var(--radius-full)',
+              backgroundColor: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--color-text-light)',
+              fontSize: '20px',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(205, 127, 50, 0.1)';
+              e.currentTarget.style.color = 'var(--color-vermilion)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.color = 'var(--color-text-light)';
+            }}
           >
-            <FaTimes className="text-gray-500" />
+            <FaTimes />
           </button>
         </div>
 
-        <div className="p-6">
+        <div style={{ padding: 'var(--spacing-8)' }}>
           {currentStep === 1 ? (
             <>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr',
+                gap: 'var(--spacing-8)'
+              }} className="lg:grid-cols-2">
                 {/* Service Information */}
-                <div className="space-y-6">
-                  <div className="bg-gray-50 rounded-xl p-4">
-                    <div className="flex gap-4">
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 'var(--spacing-6)'
+                }}>
+                  <div style={{
+                    backgroundColor: 'var(--color-cream)',
+                    borderRadius: 'var(--radius-xl)',
+                    padding: 'var(--spacing-6)',
+                    border: '2px solid var(--color-bronze-light)'
+                  }}>
+                    <div style={{ display: 'flex', gap: 'var(--spacing-4)' }}>
                       <img
                         src={item.image}
                         alt={item.name}
-                        className="w-20 h-20 object-cover rounded-lg"
+                        style={{
+                          width: '80px',
+                          height: '80px',
+                          objectFit: 'cover',
+                          borderRadius: 'var(--radius-lg)',
+                          border: '2px solid var(--color-bronze-light)'
+                        }}
                       />
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                      <div style={{ flex: 1 }}>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 'var(--spacing-2)',
+                          marginBottom: 'var(--spacing-2)'
+                        }}>
+                          <span style={{
+                            backgroundColor: 'var(--color-bronze)',
+                            color: '#FFFFFF',
+                            fontSize: 'var(--font-size-xs)',
+                            padding: '4px 12px',
+                            borderRadius: 'var(--radius-full)',
+                            fontWeight: 'var(--font-weight-semibold)'
+                          }}>
                             {getServiceTypeText()}
                           </span>
-                          <div className="flex items-center gap-1">
-                            <FaStar className="text-yellow-400 text-sm" />
-                            <span className="text-sm text-gray-600">{item.rating}</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <FaStar style={{
+                              color: 'var(--color-bronze)',
+                              fontSize: 'var(--font-size-sm)'
+                            }} />
+                            <span style={{
+                              fontSize: 'var(--font-size-sm)',
+                              color: 'var(--color-text-light)'
+                            }}>{item.rating}</span>
                           </div>
                         </div>
-                        <h3 className="font-semibold text-gray-900 mb-2">{item.name}</h3>
-                        <p className="text-lg font-bold text-blue-600">{item.price}</p>
+                        <h3 style={{
+                          fontFamily: 'var(--font-heading)',
+                          fontWeight: 'var(--font-weight-bold)',
+                          color: 'var(--color-deep-indigo)',
+                          marginBottom: 'var(--spacing-2)',
+                          margin: 0
+                        }}>{item.name}</h3>
+                        <p style={{
+                          fontSize: 'var(--font-size-lg)',
+                          fontFamily: 'var(--font-heading)',
+                          fontWeight: 'var(--font-weight-bold)',
+                          color: 'var(--color-vermilion)',
+                          margin: 0
+                        }}>{item.price}</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Booking Summary */}
-                  <div className="bg-blue-50 rounded-xl p-4">
-                    <h4 className="font-semibold text-blue-900 mb-3">Tóm tắt đặt chỗ</h4>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span>Ngày nhận phòng:</span>
-                        <span>{bookingData.checkIn || 'Chưa chọn'}</span>
+                  <div style={{
+                    backgroundColor: 'var(--color-cream)',
+                    borderRadius: 'var(--radius-xl)',
+                    padding: 'var(--spacing-6)',
+                    border: '2px solid var(--color-bronze-light)'
+                  }}>
+                    <h4 style={{
+                      fontFamily: 'var(--font-heading)',
+                      fontWeight: 'var(--font-weight-bold)',
+                      color: 'var(--color-deep-indigo)',
+                      marginBottom: 'var(--spacing-4)',
+                      margin: 0
+                    }}>Tóm tắt đặt chỗ</h4>
+                    <div style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 'var(--spacing-3)',
+                      fontSize: 'var(--font-size-sm)'
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ color: 'var(--color-text-light)' }}>Ngày nhận phòng:</span>
+                        <span style={{
+                          fontWeight: 'var(--font-weight-semibold)',
+                          color: 'var(--color-deep-indigo)'
+                        }}>{bookingData.checkIn || 'Chưa chọn'}</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span>Ngày trả phòng:</span>
-                        <span>{bookingData.checkOut || 'Chưa chọn'}</span>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ color: 'var(--color-text-light)' }}>Ngày trả phòng:</span>
+                        <span style={{
+                          fontWeight: 'var(--font-weight-semibold)',
+                          color: 'var(--color-deep-indigo)'
+                        }}>{bookingData.checkOut || 'Chưa chọn'}</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span>Số khách:</span>
-                        <span>{bookingData.guests} người</span>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ color: 'var(--color-text-light)' }}>Số khách:</span>
+                        <span style={{
+                          fontWeight: 'var(--font-weight-semibold)',
+                          color: 'var(--color-deep-indigo)'
+                        }}>{bookingData.guests} người</span>
                       </div>
-                      <div className="border-t border-blue-200 pt-2 mt-2">
-                        <div className="flex justify-between font-semibold text-blue-900">
+                      <div style={{
+                        borderTop: '2px solid var(--color-bronze-light)',
+                        paddingTop: 'var(--spacing-3)',
+                        marginTop: 'var(--spacing-3)'
+                      }}>
+                        <div style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          fontFamily: 'var(--font-heading)',
+                          fontWeight: 'var(--font-weight-bold)',
+                          color: 'var(--color-deep-indigo)'
+                        }}>
                           <span>Tổng cộng:</span>
-                          <span>{formatCurrency(calculateTotal())}</span>
+                          <span style={{ color: 'var(--color-vermilion)' }}>{formatCurrency(calculateTotal())}</span>
                         </div>
                       </div>
                     </div>
@@ -229,54 +466,292 @@ const BookingModal: React.FC<BookingModalProps> = ({ isOpen, onClose, item, serv
                 </div>
 
                 {/* Booking Form */}
-                <div className="space-y-6">
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 'var(--spacing-6)'
+                }}>
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-4">Thông tin liên hệ</h4>
+                    <h4 style={{
+                      fontFamily: 'var(--font-heading)',
+                      fontWeight: 'var(--font-weight-bold)',
+                      color: 'var(--color-deep-indigo)',
+                      marginBottom: 'var(--spacing-4)',
+                      margin: 0
+                    }}>Thông tin liên hệ</h4>
                     {user ? (
-                      <div className="bg-gray-50 rounded-xl p-4 space-y-3">
-                        <div className="flex items-center space-x-3">
-                          <FaUser className="text-gray-400" />
-                          <div className="flex-1">
-                            <p className="text-sm text-gray-600">Họ và tên</p>
-                            <p className="font-medium text-gray-900">{bookingData.fullName}</p>
+                      // Logged-in user: Read-only display
+                      <div style={{
+                        backgroundColor: 'var(--color-cream)',
+                        borderRadius: 'var(--radius-xl)',
+                        padding: 'var(--spacing-6)',
+                        border: '2px solid var(--color-bronze-light)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 'var(--spacing-4)'
+                      }}>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 'var(--spacing-3)'
+                        }}>
+                          <FaUser style={{
+                            color: 'var(--color-bronze)',
+                            fontSize: '18px'
+                          }} />
+                          <div style={{ flex: 1 }}>
+                            <p style={{
+                              fontSize: 'var(--font-size-sm)',
+                              color: 'var(--color-text-light)',
+                              margin: 0,
+                              marginBottom: 'var(--spacing-1)'
+                            }}>Họ và tên</p>
+                            <p style={{
+                              fontWeight: 'var(--font-weight-semibold)',
+                              color: 'var(--color-deep-indigo)',
+                              margin: 0
+                            }}>{bookingData.fullName}</p>
                           </div>
                         </div>
 
-                        <div className="flex items-center space-x-3">
-                          <FaPhone className="text-gray-400" />
-                          <div className="flex-1">
-                            <p className="text-sm text-gray-600">Số điện thoại</p>
-                            <p className="font-medium text-gray-900">{bookingData.phone || 'Chưa cập nhật'}</p>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 'var(--spacing-3)'
+                        }}>
+                          <FaPhone style={{
+                            color: 'var(--color-bronze)',
+                            fontSize: '18px'
+                          }} />
+                          <div style={{ flex: 1 }}>
+                            <p style={{
+                              fontSize: 'var(--font-size-sm)',
+                              color: 'var(--color-text-light)',
+                              margin: 0,
+                              marginBottom: 'var(--spacing-1)'
+                            }}>Số điện thoại</p>
+                            <p style={{
+                              fontWeight: 'var(--font-weight-semibold)',
+                              color: 'var(--color-deep-indigo)',
+                              margin: 0
+                            }}>{bookingData.phone || 'Chưa cập nhật'}</p>
                           </div>
                         </div>
 
-                        <div className="flex items-center space-x-3">
-                          <FaEnvelope className="text-gray-400" />
-                          <div className="flex-1">
-                            <p className="text-sm text-gray-600">Email</p>
-                            <p className="font-medium text-gray-900">{bookingData.email}</p>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 'var(--spacing-3)'
+                        }}>
+                          <FaEnvelope style={{
+                            color: 'var(--color-bronze)',
+                            fontSize: '18px'
+                          }} />
+                          <div style={{ flex: 1 }}>
+                            <p style={{
+                              fontSize: 'var(--font-size-sm)',
+                              color: 'var(--color-text-light)',
+                              margin: 0,
+                              marginBottom: 'var(--spacing-1)'
+                            }}>Email</p>
+                            <p style={{
+                              fontWeight: 'var(--font-weight-semibold)',
+                              color: 'var(--color-deep-indigo)',
+                              margin: 0
+                            }}>{bookingData.email}</p>
                           </div>
                         </div>
 
                         {(!bookingData.phone) && (
-                          <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                            <p className="text-sm text-yellow-800">
-                              📝 Vui lòng cập nhật số điện thoại trong hồ sơ cá nhân để tiếp tục đặt dịch vụ.
+                          <div style={{
+                            marginTop: 'var(--spacing-4)',
+                            padding: 'var(--spacing-4)',
+                            backgroundColor: 'rgba(205, 127, 50, 0.1)',
+                            border: '2px solid var(--color-bronze-light)',
+                            borderRadius: 'var(--radius-lg)'
+                          }}>
+                            <p style={{
+                              fontSize: 'var(--font-size-sm)',
+                              color: 'var(--color-deep-indigo)',
+                              margin: 0
+                            }}>
+                              Vui lòng cập nhật số điện thoại trong hồ sơ cá nhân để tiếp tục đặt dịch vụ.
                             </p>
                           </div>
                         )}
                       </div>
                     ) : (
-                      <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-                        <p className="text-red-800 text-sm">
-                          🔐 Vui lòng đăng nhập để tiếp tục đặt dịch vụ.
-                        </p>
+                      // Guest user: Form inputs
+                      <div style={{
+                        backgroundColor: 'var(--color-cream)',
+                        borderRadius: 'var(--radius-xl)',
+                        padding: 'var(--spacing-6)',
+                        border: '2px solid var(--color-bronze-light)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 'var(--spacing-4)'
+                      }}>
+                        {/* Full Name Input */}
+                        <div>
+                          <label style={{
+                            display: 'block',
+                            fontSize: 'var(--font-size-sm)',
+                            fontWeight: 'var(--font-weight-semibold)',
+                            color: 'var(--color-deep-indigo)',
+                            marginBottom: 'var(--spacing-2)'
+                          }}>
+                            Họ và tên <span style={{ color: 'var(--color-vermilion)' }}>*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={bookingData.fullName}
+                            onChange={(e) => handleInputChange('fullName', e.target.value)}
+                            placeholder="Nhập họ và tên đầy đủ"
+                            style={{
+                              width: '100%',
+                              padding: 'var(--spacing-3)',
+                              border: errors.fullName ? '2px solid var(--color-vermilion)' : '2px solid var(--color-bronze-light)',
+                              borderRadius: 'var(--radius-lg)',
+                              fontFamily: 'var(--font-body)',
+                              fontSize: 'var(--font-size-sm)',
+                              color: 'var(--color-text)',
+                              outline: 'none',
+                              transition: 'all 0.3s ease'
+                            }}
+                            onFocus={(e) => {
+                              if (!errors.fullName) {
+                                e.currentTarget.style.border = '2px solid var(--color-bronze)';
+                                e.currentTarget.style.boxShadow = '0 0 0 4px rgba(205, 127, 50, 0.1)';
+                              }
+                            }}
+                            onBlur={(e) => {
+                              if (!errors.fullName) {
+                                e.currentTarget.style.border = '2px solid var(--color-bronze-light)';
+                                e.currentTarget.style.boxShadow = 'none';
+                              }
+                            }}
+                          />
+                          {errors.fullName && (
+                            <p style={{
+                              fontSize: 'var(--font-size-xs)',
+                              color: 'var(--color-vermilion)',
+                              marginTop: 'var(--spacing-1)',
+                              margin: 0
+                            }}>{errors.fullName}</p>
+                          )}
+                        </div>
+
+                        {/* Email Input */}
+                        <div>
+                          <label style={{
+                            display: 'block',
+                            fontSize: 'var(--font-size-sm)',
+                            fontWeight: 'var(--font-weight-semibold)',
+                            color: 'var(--color-deep-indigo)',
+                            marginBottom: 'var(--spacing-2)'
+                          }}>
+                            Email <span style={{ color: 'var(--color-vermilion)' }}>*</span>
+                          </label>
+                          <input
+                            type="email"
+                            value={bookingData.email}
+                            onChange={(e) => handleInputChange('email', e.target.value)}
+                            placeholder="example@email.com"
+                            style={{
+                              width: '100%',
+                              padding: 'var(--spacing-3)',
+                              border: errors.email ? '2px solid var(--color-vermilion)' : '2px solid var(--color-bronze-light)',
+                              borderRadius: 'var(--radius-lg)',
+                              fontFamily: 'var(--font-body)',
+                              fontSize: 'var(--font-size-sm)',
+                              color: 'var(--color-text)',
+                              outline: 'none',
+                              transition: 'all 0.3s ease'
+                            }}
+                            onFocus={(e) => {
+                              if (!errors.email) {
+                                e.currentTarget.style.border = '2px solid var(--color-bronze)';
+                                e.currentTarget.style.boxShadow = '0 0 0 4px rgba(205, 127, 50, 0.1)';
+                              }
+                            }}
+                            onBlur={(e) => {
+                              if (!errors.email) {
+                                e.currentTarget.style.border = '2px solid var(--color-bronze-light)';
+                                e.currentTarget.style.boxShadow = 'none';
+                              }
+                            }}
+                          />
+                          {errors.email && (
+                            <p style={{
+                              fontSize: 'var(--font-size-xs)',
+                              color: 'var(--color-vermilion)',
+                              marginTop: 'var(--spacing-1)',
+                              margin: 0
+                            }}>{errors.email}</p>
+                          )}
+                        </div>
+
+                        {/* Phone Input */}
+                        <div>
+                          <label style={{
+                            display: 'block',
+                            fontSize: 'var(--font-size-sm)',
+                            fontWeight: 'var(--font-weight-semibold)',
+                            color: 'var(--color-deep-indigo)',
+                            marginBottom: 'var(--spacing-2)'
+                          }}>
+                            Số điện thoại <span style={{ color: 'var(--color-vermilion)' }}>*</span>
+                          </label>
+                          <input
+                            type="tel"
+                            value={bookingData.phone}
+                            onChange={(e) => handleInputChange('phone', e.target.value)}
+                            placeholder="0xxxxxxxxx (10 số)"
+                            style={{
+                              width: '100%',
+                              padding: 'var(--spacing-3)',
+                              border: errors.phone ? '2px solid var(--color-vermilion)' : '2px solid var(--color-bronze-light)',
+                              borderRadius: 'var(--radius-lg)',
+                              fontFamily: 'var(--font-body)',
+                              fontSize: 'var(--font-size-sm)',
+                              color: 'var(--color-text)',
+                              outline: 'none',
+                              transition: 'all 0.3s ease'
+                            }}
+                            onFocus={(e) => {
+                              if (!errors.phone) {
+                                e.currentTarget.style.border = '2px solid var(--color-bronze)';
+                                e.currentTarget.style.boxShadow = '0 0 0 4px rgba(205, 127, 50, 0.1)';
+                              }
+                            }}
+                            onBlur={(e) => {
+                              if (!errors.phone) {
+                                e.currentTarget.style.border = '2px solid var(--color-bronze-light)';
+                                e.currentTarget.style.boxShadow = 'none';
+                              }
+                            }}
+                          />
+                          {errors.phone && (
+                            <p style={{
+                              fontSize: 'var(--font-size-xs)',
+                              color: 'var(--color-vermilion)',
+                              marginTop: 'var(--spacing-1)',
+                              margin: 0
+                            }}>{errors.phone}</p>
+                          )}
+                        </div>
                       </div>
                     )}
                   </div>
 
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <div style={{ marginTop: 'var(--spacing-6)' }}>
+                    <label style={{
+                      display: 'block',
+                      fontSize: 'var(--font-size-sm)',
+                      fontWeight: 'var(--font-weight-semibold)',
+                      color: 'var(--color-deep-indigo)',
+                      marginBottom: 'var(--spacing-2)'
+                    }}>
                       Yêu cầu đặc biệt (tùy chọn)
                     </label>
                     <textarea
@@ -284,84 +759,184 @@ const BookingModal: React.FC<BookingModalProps> = ({ isOpen, onClose, item, serv
                       onChange={(e) => handleInputChange('specialRequests', e.target.value)}
                       placeholder="Ghi chú thêm về yêu cầu của bạn..."
                       rows={3}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      style={{
+                        width: '100%',
+                        padding: 'var(--spacing-4)',
+                        border: '2px solid var(--color-bronze-light)',
+                        borderRadius: 'var(--radius-xl)',
+                        fontFamily: 'var(--font-body)',
+                        fontSize: 'var(--font-size-sm)',
+                        color: 'var(--color-text)',
+                        transition: 'all 0.3s ease',
+                        outline: 'none',
+                        resize: 'vertical'
+                      }}
+                      onFocus={(e) => {
+                        e.currentTarget.style.border = '2px solid var(--color-bronze)';
+                        e.currentTarget.style.boxShadow = '0 0 0 4px rgba(205, 127, 50, 0.1)';
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.style.border = '2px solid var(--color-bronze-light)';
+                        e.currentTarget.style.boxShadow = 'none';
+                      }}
                     />
                   </div>
                 </div>
               </div>
 
               {/* Continue Payment Button - Full Width */}
-              <div className="mt-8">
+              <div style={{ marginTop: 'var(--spacing-8)' }}>
                 <button
                   onClick={handleBookingSubmit}
-                  disabled={!user || !bookingData.phone || !bookingData.checkIn || !bookingData.checkOut}
-                  className={`w-full py-4 rounded-xl font-semibold text-lg transition-colors ${
-                    (!user || !bookingData.phone || !bookingData.checkIn || !bookingData.checkOut)
-                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                      : 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg hover:shadow-xl'
-                  }`}
+                  disabled={!bookingData.fullName || !bookingData.email || !bookingData.phone || !bookingData.checkIn || !bookingData.checkOut}
+                  style={{
+                    width: '100%',
+                    padding: 'var(--spacing-4) var(--spacing-6)',
+                    borderRadius: 'var(--radius-xl)',
+                    fontFamily: 'var(--font-heading)',
+                    fontWeight: 'var(--font-weight-bold)',
+                    fontSize: 'var(--font-size-lg)',
+                    border: 'none',
+                    cursor: (!bookingData.fullName || !bookingData.email || !bookingData.phone || !bookingData.checkIn || !bookingData.checkOut) ? 'not-allowed' : 'pointer',
+                    backgroundColor: (!bookingData.fullName || !bookingData.email || !bookingData.phone || !bookingData.checkIn || !bookingData.checkOut) 
+                      ? 'rgba(158, 158, 158, 0.3)' 
+                      : 'var(--color-vermilion)',
+                    color: (!bookingData.fullName || !bookingData.email || !bookingData.phone || !bookingData.checkIn || !bookingData.checkOut)
+                      ? 'var(--color-text-light)'
+                      : '#FFFFFF',
+                    transition: 'all 0.3s ease',
+                    boxShadow: (!bookingData.fullName || !bookingData.email || !bookingData.phone || !bookingData.checkIn || !bookingData.checkOut)
+                      ? 'none'
+                      : 'var(--shadow-lg)'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (bookingData.fullName && bookingData.email && bookingData.phone && bookingData.checkIn && bookingData.checkOut) {
+                      e.currentTarget.style.backgroundColor = 'var(--color-deep-indigo)';
+                      e.currentTarget.style.boxShadow = 'var(--shadow-xl)';
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (bookingData.fullName && bookingData.email && bookingData.phone && bookingData.checkIn && bookingData.checkOut) {
+                      e.currentTarget.style.backgroundColor = 'var(--color-vermilion)';
+                      e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
+                      e.currentTarget.style.transform = 'translateY(0)';
+                    }
+                  }}
                 >
-                  {!user 
-                    ? '🔐 Vui lòng đăng nhập để tiếp tục' 
-                    : !bookingData.phone 
-                    ? '📞 Vui lòng cập nhật số điện thoại'
+                  {!bookingData.fullName || !bookingData.email || !bookingData.phone
+                    ? 'Vui lòng điền đầy đủ thông tin' 
                     : (!bookingData.checkIn || !bookingData.checkOut)
-                    ? '📅 Vui lòng chọn ngày ở trang chi tiết dịch vụ'
-                    : '💳 Tiếp tục thanh toán'
+                    ? 'Vui lòng chọn ngày ở trang chi tiết dịch vụ'
+                    : 'Tiếp tục thanh toán'
                   }
                 </button>
               </div>
             </>
           
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr',
+              gap: 'var(--spacing-8)'
+            }} className="lg:grid-cols-2">
               {/* Payment Summary */}
-              <div className="space-y-6">
-                <div className="bg-gray-50 rounded-xl p-6">
-                  <h4 className="font-semibold text-gray-900 mb-4">Thông tin đặt chỗ</h4>
-                  <div className="space-y-3 text-sm">
-                    <div className="flex justify-between">
-                      <span>Khách hàng:</span>
-                      <span className="font-medium">{bookingData.fullName}</span>
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'var(--spacing-6)'
+              }}>
+                <div style={{
+                  backgroundColor: 'var(--color-cream)',
+                  borderRadius: 'var(--radius-xl)',
+                  padding: 'var(--spacing-8)',
+                  border: '2px solid var(--color-bronze-light)'
+                }}>
+                  <h4 style={{
+                    fontFamily: 'var(--font-heading)',
+                    fontWeight: 'var(--font-weight-bold)',
+                    color: 'var(--color-deep-indigo)',
+                    marginBottom: 'var(--spacing-6)',
+                    margin: 0
+                  }}>Thông tin đặt chỗ</h4>
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 'var(--spacing-4)',
+                    fontSize: 'var(--font-size-sm)'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: 'var(--color-text-light)' }}>Khách hàng:</span>
+                      <span style={{
+                        fontWeight: 'var(--font-weight-semibold)',
+                        color: 'var(--color-deep-indigo)'
+                      }}>{bookingData.fullName}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span>Điện thoại:</span>
-                      <span>{bookingData.phone}</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: 'var(--color-text-light)' }}>Điện thoại:</span>
+                      <span style={{ color: 'var(--color-text)' }}>{bookingData.phone}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span>Email:</span>
-                      <span>{bookingData.email}</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: 'var(--color-text-light)' }}>Email:</span>
+                      <span style={{ color: 'var(--color-text)' }}>{bookingData.email}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span>Dịch vụ:</span>
-                      <span>{item.name}</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: 'var(--color-text-light)' }}>Dịch vụ:</span>
+                      <span style={{ color: 'var(--color-text)' }}>{item.name}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span>Thời gian:</span>
-                      <span>{bookingData.checkIn} - {bookingData.checkOut}</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: 'var(--color-text-light)' }}>Thời gian:</span>
+                      <span style={{ color: 'var(--color-text)' }}>{bookingData.checkIn} - {bookingData.checkOut}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span>Số khách:</span>
-                      <span>{bookingData.guests} người</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: 'var(--color-text-light)' }}>Số khách:</span>
+                      <span style={{ color: 'var(--color-text)' }}>{bookingData.guests} người</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-blue-50 rounded-xl p-6">
-                  <h4 className="font-semibold text-blue-900 mb-4">Chi tiết thanh toán</h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span>Giá dịch vụ:</span>
-                      <span>{formatCurrency(calculateTotal())}</span>
+                <div style={{
+                  backgroundColor: 'var(--color-cream)',
+                  borderRadius: 'var(--radius-xl)',
+                  padding: 'var(--spacing-8)',
+                  border: '2px solid var(--color-bronze-light)'
+                }}>
+                  <h4 style={{
+                    fontFamily: 'var(--font-heading)',
+                    fontWeight: 'var(--font-weight-bold)',
+                    color: 'var(--color-deep-indigo)',
+                    marginBottom: 'var(--spacing-6)',
+                    margin: 0
+                  }}>Chi tiết thanh toán</h4>
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 'var(--spacing-3)',
+                    fontSize: 'var(--font-size-sm)'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: 'var(--color-text-light)' }}>Giá dịch vụ:</span>
+                      <span style={{ color: 'var(--color-text)' }}>{formatCurrency(calculateTotal())}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span>Phí dịch vụ:</span>
-                      <span>Miễn phí</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: 'var(--color-text-light)' }}>Phí dịch vụ:</span>
+                      <span style={{ color: 'var(--color-text)' }}>Miễn phí</span>
                     </div>
-                    <div className="border-t border-blue-200 pt-2 mt-2">
-                      <div className="flex justify-between font-semibold text-lg text-blue-900">
+                    <div style={{
+                      borderTop: '2px solid var(--color-bronze-light)',
+                      paddingTop: 'var(--spacing-3)',
+                      marginTop: 'var(--spacing-3)'
+                    }}>
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        fontFamily: 'var(--font-heading)',
+                        fontWeight: 'var(--font-weight-bold)',
+                        fontSize: 'var(--font-size-lg)',
+                        color: 'var(--color-deep-indigo)'
+                      }}>
                         <span>Tổng thanh toán:</span>
-                        <span>{formatCurrency(calculateTotal())}</span>
+                        <span style={{ color: 'var(--color-vermilion)' }}>{formatCurrency(calculateTotal())}</span>
                       </div>
                     </div>
                   </div>
@@ -369,64 +944,202 @@ const BookingModal: React.FC<BookingModalProps> = ({ isOpen, onClose, item, serv
               </div>
 
               {/* Payment Methods */}
-              <div className="space-y-6">
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'var(--spacing-6)'
+              }}>
                 <div>
-                  <h4 className="font-semibold text-gray-900 mb-4">Chọn phương thức thanh toán</h4>
-                  <div className="space-y-3">
-                    <label className={`flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all ${
-                      paymentMethod === 'vnpay' 
-                        ? 'border-blue-500 bg-blue-50' 
-                        : 'border-gray-300 hover:bg-gray-50'
-                    }`}>
+                  <h4 style={{
+                    fontFamily: 'var(--font-heading)',
+                    fontWeight: 'var(--font-weight-bold)',
+                    color: 'var(--color-deep-indigo)',
+                    marginBottom: 'var(--spacing-6)',
+                    margin: 0
+                  }}>Chọn phương thức thanh toán</h4>
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 'var(--spacing-4)'
+                  }}>
+                    <label style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: 'var(--spacing-5)',
+                      border: paymentMethod === 'vnpay' 
+                        ? '3px solid var(--color-bronze)' 
+                        : '2px solid var(--color-bronze-light)',
+                      borderRadius: 'var(--radius-xl)',
+                      backgroundColor: paymentMethod === 'vnpay' 
+                        ? 'var(--color-cream)' 
+                        : '#FFFFFF',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease',
+                      boxShadow: paymentMethod === 'vnpay' ? 'var(--shadow-md)' : 'none'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (paymentMethod !== 'vnpay') {
+                        e.currentTarget.style.backgroundColor = 'var(--color-cream)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (paymentMethod !== 'vnpay') {
+                        e.currentTarget.style.backgroundColor = '#FFFFFF';
+                      }
+                    }}>
                       <input
                         type="radio"
                         name="paymentMethod"
                         value="vnpay"
                         checked={paymentMethod === 'vnpay'}
                         onChange={(e) => setPaymentMethod(e.target.value)}
-                        className="text-blue-600 focus:ring-blue-500"
+                        style={{
+                          accentColor: 'var(--color-bronze)',
+                          width: '20px',
+                          height: '20px',
+                          cursor: 'pointer'
+                        }}
                       />
-                      <div className="ml-3 flex items-center gap-3 flex-1">
-                        <div className="w-16 h-10 bg-white border border-gray-200 rounded-lg flex items-center justify-center shadow-md overflow-hidden">
+                      <div style={{
+                        marginLeft: 'var(--spacing-4)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 'var(--spacing-4)',
+                        flex: 1
+                      }}>
+                        <div style={{
+                          width: '64px',
+                          height: '40px',
+                          backgroundColor: '#FFFFFF',
+                          border: '1px solid var(--color-bronze-light)',
+                          borderRadius: 'var(--radius-lg)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          boxShadow: 'var(--shadow-sm)',
+                          overflow: 'hidden'
+                        }}>
                           <img 
                             src={VNPayLogo} 
                             alt="VNPay Logo" 
-                            className="w-full h-full object-contain p-1"
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'contain',
+                              padding: '2px'
+                            }}
                           />
                         </div>
-                        <div className="flex-1">
-                          <p className="font-semibold text-gray-900">VNPay</p>
-                          <p className="text-sm text-gray-500">Thanh toán nhanh chóng qua ví điện tử VNPay</p>
-                          <p className="text-xs text-green-600 font-medium">✓ Bảo mật cao • Xử lý tức thì</p>
+                        <div style={{ flex: 1 }}>
+                          <p style={{
+                            fontWeight: 'var(--font-weight-bold)',
+                            color: 'var(--color-deep-indigo)',
+                            margin: 0,
+                            marginBottom: 'var(--spacing-1)'
+                          }}>VNPay</p>
+                          <p style={{
+                            fontSize: 'var(--font-size-sm)',
+                            color: 'var(--color-text-light)',
+                            margin: 0,
+                            marginBottom: 'var(--spacing-1)'
+                          }}>Thanh toán nhanh chóng qua ví điện tử VNPay</p>
+                          <p style={{
+                            fontSize: 'var(--font-size-xs)',
+                            color: 'var(--color-bronze)',
+                            fontWeight: 'var(--font-weight-semibold)',
+                            margin: 0
+                          }}>✓ Bảo mật cao • Xử lý tức thì</p>
                         </div>
                       </div>
                     </label>
 
-                    <label className={`flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all ${
-                      paymentMethod === 'banking' 
-                        ? 'border-blue-500 bg-blue-50' 
-                        : 'border-gray-300 hover:bg-gray-50'
-                    }`}>
+                    <label style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: 'var(--spacing-5)',
+                      border: paymentMethod === 'banking' 
+                        ? '3px solid var(--color-bronze)' 
+                        : '2px solid var(--color-bronze-light)',
+                      borderRadius: 'var(--radius-xl)',
+                      backgroundColor: paymentMethod === 'banking' 
+                        ? 'var(--color-cream)' 
+                        : '#FFFFFF',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease',
+                      boxShadow: paymentMethod === 'banking' ? 'var(--shadow-md)' : 'none'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (paymentMethod !== 'banking') {
+                        e.currentTarget.style.backgroundColor = 'var(--color-cream)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (paymentMethod !== 'banking') {
+                        e.currentTarget.style.backgroundColor = '#FFFFFF';
+                      }
+                    }}>
                       <input
                         type="radio"
                         name="paymentMethod"
                         value="banking"
                         checked={paymentMethod === 'banking'}
                         onChange={(e) => setPaymentMethod(e.target.value)}
-                        className="text-blue-600 focus:ring-blue-500"
+                        style={{
+                          accentColor: 'var(--color-bronze)',
+                          width: '20px',
+                          height: '20px',
+                          cursor: 'pointer'
+                        }}
                       />
-                      <div className="ml-3 flex items-center gap-3 flex-1">
-                        <div className="w-16 h-10 bg-white border border-gray-200 rounded-lg flex items-center justify-center shadow-md overflow-hidden">
+                      <div style={{
+                        marginLeft: 'var(--spacing-4)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 'var(--spacing-4)',
+                        flex: 1
+                      }}>
+                        <div style={{
+                          width: '64px',
+                          height: '40px',
+                          backgroundColor: '#FFFFFF',
+                          border: '1px solid var(--color-bronze-light)',
+                          borderRadius: 'var(--radius-lg)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          boxShadow: 'var(--shadow-sm)',
+                          overflow: 'hidden'
+                        }}>
                           <img 
                             src={InternetPaymentLogo} 
                             alt="Internet Banking Logo" 
-                            className="w-full h-full object-contain p-1"
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'contain',
+                              padding: '2px'
+                            }}
                           />
                         </div>
-                        <div className="flex-1">
-                          <p className="font-semibold text-gray-900">Internet Banking</p>
-                          <p className="text-sm text-gray-500">Chuyển khoản trực tiếp qua ngân hàng</p>
-                          <p className="text-xs text-green-600 font-medium">✓ Hỗ trợ tất cả ngân hàng • An toàn</p>
+                        <div style={{ flex: 1 }}>
+                          <p style={{
+                            fontWeight: 'var(--font-weight-bold)',
+                            color: 'var(--color-deep-indigo)',
+                            margin: 0,
+                            marginBottom: 'var(--spacing-1)'
+                          }}>Internet Banking</p>
+                          <p style={{
+                            fontSize: 'var(--font-size-sm)',
+                            color: 'var(--color-text-light)',
+                            margin: 0,
+                            marginBottom: 'var(--spacing-1)'
+                          }}>Chuyển khoản trực tiếp qua ngân hàng</p>
+                          <p style={{
+                            fontSize: 'var(--font-size-xs)',
+                            color: 'var(--color-bronze)',
+                            fontWeight: 'var(--font-weight-semibold)',
+                            margin: 0
+                          }}>✓ Hỗ trợ tất cả ngân hàng • An toàn</p>
                         </div>
                       </div>
                     </label>
@@ -435,9 +1148,26 @@ const BookingModal: React.FC<BookingModalProps> = ({ isOpen, onClose, item, serv
 
                 {/* Banking Details */}
                 {paymentMethod === 'banking' && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                    <h5 className="font-medium text-blue-900 mb-3">Ngân hàng hỗ trợ</h5>
-                    <div className="grid grid-cols-2 gap-2 text-xs text-blue-800">
+                  <div style={{
+                    backgroundColor: 'var(--color-cream)',
+                    border: '2px solid var(--color-bronze-light)',
+                    borderRadius: 'var(--radius-xl)',
+                    padding: 'var(--spacing-6)'
+                  }}>
+                    <h5 style={{
+                      fontFamily: 'var(--font-heading)',
+                      fontWeight: 'var(--font-weight-bold)',
+                      color: 'var(--color-deep-indigo)',
+                      marginBottom: 'var(--spacing-4)',
+                      margin: 0
+                    }}>Ngân hàng hỗ trợ</h5>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(2, 1fr)',
+                      gap: 'var(--spacing-2)',
+                      fontSize: 'var(--font-size-xs)',
+                      color: 'var(--color-text)'
+                    }}>
                       <div>• Vietcombank</div>
                       <div>• BIDV</div>
                       <div>• VietinBank</div>
@@ -450,12 +1180,35 @@ const BookingModal: React.FC<BookingModalProps> = ({ isOpen, onClose, item, serv
                   </div>
                 )}
 
-                <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
-                  <div className="flex items-start gap-3">
-                    <FaShieldAlt className="text-yellow-600 mt-1" />
-                    <div>
-                      <h5 className="font-medium text-yellow-800 mb-1">Bảo mật thanh toán</h5>
-                      <p className="text-sm text-yellow-700">
+                <div style={{
+                  backgroundColor: 'rgba(205, 127, 50, 0.1)',
+                  border: '2px solid var(--color-bronze-light)',
+                  borderRadius: 'var(--radius-xl)',
+                  padding: 'var(--spacing-6)'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 'var(--spacing-4)'
+                  }}>
+                    <FaShieldAlt style={{
+                      color: 'var(--color-bronze)',
+                      fontSize: '24px',
+                      marginTop: '4px'
+                    }} />
+                    <div style={{ flex: 1 }}>
+                      <h5 style={{
+                        fontWeight: 'var(--font-weight-bold)',
+                        color: 'var(--color-deep-indigo)',
+                        marginBottom: 'var(--spacing-2)',
+                        margin: 0
+                      }}>Bảo mật thanh toán</h5>
+                      <p style={{
+                        fontSize: 'var(--font-size-sm)',
+                        color: 'var(--color-text)',
+                        margin: 0,
+                        lineHeight: 1.6
+                      }}>
                         Thông tin thanh toán của bạn được mã hóa và bảo mật tuyệt đối. 
                         Chúng tôi cam kết không lưu trữ thông tin thẻ của bạn.
                       </p>
@@ -463,16 +1216,62 @@ const BookingModal: React.FC<BookingModalProps> = ({ isOpen, onClose, item, serv
                   </div>
                 </div>
 
-                <div className="flex gap-3">
+                <div style={{
+                  display: 'flex',
+                  gap: 'var(--spacing-4)'
+                }}>
                   <button
                     onClick={() => setCurrentStep(1)}
-                    className="flex-1 bg-gray-200 text-gray-700 py-4 rounded-xl font-semibold hover:bg-gray-300 transition-colors"
+                    style={{
+                      flex: 1,
+                      padding: 'var(--spacing-4)',
+                      borderRadius: 'var(--radius-xl)',
+                      fontFamily: 'var(--font-heading)',
+                      fontWeight: 'var(--font-weight-bold)',
+                      fontSize: 'var(--font-size-base)',
+                      border: '2px solid var(--color-bronze-light)',
+                      backgroundColor: 'var(--color-cream)',
+                      color: 'var(--color-text)',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#FFFFFF';
+                      e.currentTarget.style.borderColor = 'var(--color-bronze)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--color-cream)';
+                      e.currentTarget.style.borderColor = 'var(--color-bronze-light)';
+                    }}
                   >
                     Quay lại
                   </button>
                   <button
                     onClick={handlePayment}
-                    className="flex-1 bg-gradient-to-r from-blue-600 to-green-600 text-white py-4 rounded-xl font-semibold hover:from-blue-700 hover:to-green-700 transition-colors"
+                    style={{
+                      flex: 1,
+                      padding: 'var(--spacing-4)',
+                      borderRadius: 'var(--radius-xl)',
+                      fontFamily: 'var(--font-heading)',
+                      fontWeight: 'var(--font-weight-bold)',
+                      fontSize: 'var(--font-size-base)',
+                      border: 'none',
+                      backgroundColor: 'var(--color-vermilion)',
+                      color: '#FFFFFF',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease',
+                      boxShadow: 'var(--shadow-lg)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--color-deep-indigo)';
+                      e.currentTarget.style.boxShadow = 'var(--shadow-xl)';
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--color-vermilion)';
+                      e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
+                      e.currentTarget.style.transform = 'translateY(0)';
+                    }}
                   >
                     Thanh toán ngay
                   </button>

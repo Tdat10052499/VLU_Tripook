@@ -1,7 +1,7 @@
 """
 Login Activity Model - Track user login sessions
 """
-from datetime import datetime
+from datetime import datetime, timedelta
 from bson import ObjectId
 from app.utils.database import get_db
 
@@ -135,7 +135,6 @@ class LoginActivity:
         results = list(db.login_activities.aggregate(pipeline))
         
         # Fill in missing dates with zero counts
-        from datetime import datetime, timedelta
         result_dict = {item['date']: item for item in results}
         
         filled_results = []

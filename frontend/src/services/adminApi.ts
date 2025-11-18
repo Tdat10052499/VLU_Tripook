@@ -131,3 +131,59 @@ export const getTrips = async (page: number = 1, limit: number = 20, userId?: st
   );
   return response.data;
 };
+
+// ==================== TRANSACTION ANALYTICS ====================
+export const getTransactionStats = async (
+  period: 'week' | 'month' | 'year' = 'month',
+  startDate?: string,
+  endDate?: string
+) => {
+  const queryParams = new URLSearchParams();
+  queryParams.append('period', period);
+  if (startDate) queryParams.append('startDate', startDate);
+  if (endDate) queryParams.append('endDate', endDate);
+  
+  const response = await axios.get(
+    `${API_URL}/transaction-stats?${queryParams.toString()}`,
+    getAuthHeaders()
+  );
+  return response.data;
+};
+
+export const getTransactions = async (
+  page: number = 1,
+  limit: number = 20,
+  filters?: {
+    status?: string;
+    provider_id?: string;
+    user_id?: string;
+    startDate?: string;
+    endDate?: string;
+  }
+) => {
+  const queryParams = new URLSearchParams();
+  queryParams.append('page', page.toString());
+  queryParams.append('limit', limit.toString());
+  
+  if (filters) {
+    if (filters.status) queryParams.append('status', filters.status);
+    if (filters.provider_id) queryParams.append('provider_id', filters.provider_id);
+    if (filters.user_id) queryParams.append('user_id', filters.user_id);
+    if (filters.startDate) queryParams.append('startDate', filters.startDate);
+    if (filters.endDate) queryParams.append('endDate', filters.endDate);
+  }
+  
+  const response = await axios.get(
+    `${API_URL}/transactions?${queryParams.toString()}`,
+    getAuthHeaders()
+  );
+  return response.data;
+};
+
+export const getTransactionDetail = async (bookingId: string) => {
+  const response = await axios.get(
+    `${API_URL}/transaction/${bookingId}`,
+    getAuthHeaders()
+  );
+  return response.data;
+};

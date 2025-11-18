@@ -305,10 +305,32 @@ const ServiceDetail: React.FC<ServiceDetailProps> = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div style={{ backgroundColor: 'var(--color-cream)', minHeight: '100vh' }}>
         <Header />
-        <div className="flex items-center justify-center h-96">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          minHeight: '400px',
+          flexDirection: 'column',
+          gap: 'var(--spacing-6)'
+        }}>
+          <div style={{
+            width: '64px',
+            height: '64px',
+            border: '4px solid var(--color-bronze)',
+            borderTopColor: 'transparent',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite'
+          }} />
+          <p style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: 'var(--font-size-lg)',
+            color: 'var(--color-deep-indigo)',
+            fontWeight: 'var(--font-weight-medium)'
+          }}>
+            Đang tải thông tin dịch vụ...
+          </p>
         </div>
         <Footer />
       </div>
@@ -317,12 +339,33 @@ const ServiceDetail: React.FC<ServiceDetailProps> = () => {
 
   if (!service) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div style={{ backgroundColor: 'var(--color-cream)', minHeight: '100vh' }}>
         <Header />
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">Dịch vụ không tìm thấy</h1>
-            <Link to="/services" className="text-blue-600 hover:underline">
+        <div style={{ 
+          maxWidth: '800px',
+          margin: '0 auto',
+          padding: 'var(--spacing-16) var(--spacing-8)'
+        }}>
+          <div style={{ textAlign: 'center' }}>
+            <h1 style={{
+              fontFamily: 'var(--font-heading)',
+              fontSize: 'var(--font-size-3xl)',
+              fontWeight: 'var(--font-weight-bold)',
+              color: 'var(--color-deep-indigo)',
+              marginBottom: 'var(--spacing-6)'
+            }}>
+              Dịch vụ không tìm thấy
+            </h1>
+            <Link 
+              to="/services" 
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: 'var(--font-size-base)',
+                color: 'var(--color-vermilion)',
+                textDecoration: 'underline',
+                fontWeight: 'var(--font-weight-semibold)'
+              }}
+            >
               Quay lại trang dịch vụ
             </Link>
           </div>
@@ -333,186 +376,673 @@ const ServiceDetail: React.FC<ServiceDetailProps> = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div style={{ backgroundColor: 'var(--color-cream)', minHeight: '100vh' }}>
       <Header />
       
-      {/* Breadcrumb */}
-      <div className="bg-white border-b">
-        <div className="container mx-auto px-4 py-3">
-          <nav className="flex text-sm text-gray-600">
-            <Link to="/" className="hover:text-blue-600">Trang chủ</Link>
-            <span className="mx-2">&gt;</span>
-            <Link to="/services" className="hover:text-blue-600">Dịch vụ</Link>
-            <span className="mx-2">&gt;</span>
-            <span className="text-gray-900 truncate">{service.name}</span>
-          </nav>
+      {/* Hero Gallery Section - 600px Full Width */}
+      <div style={{
+        position: 'relative',
+        width: '100%',
+        height: '600px',
+        marginBottom: 'var(--spacing-12)',
+        overflow: 'hidden'
+      }}>
+        {/* Main Image with Gradient Overlay */}
+        <img
+          src={service.images[currentImageIndex]}
+          alt={`${service.name} - ${currentImageIndex + 1}`}
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            cursor: 'pointer'
+          }}
+          onClick={() => openLightbox(currentImageIndex)}
+        />
+        
+        {/* Gradient Overlay for Title */}
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'linear-gradient(to bottom, rgba(16, 24, 40, 0) 50%, rgba(16, 24, 40, 0.85) 100%)',
+          pointerEvents: 'none'
+        }} />
+        
+        {/* Favorite Button - Top Right */}
+        <button
+          onClick={() => setIsFavorite(!isFavorite)}
+          style={{
+            position: 'absolute',
+            top: 'var(--spacing-6)',
+            right: 'var(--spacing-6)',
+            width: '56px',
+            height: '56px',
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(10px)',
+            border: 'none',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            fontSize: '24px',
+            color: isFavorite ? 'var(--color-vermilion)' : 'var(--color-bronze)',
+            boxShadow: 'var(--shadow-lg)',
+            zIndex: 10
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'scale(1.1)';
+            e.currentTarget.style.boxShadow = 'var(--shadow-xl)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'scale(1)';
+            e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
+          }}
+        >
+          {isFavorite ? <FaHeart /> : <FaRegHeart />}
+        </button>
+        
+        {/* Image Counter Badge - Bottom Right */}
+        <div style={{
+          position: 'absolute',
+          bottom: 'var(--spacing-6)',
+          right: 'var(--spacing-6)',
+          backgroundColor: 'rgba(16, 24, 40, 0.8)',
+          backdropFilter: 'blur(10px)',
+          padding: 'var(--spacing-3) var(--spacing-5)',
+          borderRadius: 'var(--radius-full)',
+          fontFamily: 'var(--font-body)',
+          fontSize: 'var(--font-size-sm)',
+          fontWeight: 'var(--font-weight-semibold)',
+          color: '#FFFFFF',
+          zIndex: 10
+        }}>
+          {currentImageIndex + 1} / {service.images.length}
+        </div>
+        
+        {/* Navigation Arrow - Left */}
+        <button
+          onClick={prevImage}
+          style={{
+            position: 'absolute',
+            left: 'var(--spacing-6)',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            width: '56px',
+            height: '56px',
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(10px)',
+            border: 'none',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            fontSize: '20px',
+            color: 'var(--color-deep-indigo)',
+            boxShadow: 'var(--shadow-lg)',
+            zIndex: 10
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--color-bronze)';
+            e.currentTarget.style.color = '#FFFFFF';
+            e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+            e.currentTarget.style.color = 'var(--color-deep-indigo)';
+            e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
+          }}
+        >
+          <FaChevronLeft />
+        </button>
+        
+        {/* Navigation Arrow - Right */}
+        <button
+          onClick={nextImage}
+          style={{
+            position: 'absolute',
+            right: 'var(--spacing-6)',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            width: '56px',
+            height: '56px',
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(10px)',
+            border: 'none',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            fontSize: '20px',
+            color: 'var(--color-deep-indigo)',
+            boxShadow: 'var(--shadow-lg)',
+            zIndex: 10
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--color-bronze)';
+            e.currentTarget.style.color = '#FFFFFF';
+            e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+            e.currentTarget.style.color = 'var(--color-deep-indigo)';
+            e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
+          }}
+        >
+          <FaChevronRight />
+        </button>
+        
+        {/* Service Title Overlay - Bottom */}
+        <div style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          padding: 'var(--spacing-10) var(--spacing-12)',
+          zIndex: 5
+        }}>
+          <h1 style={{
+            fontFamily: 'var(--font-heading)',
+            fontSize: 'clamp(2rem, 4vw, 3rem)',
+            fontWeight: 'var(--font-weight-bold)',
+            color: '#FFFFFF',
+            marginBottom: 'var(--spacing-4)',
+            textShadow: '2px 2px 12px rgba(0, 0, 0, 0.5)',
+            lineHeight: 1.2
+          }}>
+            {service.name}
+          </h1>
+          
+          <div style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 'var(--spacing-4)',
+            alignItems: 'center'
+          }}>
+            {/* Rating Badge */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--spacing-2)',
+              padding: 'var(--spacing-2) var(--spacing-4)',
+              backgroundColor: 'var(--color-bronze)',
+              borderRadius: 'var(--radius-full)',
+              fontFamily: 'var(--font-body)',
+              fontSize: 'var(--font-size-sm)',
+              fontWeight: 'var(--font-weight-semibold)',
+              color: '#FFFFFF',
+              boxShadow: 'var(--shadow-md)'
+            }}>
+              <FaStar style={{ fontSize: '14px' }} />
+              <span>{service.averageRating.toFixed(1)}</span>
+              <span>({service.totalReviews} đánh giá)</span>
+            </div>
+            
+            {/* Location Badge */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--spacing-2)',
+              padding: 'var(--spacing-2) var(--spacing-4)',
+              backgroundColor: 'rgba(255, 255, 255, 0.2)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: 'var(--radius-full)',
+              fontFamily: 'var(--font-body)',
+              fontSize: 'var(--font-size-sm)',
+              fontWeight: 'var(--font-weight-medium)',
+              color: '#FFFFFF',
+              boxShadow: 'var(--shadow-md)'
+            }}>
+              <FaMapMarkerAlt style={{ fontSize: '14px' }} />
+              <span>{service.location.address}</span>
+            </div>
+          </div>
+        </div>
+        
+        {/* Thumbnail Gallery - Bottom Center */}
+        <div style={{
+          position: 'absolute',
+          bottom: 'var(--spacing-6)',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          display: 'flex',
+          gap: 'var(--spacing-3)',
+          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+          backdropFilter: 'blur(10px)',
+          borderRadius: 'var(--radius-xl)',
+          padding: 'var(--spacing-3)',
+          boxShadow: 'var(--shadow-xl)',
+          maxWidth: 'calc(100% - 32px)',
+          overflowX: 'auto',
+          zIndex: 10
+        }}>
+          {service.images.map((image, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentImageIndex(index)}
+              style={{
+                width: '80px',
+                height: '60px',
+                padding: 0,
+                border: index === currentImageIndex ? '3px solid var(--color-bronze)' : '3px solid transparent',
+                borderRadius: 'var(--radius-lg)',
+                overflow: 'hidden',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                opacity: index === currentImageIndex ? 1 : 0.6,
+                flexShrink: 0,
+                backgroundColor: 'transparent'
+              }}
+              onMouseEnter={(e) => {
+                if (index !== currentImageIndex) {
+                  e.currentTarget.style.opacity = '0.9';
+                  e.currentTarget.style.border = '3px solid var(--color-bronze-light)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (index !== currentImageIndex) {
+                  e.currentTarget.style.opacity = '0.6';
+                  e.currentTarget.style.border = '3px solid transparent';
+                }
+              }}
+            >
+              <img
+                src={image}
+                alt={`Thumbnail ${index + 1}`}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover'
+                }}
+              />
+            </button>
+          ))}
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8 min-h-[calc(100vh-200px)]">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start min-h-full">
+      {/* Main Content Container - 2 Column Layout */}
+      <div style={{
+        maxWidth: '1400px',
+        margin: '0 auto',
+        padding: '0 var(--spacing-8) var(--spacing-16)'
+      }}>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 400px',
+          gap: 'var(--spacing-10)',
+          alignItems: 'start'
+        }}>
           {/* Left Column - Main Content */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Service Header */}
-            <div className="bg-white rounded-lg shadow-md p-6 w-full">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h1 className="text-3xl font-bold text-gray-900 mb-2">{service.name}</h1>
-                  <div className="flex items-center space-x-4 text-sm text-gray-600">
-                    <div className="flex items-center space-x-1">
-                      {renderStars(Math.round(service.averageRating))}
-                      <span className="ml-1">{service.averageRating}</span>
-                      <span>({service.totalReviews} đánh giá)</span>
-                    </div>
-                    <div className="flex items-center">
-                      <FaMapMarkerAlt className="mr-1" />
-                      <span>{service.location.address}</span>
-                    </div>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setIsFavorite(!isFavorite)}
-                  className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-                >
-                  {isFavorite ? (
-                    <FaHeart className="text-red-500 text-xl" />
-                  ) : (
-                    <FaRegHeart className="text-gray-400 text-xl" />
-                  )}
-                </button>
-              </div>
-            </div>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--spacing-8)'
+          }}>
 
-            {/* Image Gallery */}
-            <div className="bg-white rounded-lg shadow-md p-6 w-full">
-              <h2 className="text-2xl font-bold mb-4">Hình ảnh</h2>
-              <div className="relative">
-                {/* Main Image */}
-                <div className="relative h-96 rounded-lg overflow-hidden mb-4">
-                  <img
-                    src={service.images[currentImageIndex]}
-                    alt={`${service.name} - ${currentImageIndex + 1}`}
-                    className="w-full h-full object-cover cursor-pointer"
-                    onClick={() => openLightbox(currentImageIndex)}
-                  />
-                  <button
-                    onClick={prevImage}
-                    className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all"
-                  >
-                    <FaChevronLeft />
-                  </button>
-                  <button
-                    onClick={nextImage}
-                    className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all"
-                  >
-                    <FaChevronRight />
-                  </button>
-                </div>
-                
-                {/* Thumbnail Gallery */}
-                <div className="grid grid-cols-5 gap-2">
-                  {service.images.map((image, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setCurrentImageIndex(index)}
-                      className={`h-20 rounded-lg overflow-hidden border-2 transition-all ${
-                        index === currentImageIndex ? 'border-blue-500' : 'border-transparent'
-                      }`}
-                    >
-                      <img
-                        src={image}
-                        alt={`Thumbnail ${index + 1}`}
-                        className="w-full h-full object-cover"
-                      />
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Provider Information */}
-            <div className="bg-white rounded-lg shadow-md p-6 w-full">
-              <h2 className="text-2xl font-bold mb-4">Nhà cung cấp dịch vụ</h2>
-              <div className="flex items-center space-x-4">
-                <img
-                  src={service.provider.logo}
-                  alt={service.provider.name}
-                  className="w-16 h-16 rounded-full object-cover"
-                />
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold">{service.provider.name}</h3>
-                  <div className="flex items-center space-x-1 text-sm text-gray-600">
-                    {renderStars(Math.round(service.provider.rating), 'sm')}
-                    <span className="ml-1">{service.provider.rating}</span>
-                  </div>
-                  <p className="text-sm text-gray-600">
-                    {service.provider.yearsActive} năm kinh nghiệm • {service.provider.totalServices} dịch vụ
-                  </p>
-                </div>
-                <button
-                  onClick={() => setIsProviderCardOpen(true)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Xem thông tin
-                </button>
-              </div>
-            </div>
-
-            {/* Service Description */}
-            <div className="bg-white rounded-lg shadow-md p-6 w-full">
-              <h2 className="text-2xl font-bold mb-4">Thông tin về dịch vụ</h2>
-              <p className="text-gray-700 mb-4">{service.description}</p>
+            {/* Service Description Section */}
+            <div style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: 'var(--radius-2xl)',
+              padding: 'var(--spacing-8)',
+              boxShadow: 'var(--shadow-sm)'
+            }}>
+              <h2 style={{
+                fontFamily: 'var(--font-heading)',
+                fontSize: 'var(--font-size-2xl)',
+                fontWeight: 'var(--font-weight-bold)',
+                color: 'var(--color-deep-indigo)',
+                borderBottom: '3px solid var(--color-bronze)',
+                paddingBottom: 'var(--spacing-4)',
+                marginBottom: 'var(--spacing-6)'
+              }}>
+                Thông tin về dịch vụ
+              </h2>
+              <p style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: 'var(--font-size-base)',
+                lineHeight: 1.7,
+                color: 'var(--color-text)',
+                marginBottom: 'var(--spacing-6)'
+              }}>
+                {service.description}
+              </p>
               
-              <h3 className="text-lg font-semibold mb-3">Tiện nghi</h3>
-              <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-2">
+              <h3 style={{
+                fontFamily: 'var(--font-heading)',
+                fontSize: 'var(--font-size-lg)',
+                fontWeight: 'var(--font-weight-semibold)',
+                color: 'var(--color-deep-indigo)',
+                marginBottom: 'var(--spacing-4)'
+              }}>
+                Tiện nghi
+              </h3>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                gap: 'var(--spacing-3)'
+              }}>
                 {service.amenities.map((amenity, index) => (
-                  <div key={index} className="flex items-center space-x-2 text-sm text-gray-600">
-                    <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                  <div key={index} style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 'var(--spacing-2)',
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 'var(--font-size-sm)',
+                    color: 'var(--color-text)'
+                  }}>
+                    <span style={{
+                      width: '6px',
+                      height: '6px',
+                      backgroundColor: 'var(--color-bronze)',
+                      borderRadius: '50%',
+                      flexShrink: 0
+                    }} />
                     <span>{amenity}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Reviews */}
-            <div className="bg-white rounded-lg shadow-md p-6 w-full">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-bold">Đánh giá từ khách hàng</h2>
-                <div className="flex items-center space-x-2">
-                  <FaFilter className="text-gray-400" />
+            {/* Map Location Section */}
+            <div style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: 'var(--radius-2xl)',
+              padding: 'var(--spacing-8)',
+              boxShadow: 'var(--shadow-sm)'
+            }}>
+              <h2 style={{
+                fontFamily: 'var(--font-heading)',
+                fontSize: 'var(--font-size-2xl)',
+                fontWeight: 'var(--font-weight-bold)',
+                color: 'var(--color-deep-indigo)',
+                borderBottom: '3px solid var(--color-bronze)',
+                paddingBottom: 'var(--spacing-4)',
+                marginBottom: 'var(--spacing-6)'
+              }}>
+                Vị trí
+              </h2>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--spacing-3)',
+                padding: 'var(--spacing-4)',
+                backgroundColor: 'var(--color-cream)',
+                borderRadius: 'var(--radius-lg)',
+                border: '2px solid var(--color-bronze-light)',
+                marginBottom: 'var(--spacing-6)'
+              }}>
+                <FaMapMarkerAlt style={{ 
+                  color: 'var(--color-bronze)', 
+                  fontSize: '24px',
+                  flexShrink: 0
+                }} />
+                <span style={{
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 'var(--font-size-base)',
+                  color: 'var(--color-text)',
+                  fontWeight: 'var(--font-weight-medium)'
+                }}>
+                  {service.location.address}
+                </span>
+              </div>
+              <div style={{
+                height: '400px',
+                borderRadius: 'var(--radius-xl)',
+                overflow: 'hidden',
+                border: '2px solid var(--color-bronze-light)'
+              }}>
+                <SimpleMap 
+                  latitude={service.location.coordinates[0]}
+                  longitude={service.location.coordinates[1]}
+                  popupContent={service.name}
+                />
+              </div>
+            </div>
+
+            {/* Provider Information Card */}
+            <div style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: 'var(--radius-2xl)',
+              padding: 'var(--spacing-8)',
+              boxShadow: 'var(--shadow-sm)'
+            }}>
+              <h2 style={{
+                fontFamily: 'var(--font-heading)',
+                fontSize: 'var(--font-size-2xl)',
+                fontWeight: 'var(--font-weight-bold)',
+                color: 'var(--color-deep-indigo)',
+                borderBottom: '3px solid var(--color-bronze)',
+                paddingBottom: 'var(--spacing-4)',
+                marginBottom: 'var(--spacing-6)'
+              }}>
+                Nhà cung cấp dịch vụ
+              </h2>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--spacing-6)',
+                padding: 'var(--spacing-6)',
+                backgroundColor: 'var(--color-cream)',
+                borderRadius: 'var(--radius-xl)',
+                border: '2px solid var(--color-bronze-light)'
+              }}>
+                <img
+                  src={service.provider.logo}
+                  alt={service.provider.name}
+                  style={{
+                    width: '80px',
+                    height: '80px',
+                    borderRadius: '50%',
+                    objectFit: 'cover',
+                    border: '3px solid var(--color-bronze)',
+                    flexShrink: 0
+                  }}
+                />
+                <div style={{ flex: 1 }}>
+                  <h3 style={{
+                    fontFamily: 'var(--font-heading)',
+                    fontSize: 'var(--font-size-xl)',
+                    fontWeight: 'var(--font-weight-bold)',
+                    color: 'var(--color-deep-indigo)',
+                    marginBottom: 'var(--spacing-2)'
+                  }}>
+                    {service.provider.name}
+                  </h3>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 'var(--spacing-2)',
+                    marginBottom: 'var(--spacing-2)'
+                  }}>
+                    {renderStars(Math.round(service.provider.rating))}
+                    <span style={{
+                      fontFamily: 'var(--font-body)',
+                      fontSize: 'var(--font-size-sm)',
+                      fontWeight: 'var(--font-weight-semibold)',
+                      color: 'var(--color-text)'
+                    }}>
+                      {service.provider.rating.toFixed(1)}
+                    </span>
+                  </div>
+                  <p style={{
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 'var(--font-size-sm)',
+                    color: 'var(--color-text-light)'
+                  }}>
+                    {service.provider.yearsActive} năm kinh nghiệm • {service.provider.totalServices} dịch vụ
+                  </p>
+                </div>
+                <button
+                  onClick={() => setIsProviderCardOpen(true)}
+                  style={{
+                    padding: 'var(--spacing-3) var(--spacing-6)',
+                    backgroundColor: 'var(--color-bronze)',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    borderRadius: 'var(--radius-lg)',
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 'var(--font-size-base)',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-deep-indigo)';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-bronze)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                >
+                  Xem thông tin
+                </button>
+              </div>
+            </div>
+
+            {/* Reviews Section */}
+            <div style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: 'var(--radius-2xl)',
+              padding: 'var(--spacing-8)',
+              boxShadow: 'var(--shadow-sm)'
+            }}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: 'var(--spacing-6)',
+                paddingBottom: 'var(--spacing-4)',
+                borderBottom: '3px solid var(--color-bronze)'
+              }}>
+                <h2 style={{
+                  fontFamily: 'var(--font-heading)',
+                  fontSize: 'var(--font-size-2xl)',
+                  fontWeight: 'var(--font-weight-bold)',
+                  color: 'var(--color-deep-indigo)'
+                }}>
+                  Đánh giá từ khách hàng
+                </h2>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 'var(--spacing-3)'
+                }}>
+                  <FaFilter style={{ 
+                    color: 'var(--color-bronze)', 
+                    fontSize: '16px' 
+                  }} />
                   <select
                     value={reviewFilter}
                     onChange={(e) => setReviewFilter(e.target.value)}
-                    className="border rounded px-3 py-1 text-sm"
+                    style={{
+                      padding: 'var(--spacing-2) var(--spacing-4)',
+                      border: '2px solid var(--color-bronze-light)',
+                      borderRadius: 'var(--radius-lg)',
+                      fontFamily: 'var(--font-body)',
+                      fontSize: 'var(--font-size-sm)',
+                      color: 'var(--color-text)',
+                      backgroundColor: '#FFFFFF',
+                      cursor: 'pointer',
+                      outline: 'none',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--color-bronze)';
+                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(205, 127, 50, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--color-bronze-light)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
                   >
                     <option value="all">Tất cả đánh giá</option>
                     <option value="5">5 sao</option>
                     <option value="4">4 sao trở lên</option>
                     <option value="3">3 sao trở lên</option>
-                    <option value="2">2 sao trở lên</option>
-                    <option value="1">1 sao trở lên</option>
                   </select>
                 </div>
               </div>
               
-              <div className="space-y-4">
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'var(--spacing-6)'
+              }}>
                 {filteredReviews.slice(0, displayedReviews).map((review) => (
-                  <div key={review.id} className="border-b border-gray-200 pb-4 last:border-b-0">
-                    <div className="flex items-start space-x-3">
+                  <div key={review.id} style={{
+                    padding: 'var(--spacing-6)',
+                    backgroundColor: 'var(--color-cream)',
+                    borderRadius: 'var(--radius-xl)',
+                    border: '2px solid var(--color-bronze-light)',
+                    transition: 'all 0.3s ease'
+                  }}>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'start',
+                      gap: 'var(--spacing-4)',
+                      marginBottom: 'var(--spacing-4)'
+                    }}>
                       <img
-                        src={review.userAvatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=50&h=50&fit=crop'}
+                        src={review.userAvatar || `https://i.pravatar.cc/150?img=${review.id}`}
                         alt={review.userName}
-                        className="w-10 h-10 rounded-full object-cover"
+                        style={{
+                          width: '48px',
+                          height: '48px',
+                          borderRadius: '50%',
+                          objectFit: 'cover',
+                          border: '2px solid var(--color-bronze)',
+                          flexShrink: 0
+                        }}
                       />
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2 mb-1">
-                          <h4 className="font-semibold text-sm">{review.userName}</h4>
-                          <div className="flex items-center space-x-1">
-                            {renderStars(review.rating, 'sm')}
-                          </div>
-                          <span className="text-xs text-gray-500">{new Date(review.date).toLocaleDateString('vi-VN')}</span>
+                      <div style={{ flex: 1 }}>
+                        <div style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          marginBottom: 'var(--spacing-2)'
+                        }}>
+                          <h4 style={{
+                            fontFamily: 'var(--font-body)',
+                            fontSize: 'var(--font-size-base)',
+                            fontWeight: 'var(--font-weight-semibold)',
+                            color: 'var(--color-deep-indigo)'
+                          }}>
+                            {review.userName}
+                          </h4>
+                          <span style={{
+                            fontFamily: 'var(--font-body)',
+                            fontSize: 'var(--font-size-xs)',
+                            color: 'var(--color-text-light)'
+                          }}>
+                            {new Date(review.date).toLocaleDateString('vi-VN')}
+                          </span>
                         </div>
-                        <p className="text-sm text-gray-700">{review.comment}</p>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 'var(--spacing-1)',
+                          marginBottom: 'var(--spacing-3)'
+                        }}>
+                          {renderStars(review.rating)}
+                        </div>
+                        <p style={{
+                          fontFamily: 'var(--font-body)',
+                          fontSize: 'var(--font-size-sm)',
+                          lineHeight: 1.6,
+                          color: 'var(--color-text)'
+                        }}>
+                          {review.comment}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -522,7 +1052,32 @@ const ServiceDetail: React.FC<ServiceDetailProps> = () => {
               {filteredReviews.length > displayedReviews && (
                 <button
                   onClick={() => setDisplayedReviews(prev => prev + 5)}
-                  className="mt-4 w-full py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  style={{
+                    marginTop: 'var(--spacing-6)',
+                    padding: 'var(--spacing-3) var(--spacing-8)',
+                    backgroundColor: 'transparent',
+                    color: 'var(--color-bronze)',
+                    border: '2px solid var(--color-bronze)',
+                    borderRadius: 'var(--radius-lg)',
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 'var(--font-size-base)',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    width: '100%'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-bronze)';
+                    e.currentTarget.style.color = '#FFFFFF';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = 'var(--color-bronze)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
                 >
                   Xem thêm đánh giá
                 </button>
@@ -530,164 +1085,342 @@ const ServiceDetail: React.FC<ServiceDetailProps> = () => {
             </div>
           </div>
 
-          {/* Right Column - Booking Panel */}
-          <div className="lg:col-span-1 min-h-full">
-            <div className="sticky top-6 flex flex-col space-y-6 min-h-[calc(100vh-8rem)]">
-              <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-100">
-              <div className="mb-6">
-                <div className="flex items-center space-x-2 mb-2">
+          {/* Right Column - Sticky Booking Card */}
+          <div style={{
+            position: 'sticky',
+            top: 'var(--spacing-8)'
+          }}>
+            <div style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: 'var(--radius-2xl)',
+              padding: 'var(--spacing-8)',
+              boxShadow: 'var(--shadow-lg)',
+              border: '3px solid var(--color-bronze-light)',
+              boxSizing: 'border-box'
+            }}>
+              {/* Price Display */}
+              <div style={{
+                marginBottom: 'var(--spacing-6)',
+                paddingBottom: 'var(--spacing-6)',
+                borderBottom: '2px solid var(--color-bronze-light)'
+              }}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  gap: 'var(--spacing-3)',
+                  marginBottom: 'var(--spacing-2)'
+                }}>
                   {service.discountPrice && (
-                    <span className="text-lg text-gray-500 line-through">
+                    <span style={{
+                      fontFamily: 'var(--font-body)',
+                      fontSize: 'var(--font-size-lg)',
+                      color: '#999999',
+                      textDecoration: 'line-through'
+                    }}>
                       {service.basePrice.toLocaleString()}đ
                     </span>
                   )}
-                  <span className="text-2xl font-bold text-blue-600">
+                  <span style={{
+                    fontFamily: 'var(--font-heading)',
+                    fontSize: 'var(--font-size-3xl)',
+                    fontWeight: 'var(--font-weight-bold)',
+                    color: 'var(--color-vermilion)'
+                  }}>
                     {(service.discountPrice || service.basePrice).toLocaleString()}đ
                   </span>
-                  <span className="text-sm text-gray-600">/đêm</span>
                 </div>
+                <span style={{
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 'var(--font-size-sm)',
+                  color: '#666666'
+                }}>
+                  / đêm
+                </span>
                 {service.discountPrice && (
-                  <span className="text-sm text-green-600 font-medium">
+                  <div style={{
+                    marginTop: 'var(--spacing-2)',
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 'var(--font-size-sm)',
+                    color: '#333333',
+                    fontWeight: 'var(--font-weight-bold)'
+                  }}>
                     Tiết kiệm {((service.basePrice - service.discountPrice) / service.basePrice * 100).toFixed(0)}%
-                  </span>
+                  </div>
                 )}
               </div>
 
-              <div className="space-y-4 mb-6">
-                {/* Date Selection */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Ngày nhận phòng
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="date"
-                        value={checkInDate}
-                        onChange={(e) => setCheckInDate(e.target.value)}
-                        min={new Date().toISOString().split('T')[0]}
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Ngày trả phòng
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="date"
-                        value={checkOutDate}
-                        onChange={(e) => setCheckOutDate(e.target.value)}
-                        min={checkInDate || new Date().toISOString().split('T')[0]}
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Guest Count */}
+              {/* Date Inputs */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: 'var(--spacing-4)',
+                marginBottom: 'var(--spacing-6)'
+              }}>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Số khách
+                  <label style={{
+                    display: 'block',
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 'var(--font-size-sm)',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    color: 'var(--color-deep-indigo)',
+                    marginBottom: 'var(--spacing-2)'
+                  }}>
+                    Ngày nhận
                   </label>
-                  <div className="relative">
-                    <select
-                      value={guestCount}
-                      onChange={(e) => setGuestCount(parseInt(e.target.value))}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 appearance-none"
-                    >
-                      {Array.from({ length: service.maxGuests }, (_, i) => (
-                        <option key={i + 1} value={i + 1}>
-                          {i + 1} khách
-                        </option>
-                      ))}
-                    </select>
-                    <FaUsers className="absolute right-3 top-3 text-gray-400 text-sm" />
-                  </div>
+                  <input
+                    type="date"
+                    value={checkInDate}
+                    onChange={(e) => setCheckInDate(e.target.value)}
+                    min={new Date().toISOString().split('T')[0]}
+                    style={{
+                      width: '100%',
+                      padding: 'var(--spacing-3)',
+                      border: '2px solid var(--color-bronze-light)',
+                      borderRadius: 'var(--radius-lg)',
+                      fontFamily: 'var(--font-body)',
+                      fontSize: 'var(--font-size-sm)',
+                      color: 'var(--color-text)',
+                      outline: 'none',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--color-bronze)';
+                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(205, 127, 50, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--color-bronze-light)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                  />
+                </div>
+                <div>
+                  <label style={{
+                    display: 'block',
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 'var(--font-size-sm)',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    color: 'var(--color-deep-indigo)',
+                    marginBottom: 'var(--spacing-2)'
+                  }}>
+                    Ngày trả
+                  </label>
+                  <input
+                    type="date"
+                    value={checkOutDate}
+                    onChange={(e) => setCheckOutDate(e.target.value)}
+                    min={checkInDate || new Date().toISOString().split('T')[0]}
+                    style={{
+                      width: '100%',
+                      padding: 'var(--spacing-3)',
+                      border: '2px solid var(--color-bronze-light)',
+                      borderRadius: 'var(--radius-lg)',
+                      fontFamily: 'var(--font-body)',
+                      fontSize: 'var(--font-size-sm)',
+                      color: 'var(--color-text)',
+                      outline: 'none',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--color-bronze)';
+                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(205, 127, 50, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--color-bronze-light)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                  />
                 </div>
               </div>
 
-              {/* Price Calculation */}
+              {/* Guest Counter */}
+              <div style={{
+                marginBottom: 'var(--spacing-8)'
+              }}>
+                <label style={{
+                  display: 'block',
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 'var(--font-size-sm)',
+                  fontWeight: 'var(--font-weight-semibold)',
+                  color: 'var(--color-deep-indigo)',
+                  marginBottom: 'var(--spacing-2)'
+                }}>
+                  Số khách
+                </label>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 'var(--spacing-4)',
+                  padding: 'var(--spacing-3)',
+                  border: '2px solid var(--color-bronze-light)',
+                  borderRadius: 'var(--radius-lg)'
+                }}>
+                  <button
+                    onClick={() => setGuestCount(Math.max(1, guestCount - 1))}
+                    style={{
+                      width: '36px',
+                      height: '36px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: 'var(--color-bronze-light)',
+                      border: 'none',
+                      borderRadius: 'var(--radius-md)',
+                      fontFamily: 'var(--font-body)',
+                      fontSize: 'var(--font-size-xl)',
+                      fontWeight: 'var(--font-weight-bold)',
+                      color: 'var(--color-deep-indigo)',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--color-bronze)';
+                      e.currentTarget.style.color = '#FFFFFF';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--color-bronze-light)';
+                      e.currentTarget.style.color = 'var(--color-deep-indigo)';
+                    }}
+                  >
+                    −
+                  </button>
+                  <div style={{
+                    flex: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 'var(--spacing-2)'
+                  }}>
+                    <FaUsers style={{ color: 'var(--color-bronze)', fontSize: '20px' }} />
+                    <span style={{
+                      fontFamily: 'var(--font-body)',
+                      fontSize: 'var(--font-size-lg)',
+                      fontWeight: 'var(--font-weight-semibold)',
+                      color: 'var(--color-deep-indigo)'
+                    }}>
+                      {guestCount}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setGuestCount(Math.min(service.maxGuests, guestCount + 1))}
+                    style={{
+                      width: '36px',
+                      height: '36px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: 'var(--color-bronze-light)',
+                      border: 'none',
+                      borderRadius: 'var(--radius-md)',
+                      fontFamily: 'var(--font-body)',
+                      fontSize: 'var(--font-size-xl)',
+                      fontWeight: 'var(--font-weight-bold)',
+                      color: 'var(--color-deep-indigo)',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--color-bronze)';
+                      e.currentTarget.style.color = '#FFFFFF';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--color-bronze-light)';
+                      e.currentTarget.style.color = 'var(--color-deep-indigo)';
+                    }}
+                  >
+                    +
+                  </button>
+                </div>
+                <p style={{
+                  marginTop: 'var(--spacing-2)',
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 'var(--font-size-xs)',
+                  color: 'var(--color-text-light)'
+                }}>
+                  Tối đa {service.maxGuests} khách
+                </p>
+              </div>
+
+              {/* Total Price */}
               {checkInDate && checkOutDate && (
-                <div className="border-t border-gray-200 pt-4 mb-6">
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span>Tổng tiền:</span>
-                      <span className="font-semibold">{calculatePrice().toLocaleString()}đ</span>
-                    </div>
+                <div style={{
+                  marginBottom: 'var(--spacing-6)',
+                  padding: 'var(--spacing-4)',
+                  backgroundColor: 'var(--color-cream)',
+                  borderRadius: 'var(--radius-lg)',
+                  border: '2px solid var(--color-bronze-light)'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                  }}>
+                    <span style={{
+                      fontFamily: 'var(--font-body)',
+                      fontSize: 'var(--font-size-base)',
+                      fontWeight: 'var(--font-weight-semibold)',
+                      color: 'var(--color-deep-indigo)'
+                    }}>
+                      Tổng cộng:
+                    </span>
+                    <span style={{
+                      fontFamily: 'var(--font-heading)',
+                      fontSize: 'var(--font-size-2xl)',
+                      fontWeight: 'var(--font-weight-bold)',
+                      color: 'var(--color-vermilion)'
+                    }}>
+                      {calculatePrice().toLocaleString()}đ
+                    </span>
                   </div>
                 </div>
               )}
 
-              {/* Booking Button */}
+              {/* Booking CTA Button */}
               <button
-                className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors mb-3"
-                disabled={!checkInDate || !checkOutDate}
                 onClick={() => setIsBookingModalOpen(true)}
+                disabled={!checkInDate || !checkOutDate}
+                style={{
+                  width: '100%',
+                  padding: 'var(--spacing-4)',
+                  backgroundColor: !checkInDate || !checkOutDate ? '#CCCCCC' : '#27AE60',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  borderRadius: 'var(--radius-lg)',
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 'var(--font-size-lg)',
+                  fontWeight: 'var(--font-weight-bold)',
+                  cursor: !checkInDate || !checkOutDate ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.3s ease',
+                  boxShadow: 'var(--shadow-md)',
+                  opacity: !checkInDate || !checkOutDate ? 0.5 : 1,
+                  boxSizing: 'border-box'
+                }}
+                onMouseEnter={(e) => {
+                  if (checkInDate && checkOutDate) {
+                    e.currentTarget.style.backgroundColor = '#229954';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (checkInDate && checkOutDate) {
+                    e.currentTarget.style.backgroundColor = '#27AE60';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+                  }
+                }}
               >
                 Đặt ngay
               </button>
-              
-              <p className="text-xs text-gray-500 text-center">
-                Bạn sẽ không bị tính phí ngay lúc này
+
+              <p style={{
+                marginTop: 'var(--spacing-4)',
+                fontFamily: 'var(--font-body)',
+                fontSize: 'var(--font-size-xs)',
+                color: 'var(--color-text-light)',
+                textAlign: 'center'
+              }}>
+                Bạn sẽ không bị tính phí ngay bây giờ
               </p>
-              </div>
-
-              {/* Location Map */}
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h2 className="text-2xl font-bold mb-4">Vị trí</h2>
-                <div className="h-80 rounded-lg overflow-hidden">
-                  <SimpleMap 
-                    latitude={service.location.coordinates[0]}
-                    longitude={service.location.coordinates[1]}
-                    popupContent={service.name}
-                  />
-                </div>
-                <p className="text-sm text-gray-600 mt-2">{service.location.address}</p>
-              </div>
-
-              {/* Related Services */}
-              <div className="bg-white rounded-lg shadow-md p-6 flex-1 flex flex-col">
-                <h2 className="text-2xl font-bold mb-4">Dịch vụ liên quan</h2>
-                <p className="text-sm text-gray-600 mb-4">Các dịch vụ khác từ {service.provider.name}</p>
-                <div className="space-y-4 flex-1 overflow-y-auto">
-                  {relatedServices.map((relatedService) => (
-                    <div key={relatedService.id} className="flex items-center space-x-3 p-3 border border-gray-100 rounded-lg hover:border-blue-200 hover:shadow-sm transition-all cursor-pointer">
-                      <div className="flex-shrink-0">
-                        <img
-                          src={relatedService.image}
-                          alt={relatedService.name}
-                          className="w-16 h-12 object-cover rounded-md"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="text-sm font-semibold text-gray-900 truncate">{relatedService.name}</h4>
-                        <div className="flex items-center space-x-2 mt-1">
-                          <div className="flex items-center space-x-1">
-                            {Array.from({ length: 5 }, (_, i) => (
-                              <FaStar
-                                key={i}
-                                className={`text-xs ${i < Math.floor(relatedService.rating) ? 'text-yellow-400' : 'text-gray-300'}`}
-                              />
-                            ))}
-                            <span className="text-xs text-gray-600">{relatedService.rating}</span>
-                          </div>
-                        </div>
-                        <p className="text-sm font-bold text-blue-600 mt-1">{relatedService.price}</p>
-                      </div>
-                      <div className="flex-shrink-0">
-                        <Link
-                          to={`/services/detail/${relatedService.id}`}
-                          className="text-xs bg-blue-50 text-blue-600 px-3 py-1 rounded-full hover:bg-blue-100 transition-colors"
-                        >
-                          Xem chi tiết
-                        </Link>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -695,106 +1428,437 @@ const ServiceDetail: React.FC<ServiceDetailProps> = () => {
 
       {/* Provider Info Modal */}
       {isProviderCardOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-md w-full transform transition-all duration-300 scale-100">
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-bold">Thông tin nhà cung cấp</h3>
-                <button
-                  onClick={() => setIsProviderCardOpen(false)}
-                  className="p-1 hover:bg-gray-100 rounded"
-                >
-                  <FaTimes />
-                </button>
-              </div>
-              
-              <div className="text-center mb-6">
-                <img
-                  src={service.provider.logo}
-                  alt={service.provider.name}
-                  className="w-20 h-20 rounded-full object-cover mx-auto mb-3"
-                />
-                <h4 className="text-lg font-semibold">{service.provider.name}</h4>
-                <div className="flex items-center justify-center space-x-1 mb-2">
-                  {renderStars(Math.round(service.provider.rating))}
-                  <span className="ml-1">{service.provider.rating}</span>
+        <div 
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 9998,
+            backgroundColor: 'rgba(16, 24, 40, 0.75)',
+            backdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 'var(--spacing-4)'
+          }}
+          onClick={() => setIsProviderCardOpen(false)}
+        >
+          <div 
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: 'var(--radius-2xl)',
+              maxWidth: '600px',
+              width: '100%',
+              padding: 'var(--spacing-10)',
+              position: 'relative',
+              boxShadow: 'var(--shadow-2xl)',
+              maxHeight: '90vh',
+              overflowY: 'auto'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setIsProviderCardOpen(false)}
+              style={{
+                position: 'absolute',
+                top: 'var(--spacing-6)',
+                right: 'var(--spacing-6)',
+                width: '40px',
+                height: '40px',
+                backgroundColor: 'transparent',
+                border: 'none',
+                color: 'var(--color-text-light)',
+                fontSize: '24px',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 'var(--radius-md)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--color-cream)';
+                e.currentTarget.style.color = 'var(--color-vermilion)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.color = 'var(--color-text-light)';
+              }}
+            >
+              <FaTimes />
+            </button>
+
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--spacing-6)',
+              marginBottom: 'var(--spacing-8)',
+              paddingBottom: 'var(--spacing-6)',
+              borderBottom: '2px solid var(--color-bronze-light)'
+            }}>
+              <img
+                src={service.provider.logo}
+                alt={service.provider.name}
+                style={{
+                  width: '100px',
+                  height: '100px',
+                  borderRadius: '50%',
+                  objectFit: 'cover',
+                  border: '4px solid var(--color-bronze)',
+                  flexShrink: 0
+                }}
+              />
+              <div style={{ flex: 1 }}>
+                <h3 style={{
+                  fontFamily: 'var(--font-heading)',
+                  fontSize: 'var(--font-size-2xl)',
+                  fontWeight: 'var(--font-weight-bold)',
+                  color: 'var(--color-deep-indigo)',
+                  marginBottom: 'var(--spacing-2)'
+                }}>
+                  {service.provider.name}
+                </h3>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 'var(--spacing-2)',
+                  marginBottom: 'var(--spacing-2)'
+                }}>
+                  <div style={{ display: 'flex' }}>
+                    {renderStars(Math.round(service.provider.rating))}
+                  </div>
+                  <span style={{
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 'var(--font-size-base)',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    color: 'var(--color-text)'
+                  }}>
+                    {service.provider.rating.toFixed(1)}
+                  </span>
                 </div>
-                <p className="text-sm text-gray-600 mb-4">
-                  {service.provider.description}
+                <p style={{
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 'var(--font-size-sm)',
+                  color: 'var(--color-text-light)'
+                }}>
+                  {service.provider.yearsActive} năm kinh nghiệm • {service.provider.totalServices} dịch vụ
                 </p>
               </div>
+            </div>
 
-              <div className="space-y-3 mb-6">
-                <div className="flex items-center space-x-3">
-                  <FaPhone className="text-blue-600" />
-                  <span className="text-sm">{service.provider.phone}</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <FaEnvelope className="text-blue-600" />
-                  <span className="text-sm">{service.provider.email}</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <FaGlobe className="text-blue-600" />
-                  <a href={service.provider.website} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline">
-                    {service.provider.website}
-                  </a>
-                </div>
-              </div>
+            <div style={{ marginBottom: 'var(--spacing-8)' }}>
+              <h4 style={{
+                fontFamily: 'var(--font-heading)',
+                fontSize: 'var(--font-size-lg)',
+                fontWeight: 'var(--font-weight-bold)',
+                color: 'var(--color-deep-indigo)',
+                marginBottom: 'var(--spacing-4)'
+              }}>
+                Giới thiệu
+              </h4>
+              <p style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: 'var(--font-size-base)',
+                lineHeight: 1.7,
+                color: 'var(--color-text)'
+              }}>
+                {service.provider.description}
+              </p>
+            </div>
 
-              <div className="flex space-x-3">
-                <button
-                  onClick={() => setIsProviderCardOpen(false)}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  Đóng
-                </button>
-                <button
-                  onClick={() => {
-                    setIsProviderCardOpen(false);
-                    // Navigate to provider profile
-                    navigate(`/provider/${service.provider.id}`);
-                  }}
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Xem trang cá nhân
-                </button>
+            <div style={{ marginBottom: 'var(--spacing-8)' }}>
+              <h4 style={{
+                fontFamily: 'var(--font-heading)',
+                fontSize: 'var(--font-size-lg)',
+                fontWeight: 'var(--font-weight-bold)',
+                color: 'var(--color-deep-indigo)',
+                marginBottom: 'var(--spacing-4)'
+              }}>
+                Thông tin liên hệ
+              </h4>
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'var(--spacing-3)'
+              }}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 'var(--spacing-3)',
+                  padding: 'var(--spacing-3)',
+                  backgroundColor: 'var(--color-cream)',
+                  borderRadius: 'var(--radius-lg)'
+                }}>
+                  <FaPhone style={{ color: 'var(--color-bronze)', fontSize: '18px' }} />
+                  <span style={{
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 'var(--font-size-base)',
+                    color: 'var(--color-text)'
+                  }}>
+                    {service.provider.phone}
+                  </span>
+                </div>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 'var(--spacing-3)',
+                  padding: 'var(--spacing-3)',
+                  backgroundColor: 'var(--color-cream)',
+                  borderRadius: 'var(--radius-lg)'
+                }}>
+                  <FaEnvelope style={{ color: 'var(--color-bronze)', fontSize: '18px' }} />
+                  <span style={{
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 'var(--font-size-base)',
+                    color: 'var(--color-text)'
+                  }}>
+                    {service.provider.email}
+                  </span>
+                </div>
+                {service.provider.website && (
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 'var(--spacing-3)',
+                    padding: 'var(--spacing-3)',
+                    backgroundColor: 'var(--color-cream)',
+                    borderRadius: 'var(--radius-lg)'
+                  }}>
+                    <FaGlobe style={{ color: 'var(--color-bronze)', fontSize: '18px' }} />
+                    <a
+                      href={service.provider.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        fontFamily: 'var(--font-body)',
+                        fontSize: 'var(--font-size-base)',
+                        color: 'var(--color-bronze)',
+                        textDecoration: 'underline'
+                      }}
+                    >
+                      {service.provider.website}
+                    </a>
+                  </div>
+                )}
               </div>
+            </div>
+
+            <div style={{
+              display: 'flex',
+              gap: 'var(--spacing-4)'
+            }}>
+              <button
+                onClick={() => setIsProviderCardOpen(false)}
+                style={{
+                  flex: 1,
+                  padding: 'var(--spacing-3)',
+                  backgroundColor: 'transparent',
+                  color: 'var(--color-text)',
+                  border: '2px solid var(--color-bronze-light)',
+                  borderRadius: 'var(--radius-lg)',
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 'var(--font-size-base)',
+                  fontWeight: 'var(--font-weight-semibold)',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-cream)';
+                  e.currentTarget.style.borderColor = 'var(--color-bronze)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.borderColor = 'var(--color-bronze-light)';
+                }}
+              >
+                Đóng
+              </button>
+              <button
+                onClick={() => {
+                  setIsProviderCardOpen(false);
+                  navigate(`/provider/${service.provider.id}`);
+                }}
+                style={{
+                  flex: 1,
+                  padding: 'var(--spacing-3)',
+                  backgroundColor: 'var(--color-vermilion)',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  borderRadius: 'var(--radius-lg)',
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 'var(--font-size-base)',
+                  fontWeight: 'var(--font-weight-bold)',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  boxShadow: 'var(--shadow-md)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-deep-indigo)';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-vermilion)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+                }}
+              >
+                Xem trang nhà cung cấp
+              </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Lightbox */}
+      {/* Lightbox Modal */}
       {isLightboxOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50">
-          <div className="relative max-w-4xl max-h-full p-4">
-            <button
-              onClick={() => setIsLightboxOpen(false)}
-              className="absolute top-4 right-4 text-white text-2xl hover:text-gray-300 z-10"
-            >
-              <FaTimes />
-            </button>
-            <button
-              onClick={prevLightboxImage}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white text-2xl hover:text-gray-300 z-10"
-            >
-              <FaChevronLeft />
-            </button>
-            <button
-              onClick={nextLightboxImage}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-2xl hover:text-gray-300 z-10"
-            >
-              <FaChevronRight />
-            </button>
+        <div 
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 9999,
+            backgroundColor: 'rgba(0, 0, 0, 0.95)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 'var(--spacing-4)'
+          }}
+          onClick={() => setIsLightboxOpen(false)}
+        >
+          <button
+            onClick={() => setIsLightboxOpen(false)}
+            style={{
+              position: 'absolute',
+              top: 'var(--spacing-6)',
+              right: 'var(--spacing-6)',
+              width: '56px',
+              height: '56px',
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(10px)',
+              border: 'none',
+              borderRadius: 'var(--radius-full)',
+              color: '#FFFFFF',
+              fontSize: '24px',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 10000
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--color-vermilion)';
+              e.currentTarget.style.transform = 'scale(1.1)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+              e.currentTarget.style.transform = 'scale(1)';
+            }}
+          >
+            <FaTimes />
+          </button>
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              prevLightboxImage();
+            }}
+            style={{
+              position: 'absolute',
+              left: 'var(--spacing-6)',
+              width: '56px',
+              height: '56px',
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(10px)',
+              border: 'none',
+              borderRadius: 'var(--radius-full)',
+              color: '#FFFFFF',
+              fontSize: '24px',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 10000
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--color-bronze)';
+              e.currentTarget.style.transform = 'scale(1.1)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+              e.currentTarget.style.transform = 'scale(1)';
+            }}
+          >
+            <FaChevronLeft />
+          </button>
+
+          <div style={{
+            maxWidth: '90vw',
+            maxHeight: '90vh',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 'var(--spacing-4)'
+          }} onClick={(e) => e.stopPropagation()}>
             <img
               src={service.images[lightboxImageIndex]}
               alt={`${service.name} - ${lightboxImageIndex + 1}`}
-              className="max-w-full max-h-full object-contain"
+              style={{
+                maxWidth: '100%',
+                maxHeight: '85vh',
+                objectFit: 'contain',
+                borderRadius: 'var(--radius-xl)',
+                boxShadow: 'var(--shadow-2xl)'
+              }}
             />
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white text-sm">
+            <div style={{
+              padding: 'var(--spacing-3) var(--spacing-6)',
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: 'var(--radius-full)',
+              fontFamily: 'var(--font-body)',
+              fontSize: 'var(--font-size-base)',
+              color: '#FFFFFF',
+              fontWeight: 'var(--font-weight-semibold)'
+            }}>
               {lightboxImageIndex + 1} / {service.images.length}
             </div>
           </div>
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              nextLightboxImage();
+            }}
+            style={{
+              position: 'absolute',
+              right: 'var(--spacing-6)',
+              width: '56px',
+              height: '56px',
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(10px)',
+              border: 'none',
+              borderRadius: 'var(--radius-full)',
+              color: '#FFFFFF',
+              fontSize: '24px',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 10000
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--color-bronze)';
+              e.currentTarget.style.transform = 'scale(1.1)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+              e.currentTarget.style.transform = 'scale(1)';
+            }}
+          >
+            <FaChevronRight />
+          </button>
         </div>
       )}
 

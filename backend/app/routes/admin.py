@@ -75,10 +75,14 @@ def get_pending_providers():
         db = get_db()
         
         # Find all providers with pending status and email verified
+        # Provider phải verify email trước khi admin review
         pending_providers = db.users.find({
             'role': 'provider',
             'accountStatus': 'pending',
-            'isEmailVerified': True
+            '$or': [
+                {'isEmailVerified': True},
+                {'is_verified': True}
+            ]
         }).sort('createdAt', 1)  # Sort by creation date, oldest first
         
         providers_list = []
@@ -95,7 +99,7 @@ def get_pending_providers():
                 'businessDescription': provider.get('businessDescription', ''),
                 'accountStatus': provider['accountStatus'],
                 'createdAt': provider['createdAt'].isoformat(),
-                'isEmailVerified': provider['isEmailVerified']
+                'isEmailVerified': provider.get('isEmailVerified', provider.get('is_verified', False))
             }
             providers_list.append(provider_data)
         
@@ -317,7 +321,7 @@ def get_provider_details(provider_id):
             'phone': provider['phone'],
             'role': provider['role'],
             'accountStatus': provider['accountStatus'],
-            'isEmailVerified': provider['isEmailVerified'],
+            'isEmailVerified': provider.get('isEmailVerified', provider.get('is_verified', False)),
             'createdAt': provider['createdAt'].isoformat(),
             'updatedAt': provider.get('updatedAt', provider['createdAt']).isoformat(),
             
@@ -947,4 +951,398 @@ def get_trips():
         return jsonify({
             'success': False,
             'message': 'Có lỗi xảy ra khi tải danh sách chuyến đi'
+        }), 500
+
+
+# ==================== TRANSACTION ANALYTICS ====================
+@admin_bp.route('/transaction-stats', methods=['GET', 'OPTIONS'])
+@admin_required
+def get_transaction_stats():
+    """
+    Get transaction statistics
+    Query params:
+    - period: 'week' (last 7 days), 'month' (last 30 days), 'year' (last 365 days)
+    - startDate: optional custom start date (YYYY-MM-DD)
+    - endDate: optional custom end date (YYYY-MM-DD)
+    """
+    if request.method == 'OPTIONS':
+        return '', 200
+    
+    try:
+        db = get_db()
+        period = request.args.get('period', 'month')
+        start_date_str = request.args.get('startDate')
+        end_date_str = request.args.get('endDate')
+        
+        # Calculate date range
+        if start_date_str and end_date_str:
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+            end_date = datetime.strptime(end_date_str, '%Y-%m-%d').replace(hour=23, minute=59, second=59)
+        else:
+            end_date = datetime.utcnow()
+            if period == 'week':
+                start_date = end_date - timedelta(days=7)
+            elif period == 'month':
+                start_date = end_date - timedelta(days=30)
+            elif period == 'year':
+                start_date = end_date - timedelta(days=365)
+            else:
+                start_date = end_date - timedelta(days=30)
+        
+        # Query bookings in date range
+        bookings = list(db.bookings.find({
+            'booking_date': {
+                '$gte': start_date,
+                '$lte': end_date
+            }
+        }))
+        
+        # Calculate basic stats
+        total_transactions = len(bookings)
+        total_revenue = sum(b.get('total_amount', 0) for b in bookings)
+        avg_transaction_value = total_revenue / total_transactions if total_transactions > 0 else 0
+        
+        # Calculate success rate
+        completed_count = sum(1 for b in bookings if b.get('status') == 'confirmed')
+        success_rate = (completed_count / total_transactions * 100) if total_transactions > 0 else 0
+        
+        # Get top providers (via services)
+        provider_stats = {}
+        for booking in bookings:
+            service_id = booking.get('service_id')
+            if service_id:
+                service = db.services.find_one({'_id': service_id})
+                if service:
+                    provider_id = str(service.get('provider_id'))
+                    if provider_id not in provider_stats:
+                        provider = db.users.find_one({'_id': ObjectId(provider_id)})
+                        if provider:
+                            provider_stats[provider_id] = {
+                                'provider_id': provider_id,
+                                'provider_name': provider.get('fullName', 'Unknown'),
+                                'company_name': provider.get('companyName', ''),
+                                'transaction_count': 0,
+                                'total_revenue': 0
+                            }
+                    if provider_id in provider_stats:
+                        provider_stats[provider_id]['transaction_count'] += 1
+                        provider_stats[provider_id]['total_revenue'] += booking.get('total_amount', 0)
+        
+        top_providers = sorted(provider_stats.values(), key=lambda x: x['transaction_count'], reverse=True)[:10]
+        
+        # Get top users
+        user_stats = {}
+        for booking in bookings:
+            user_id = str(booking.get('user_id'))
+            if user_id not in user_stats:
+                user = db.users.find_one({'_id': ObjectId(user_id)})
+                if user:
+                    user_stats[user_id] = {
+                        'user_id': user_id,
+                        'user_name': user.get('fullName', 'Unknown'),
+                        'email': user.get('email', ''),
+                        'transaction_count': 0,
+                        'total_spent': 0
+                    }
+            if user_id in user_stats:
+                user_stats[user_id]['transaction_count'] += 1
+                user_stats[user_id]['total_spent'] += booking.get('total_amount', 0)
+        
+        top_users = sorted(user_stats.values(), key=lambda x: x['transaction_count'], reverse=True)[:10]
+        
+        # Transaction timeline (group by date)
+        timeline = {}
+        for booking in bookings:
+            date_str = booking.get('booking_date').strftime('%Y-%m-%d')
+            if date_str not in timeline:
+                timeline[date_str] = {'date': date_str, 'count': 0, 'revenue': 0}
+            timeline[date_str]['count'] += 1
+            timeline[date_str]['revenue'] += booking.get('total_amount', 0)
+        
+        timeline_data = sorted(timeline.values(), key=lambda x: x['date'])
+        
+        # Status distribution
+        status_stats = {
+            'pending': sum(1 for b in bookings if b.get('status') == 'pending'),
+            'confirmed': sum(1 for b in bookings if b.get('status') == 'confirmed'),
+            'cancelled': sum(1 for b in bookings if b.get('status') == 'cancelled'),
+            'completed': sum(1 for b in bookings if b.get('status') == 'completed'),
+        }
+        
+        return jsonify({
+            'success': True,
+            'period': period,
+            'dateRange': {
+                'start': start_date.isoformat(),
+                'end': end_date.isoformat()
+            },
+            'stats': {
+                'totalTransactions': total_transactions,
+                'totalRevenue': round(total_revenue, 2),
+                'averageTransactionValue': round(avg_transaction_value, 2),
+                'successRate': round(success_rate, 2),
+                'statusDistribution': status_stats
+            },
+            'topProviders': top_providers,
+            'topUsers': top_users,
+            'timeline': timeline_data
+        }), 200
+        
+    except Exception as e:
+        print(f"Error getting transaction stats: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'message': 'Có lỗi xảy ra khi tải thống kê giao dịch'
+        }), 500
+
+
+@admin_bp.route('/transactions', methods=['GET', 'OPTIONS'])
+@admin_required
+def get_transactions():
+    """
+    Get list of transactions (bookings) with details
+    Query params:
+    - page: page number (default: 1)
+    - limit: items per page (default: 20)
+    - status: filter by status
+    - provider_id: filter by provider
+    - user_id: filter by user
+    - startDate: filter start date
+    - endDate: filter end date
+    """
+    if request.method == 'OPTIONS':
+        return '', 200
+    
+    try:
+        db = get_db()
+        page = int(request.args.get('page', 1))
+        limit = int(request.args.get('limit', 20))
+        status = request.args.get('status')
+        provider_id = request.args.get('provider_id')
+        user_id = request.args.get('user_id')
+        start_date_str = request.args.get('startDate')
+        end_date_str = request.args.get('endDate')
+        
+        # Build query
+        query = {}
+        
+        if status:
+            query['status'] = status
+        
+        if user_id:
+            query['user_id'] = ObjectId(user_id)
+        
+        if start_date_str and end_date_str:
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+            end_date = datetime.strptime(end_date_str, '%Y-%m-%d').replace(hour=23, minute=59, second=59)
+            query['booking_date'] = {'$gte': start_date, '$lte': end_date}
+        
+        # Get total count
+        total = db.bookings.count_documents(query)
+        
+        # Get bookings with pagination
+        bookings = list(db.bookings.find(query)
+                       .sort('booking_date', -1)
+                       .skip((page - 1) * limit)
+                       .limit(limit))
+        
+        # Enrich booking data with user, provider, service info
+        transactions = []
+        for booking in bookings:
+            # Get user info
+            user = db.users.find_one({'_id': booking.get('user_id')})
+            user_data = {
+                'user_id': str(booking.get('user_id')),
+                'name': user.get('fullName', 'Unknown') if user else 'Unknown',
+                'email': user.get('email', '') if user else ''
+            }
+            
+            # Get service and provider info
+            service_id = booking.get('service_id')
+            provider_data = {'provider_id': '', 'name': '', 'company_name': ''}
+            service_data = {'service_id': '', 'name': '', 'type': ''}
+            
+            if service_id:
+                service = db.services.find_one({'_id': service_id})
+                if service:
+                    service_data = {
+                        'service_id': str(service_id),
+                        'name': service.get('name', 'Unknown'),
+                        'type': service.get('type', '')
+                    }
+                    
+                    provider_id = service.get('provider_id')
+                    if provider_id:
+                        provider = db.users.find_one({'_id': ObjectId(provider_id)})
+                        if provider:
+                            provider_data = {
+                                'provider_id': str(provider_id),
+                                'name': provider.get('fullName', 'Unknown'),
+                                'company_name': provider.get('companyName', '')
+                            }
+            
+            # Filter by provider if specified
+            if provider_id and provider_data.get('provider_id') != provider_id:
+                continue
+            
+            transaction = {
+                'transaction_id': f"TXN-{str(booking['_id'])[-8:]}",
+                'booking_id': str(booking['_id']),
+                'user': user_data,
+                'provider': provider_data,
+                'service': service_data,
+                'amount': booking.get('total_amount', 0),
+                'currency': booking.get('currency', 'USD'),
+                'status': booking.get('status', 'pending'),
+                'payment_status': booking.get('payment_status', 'pending'),
+                'booking_date': booking.get('booking_date').isoformat() if booking.get('booking_date') else None,
+                'confirmed_at': booking.get('confirmed_at').isoformat() if booking.get('confirmed_at') else None,
+                'number_of_guests': booking.get('number_of_guests', 1),
+                'start_date': booking.get('start_date').isoformat() if booking.get('start_date') else None,
+                'end_date': booking.get('end_date').isoformat() if booking.get('end_date') else None
+            }
+            transactions.append(transaction)
+        
+        return jsonify({
+            'success': True,
+            'transactions': transactions,
+            'pagination': {
+                'page': page,
+                'limit': limit,
+                'total': total,
+                'totalPages': (total + limit - 1) // limit
+            }
+        }), 200
+        
+    except Exception as e:
+        print(f"Error getting transactions: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'message': 'Có lỗi xảy ra khi tải danh sách giao dịch'
+        }), 500
+
+
+@admin_bp.route('/transaction/<booking_id>', methods=['GET', 'OPTIONS'])
+@admin_required
+def get_transaction_detail(booking_id):
+    """Get detailed information about a specific transaction"""
+    if request.method == 'OPTIONS':
+        return '', 200
+    
+    try:
+        db = get_db()
+        
+        # Get booking
+        booking = db.bookings.find_one({'_id': ObjectId(booking_id)})
+        if not booking:
+            return jsonify({
+                'success': False,
+                'message': 'Không tìm thấy giao dịch'
+            }), 404
+        
+        # Get user info
+        user = db.users.find_one({'_id': booking.get('user_id')})
+        user_data = {
+            'user_id': str(booking.get('user_id')),
+            'name': user.get('fullName', 'Unknown') if user else 'Unknown',
+            'email': user.get('email', '') if user else '',
+            'phone': user.get('phone', '') if user else ''
+        }
+        
+        # Get service and provider info
+        service_id = booking.get('service_id')
+        provider_data = {}
+        service_data = {}
+        
+        if service_id:
+            service = db.services.find_one({'_id': service_id})
+            if service:
+                service_data = {
+                    'service_id': str(service_id),
+                    'name': service.get('name', 'Unknown'),
+                    'type': service.get('type', ''),
+                    'description': service.get('description', ''),
+                    'location': service.get('location', {})
+                }
+                
+                provider_id = service.get('provider_id')
+                if provider_id:
+                    provider = db.users.find_one({'_id': ObjectId(provider_id)})
+                    if provider:
+                        provider_data = {
+                            'provider_id': str(provider_id),
+                            'name': provider.get('fullName', 'Unknown'),
+                            'email': provider.get('email', ''),
+                            'phone': provider.get('phone', ''),
+                            'company_name': provider.get('companyName', ''),
+                            'business_address': provider.get('businessAddress', '')
+                        }
+        
+        # Get payment info if exists
+        payment = db.payments.find_one({'booking_id': booking['_id']})
+        payment_data = None
+        if payment:
+            payment_data = {
+                'payment_id': str(payment['_id']),
+                'amount': payment.get('amount', 0),
+                'status': payment.get('status', 'pending'),
+                'payment_method': payment.get('payment_method', ''),
+                'payment_provider': payment.get('payment_provider', ''),
+                'transaction_id': payment.get('transaction_id', ''),
+                'created_at': payment.get('created_at').isoformat() if payment.get('created_at') else None,
+                'processed_at': payment.get('processed_at').isoformat() if payment.get('processed_at') else None
+            }
+        
+        transaction_detail = {
+            'transaction_id': f"TXN-{str(booking['_id'])[-8:]}",
+            'booking_id': str(booking['_id']),
+            'user': user_data,
+            'provider': provider_data,
+            'service': service_data,
+            'payment': payment_data,
+            'booking_details': {
+                'booking_type': booking.get('booking_type', 'trip'),
+                'booking_reference': booking.get('booking_reference', ''),
+                'confirmation_code': booking.get('confirmation_code', ''),
+                'start_date': booking.get('start_date').isoformat() if booking.get('start_date') else None,
+                'end_date': booking.get('end_date').isoformat() if booking.get('end_date') else None,
+                'number_of_guests': booking.get('number_of_guests', 1),
+                'guest_details': booking.get('guest_details', []),
+                'special_requests': booking.get('special_requests', ''),
+                'notes': booking.get('notes', '')
+            },
+            'financial': {
+                'total_amount': booking.get('total_amount', 0),
+                'currency': booking.get('currency', 'USD'),
+                'price_breakdown': booking.get('price_breakdown', {})
+            },
+            'status': {
+                'booking_status': booking.get('status', 'pending'),
+                'payment_status': booking.get('payment_status', 'pending')
+            },
+            'timestamps': {
+                'booking_date': booking.get('booking_date').isoformat() if booking.get('booking_date') else None,
+                'confirmed_at': booking.get('confirmed_at').isoformat() if booking.get('confirmed_at') else None,
+                'cancelled_at': booking.get('cancelled_at').isoformat() if booking.get('cancelled_at') else None,
+                'created_at': booking.get('created_at').isoformat() if booking.get('created_at') else None,
+                'updated_at': booking.get('updated_at').isoformat() if booking.get('updated_at') else None
+            }
+        }
+        
+        return jsonify({
+            'success': True,
+            'transaction': transaction_detail
+        }), 200
+        
+    except Exception as e:
+        print(f"Error getting transaction detail: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'message': 'Có lỗi xảy ra khi tải thông tin giao dịch'
         }), 500
